@@ -1,0 +1,181 @@
+.card {
+  border-radius: var(--radius-md);
+  padding: 18px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+  position: relative;
+  min-height: 160px;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+}
+
+.cardPinned {
+  border-color: var(--teal-border);
+}
+
+.colorSlate {
+  background-color: var(--bg-surface);
+}
+
+.colorSage {
+  background-color: var(--sage-tint);
+  border-color: var(--sage-border);
+}
+
+.colorTeal {
+  background-color: var(--teal-tint);
+  border-color: var(--teal-border);
+}
+
+.colorSand {
+  background-color: var(--sand-tint);
+  border-color: var(--sand-border);
+}
+
+.colorLavender {
+  background-color: var(--lavender-tint);
+  border-color: var(--lavender-border);
+}
+
+.colorRose {
+  background-color: var(--rose-tint);
+  border-color: var(--rose-border);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.iconButton {
+  padding: 5px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconButton:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--text-main);
+}
+
+.pinActive {
+  color: var(--teal-primary);
+}
+
+.deleteButton:hover {
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.preview {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  flex: 1;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.tagsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tagPill {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--text-muted);
+}
+
+.timestamp {
+  font-size: 11px;
+  color: var(--text-subtle);
+  white-space: nowrap;
+}
+
+.deleteConfirm {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.96);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  z-index: 5;
+}
+
+.confirmMessage {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  text-align: center;
+}
+
+.confirmActions {
+  display: flex;
+  gap: 8px;
+}
+
+.confirmButton {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  background-color: var(--danger-text);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cancelButton {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-muted);
+  color: var(--text-main);
+  font-size: 12px;
+}
