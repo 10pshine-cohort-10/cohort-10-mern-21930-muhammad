@@ -1,0 +1,34 @@
+{
+  "name": "cohort-10-mern-21930-muhammad",
+  "version": "1.0.0",
+  "description": "Notes App (MERN / Node.js + React.js + MongoDB) Full-Stack Application",
+  "scripts": {
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue,green\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build:frontend": "npm run build --prefix frontend",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "npm run test --prefix backend",
+    "test:frontend": "npm run test --prefix frontend",
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Awadul/cohort-10-mern-21930-muhammad.git"
+  },
+  "keywords": [
+    "nodejs",
+    "react",
+    "mongodb",
+    "mongoose",
+    "pino",
+    "mocha",
+    "jest",
+    "sonarqube"
+  ],
+  "author": "Muhammad Awais Abdullah",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

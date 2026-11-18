@@ -1,0 +1,51 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "Notes App Frontend - React.js, Vite, Jest, React Testing Library",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [
+    "react",
+    "notes-app",
+    "vite",
+    "jest"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@tiptap/pm": "^3.34.0",
+    "@tiptap/react": "^3.34.0",
+    "@tiptap/starter-kit": "^3.34.0",
+    "axios": "^1.21.1",
+    "lucide-react": "^1.74.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.5",
+    "socket.io-client": "^4.8.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.13",
+    "@babel/preset-env": "^7.29.14",
+    "@babel/preset-react": "^7.29.7",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.12",
+    "@vitejs/plugin-react": "^6.3.0",
+    "babel-jest": "^30.5.2",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.5.2",
+    "jest-environment-jsdom": "^30.5.2",
+    "vite": "^8.3.8"
+  },
+  "overrides": {
+    "glob": "^14.0.6",
+    "minimatch": "^11.0.9"
+  }
+}
