@@ -1,5 +1,5 @@
 spec: test/**/*.test.js
-timeout: 20000
+timeout: 180000
 exit: true
 require: test/setup.js
 recursive: true

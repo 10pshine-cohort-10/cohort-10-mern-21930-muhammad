@@ -1,3 +1,8 @@
+const dns = require('dns');
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
+
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
 
@@ -10,8 +15,11 @@ exports.mochaGlobalSetup = async function () {
   process.env.LOG_LEVEL = 'silent';
 
   inMemoryMongoServer = await MongoMemoryServer.create({
+    binary: {
+      version: '7.0.14',
+    },
     spawn: {
-      timeout: 120000,
+      timeout: 180000,
     },
   });
   const uri = inMemoryMongoServer.getUri();
