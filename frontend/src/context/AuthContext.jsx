@@ -28,7 +28,8 @@ export function AuthProvider({ children }) {
       const userData = response.data.data;
       setUser(userData);
       localStorage.setItem('notes_user_data', JSON.stringify(userData));
-    } catch {
+    } catch (err) {
+      console.error('Failed to restore user session:', err);
       setToken(null);
       setUser(null);
       localStorage.removeItem('notes_auth_token');
@@ -47,25 +48,35 @@ export function AuthProvider({ children }) {
   }, [token, user, refreshUser]);
 
   const login = async (email, password) => {
-    const response = await client.post('/auth/login', { email, password });
-    const { token: receivedToken, user: receivedUser } = response.data.data;
+    try {
+      const response = await client.post('/auth/login', { email, password });
+      const { token: receivedToken, user: receivedUser } = response.data.data;
 
-    localStorage.setItem('notes_auth_token', receivedToken);
-    localStorage.setItem('notes_user_data', JSON.stringify(receivedUser));
-    setToken(receivedToken);
-    setUser(receivedUser);
-    return receivedUser;
+      localStorage.setItem('notes_auth_token', receivedToken);
+      localStorage.setItem('notes_user_data', JSON.stringify(receivedUser));
+      setToken(receivedToken);
+      setUser(receivedUser);
+      return receivedUser;
+    } catch (err) {
+      console.error('Login request failed:', err);
+      throw err;
+    }
   };
 
   const register = async (name, email, password) => {
-    const response = await client.post('/auth/register', { name, email, password });
-    const { token: receivedToken, user: receivedUser } = response.data.data;
+    try {
+      const response = await client.post('/auth/register', { name, email, password });
+      const { token: receivedToken, user: receivedUser } = response.data.data;
 
-    localStorage.setItem('notes_auth_token', receivedToken);
-    localStorage.setItem('notes_user_data', JSON.stringify(receivedUser));
-    setToken(receivedToken);
-    setUser(receivedUser);
-    return receivedUser;
+      localStorage.setItem('notes_auth_token', receivedToken);
+      localStorage.setItem('notes_user_data', JSON.stringify(receivedUser));
+      setToken(receivedToken);
+      setUser(receivedUser);
+      return receivedUser;
+    } catch (err) {
+      console.error('Registration request failed:', err);
+      throw err;
+    }
   };
 
   const logout = () => {

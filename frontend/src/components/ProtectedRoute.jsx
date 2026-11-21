@@ -1,6 +1,9 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+/**
+ * Route guard component redirecting unauthenticated visitors to login.
+ */
 export default function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth();
 

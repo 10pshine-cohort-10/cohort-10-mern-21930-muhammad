@@ -8,23 +8,28 @@ const { initSocket } = require('./socket/noteSocket');
 const PORT = parseInt(process.env.PORT, 10) || 3000;
 
 async function startServer() {
-  await connectDB();
-  const server = http.createServer(app);
-  initSocket(server);
+  try {
+    await connectDB();
+    const server = http.createServer(app);
+    initSocket(server);
 
-  server.listen(PORT, () => {
-    logger.info({ port: PORT, env: process.env.NODE_ENV || 'development' }, 'Server started');
-  });
-
-  const shutdownSignals = ['SIGINT', 'SIGTERM'];
-  for (const signal of shutdownSignals) {
-    process.on(signal, () => {
-      logger.info({ signal }, 'Graceful shutdown initiated');
-      server.close(() => {
-        logger.info('HTTP server closed');
-        process.exit(0);
-      });
+    server.listen(PORT, () => {
+      logger.info({ port: PORT, env: process.env.NODE_ENV || 'development' }, 'Server started');
     });
+
+    const shutdownSignals = ['SIGINT', 'SIGTERM'];
+    for (const signal of shutdownSignals) {
+      process.on(signal, () => {
+        logger.info({ signal }, 'Graceful shutdown initiated');
+        server.close(() => {
+          logger.info('HTTP server closed');
+          process.exit(0);
+        });
+      });
+    }
+  } catch (err) {
+    logger.fatal({ err }, 'Failed to start server');
+    process.exit(1);
   }
 }
 

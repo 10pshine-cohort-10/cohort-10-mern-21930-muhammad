@@ -1,8 +1,16 @@
+import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
 import { BookOpen, FileText, User as UserIcon, LogOut, Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import styles from './Layout.module.css';
 
+/**
+ * Main application shell containing navigation sidebar and topbar.
+ * @param {{
+ *   children: React.ReactNode,
+ *   onNewNoteClick?: () => void
+ * }} props
+ */
 export default function Layout({ children, onNewNoteClick }) {
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -79,3 +87,8 @@ export default function Layout({ children, onNewNoteClick }) {
     </div>
   );
 }
+
+Layout.propTypes = {
+  children: PropTypes.node.isRequired,
+  onNewNoteClick: PropTypes.func,
+};

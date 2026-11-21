@@ -76,22 +76,37 @@ export function useNotes() {
   }, [token]);
 
   const createNote = async (noteData) => {
-    const response = await client.post('/notes', noteData);
-    const created = response.data.data;
-    setNotes((prev) => [created, ...prev.filter((n) => n.id !== created.id)]);
-    return created;
+    try {
+      const response = await client.post('/notes', noteData);
+      const created = response.data.data;
+      setNotes((prev) => [created, ...prev.filter((n) => n.id !== created.id)]);
+      return created;
+    } catch (err) {
+      console.error('Failed to create note:', err);
+      throw err;
+    }
   };
 
   const updateNote = async (id, noteData) => {
-    const response = await client.put(`/notes/${id}`, noteData);
-    const updated = response.data.data;
-    setNotes((prev) => prev.map((n) => (n.id === id ? updated : n)));
-    return updated;
+    try {
+      const response = await client.put(`/notes/${id}`, noteData);
+      const updated = response.data.data;
+      setNotes((prev) => prev.map((n) => (n.id === id ? updated : n)));
+      return updated;
+    } catch (err) {
+      console.error(`Failed to update note ${id}:`, err);
+      throw err;
+    }
   };
 
   const deleteNote = async (id) => {
-    await client.delete(`/notes/${id}`);
-    setNotes((prev) => prev.filter((n) => n.id !== id));
+    try {
+      await client.delete(`/notes/${id}`);
+      setNotes((prev) => prev.filter((n) => n.id !== id));
+    } catch (err) {
+      console.error(`Failed to delete note ${id}:`, err);
+      throw err;
+    }
   };
 
   const togglePin = async (id, isPinned) => {
@@ -99,20 +114,25 @@ export function useNotes() {
   };
 
   const exportNotes = async (format = 'json') => {
-    const response = await client.get(`/notes/export?format=${format}`, {
-      responseType: 'blob',
-    });
-    const blob = new Blob([response.data], {
-      type: format === 'markdown' ? 'text/markdown' : 'application/json',
-    });
-    const downloadUrl = window.URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = downloadUrl;
-    anchor.download = `notes-backup-${Date.now()}.${format === 'markdown' ? 'md' : 'json'}`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
-    window.URL.revokeObjectURL(downloadUrl);
+    try {
+      const response = await client.get(`/notes/export?format=${format}`, {
+        responseType: 'blob',
+      });
+      const blob = new Blob([response.data], {
+        type: format === 'markdown' ? 'text/markdown' : 'application/json',
+      });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = downloadUrl;
+      anchor.download = `notes-backup-${Date.now()}.${format === 'markdown' ? 'md' : 'json'}`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (err) {
+      console.error('Failed to export notes:', err);
+      throw err;
+    }
   };
 
   const importNotes = async (file) => {

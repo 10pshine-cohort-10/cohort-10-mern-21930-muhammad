@@ -1,12 +1,17 @@
-import { useState, useRef } from 'react';
-import { Download, Upload, FileText } from 'lucide-react';
+import { useState } from 'react';
 import Layout from '../components/Layout';
 import SearchBar from '../components/SearchBar';
 import NoteCard from '../components/NoteCard';
 import NoteEditor from '../components/NoteEditor';
+import TagFilterBar from '../components/TagFilterBar';
+import ExportImportActions from '../components/ExportImportActions';
+import NotesEmptyState from '../components/NotesEmptyState';
 import { useNotes } from '../hooks/useNotes';
 import styles from './DashboardPage.module.css';
 
+/**
+ * Main dashboard view showing the note collection, filters, and actions.
+ */
 export default function DashboardPage() {
   const {
     notes,
@@ -27,7 +32,6 @@ export default function DashboardPage() {
   const [activeNoteForEdit, setActiveNoteForEdit] = useState(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [filterMode, setFilterMode] = useState('all');
-  const fileInputRef = useRef(null);
 
   const handleOpenNewNote = () => {
     setActiveNoteForEdit(null);
@@ -45,18 +49,27 @@ export default function DashboardPage() {
   };
 
   const handleSaveNote = async (noteData) => {
-    if (noteData.id) {
-      await updateNote(noteData.id, noteData);
-    } else {
-      await createNote(noteData);
+    try {
+      if (noteData.id) {
+        await updateNote(noteData.id, noteData);
+      } else {
+        await createNote(noteData);
+      }
+    } catch (err) {
+      console.error('Failed to save note:', err);
     }
   };
 
   const handleImportFileChange = async (event) => {
     const file = event.target.files?.[0];
     if (file) {
-      await importNotes(file);
-      event.target.value = '';
+      try {
+        await importNotes(file);
+      } catch (err) {
+        console.error('Failed to import notes file:', err);
+      } finally {
+        event.target.value = '';
+      }
     }
   };
 
@@ -74,84 +87,19 @@ export default function DashboardPage() {
             onChange={setSearchQuery}
             onClear={() => setSearchQuery('')}
           />
-
-          <div className={styles.actionsGroup}>
-            <button
-              type="button"
-              className={styles.secondaryBtn}
-              onClick={() => exportNotes('json')}
-              title="Export all notes to JSON backup"
-            >
-              <Download size={14} />
-              <span>Export JSON</span>
-            </button>
-
-            <button
-              type="button"
-              className={styles.secondaryBtn}
-              onClick={() => exportNotes('markdown')}
-              title="Export notes to Markdown document"
-            >
-              <Download size={14} />
-              <span>Export MD</span>
-            </button>
-
-            <button
-              type="button"
-              className={styles.secondaryBtn}
-              onClick={() => fileInputRef.current?.click()}
-              title="Import notes from JSON backup"
-            >
-              <Upload size={14} />
-              <span>Import</span>
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              className={styles.hiddenInput}
-              onChange={handleImportFileChange}
-            />
-          </div>
+          <ExportImportActions
+            onExport={exportNotes}
+            onImportFile={handleImportFileChange}
+          />
         </div>
 
-        <div className={styles.tagFilterBar}>
-          <button
-            type="button"
-            className={`${styles.tagChip} ${filterMode === 'all' && !selectedTag ? styles.tagChipActive : ''}`}
-            onClick={() => {
-              setFilterMode('all');
-              setSelectedTag('');
-            }}
-          >
-            All Notes
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.tagChip} ${filterMode === 'pinned' ? styles.tagChipActive : ''}`}
-            onClick={() => {
-              setFilterMode('pinned');
-              setSelectedTag('');
-            }}
-          >
-            Pinned
-          </button>
-
-          {allTags.map((tag) => (
-            <button
-              key={tag}
-              type="button"
-              className={`${styles.tagChip} ${selectedTag === tag ? styles.tagChipActive : ''}`}
-              onClick={() => {
-                setFilterMode('all');
-                setSelectedTag(selectedTag === tag ? '' : tag);
-              }}
-            >
-              #{tag}
-            </button>
-          ))}
-        </div>
+        <TagFilterBar
+          filterMode={filterMode}
+          selectedTag={selectedTag}
+          allTags={allTags}
+          onSelectFilterMode={setFilterMode}
+          onSelectTag={setSelectedTag}
+        />
 
         {isLoading ? (
           <div className={styles.skeletonGrid}>
@@ -160,26 +108,10 @@ export default function DashboardPage() {
             <div className={styles.skeletonCard} />
           </div>
         ) : displayedNotes.length === 0 ? (
-          <div className={styles.emptyState}>
-            <FileText size={40} color="var(--text-subtle)" />
-            <h4 className={styles.emptyTitle}>
-              {searchQuery ? 'No notes matched your search' : 'No notes yet'}
-            </h4>
-            <p className={styles.emptySubtitle}>
-              {searchQuery
-                ? 'Try searching with different keywords or clear the filter.'
-                : 'Capture your thoughts, ideas, and tasks with rich text formatting.'}
-            </p>
-            {!searchQuery && (
-              <button
-                type="button"
-                className={styles.createFirstBtn}
-                onClick={handleOpenNewNote}
-              >
-                Create First Note
-              </button>
-            )}
-          </div>
+          <NotesEmptyState
+            searchQuery={searchQuery}
+            onCreateNote={handleOpenNewNote}
+          />
         ) : (
           <div className={styles.notesGrid}>
             {displayedNotes.map((note) => (

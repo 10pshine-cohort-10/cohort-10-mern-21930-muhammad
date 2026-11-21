@@ -1,39 +1,31 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Pin, Trash2 } from 'lucide-react';
+import { extractPlainText, formatRelativeTime } from '../utils/formatters';
 import styles from './NoteCard.module.css';
 
-function extractPlainText(html) {
-  if (!html) return '';
-  const temporaryDiv = document.createElement('div');
-  temporaryDiv.innerHTML = html;
-  return temporaryDiv.textContent || temporaryDiv.innerText || '';
-}
+const COLOR_CLASS_MAP = {
+  slate: styles.colorSlate,
+  sage: styles.colorSage,
+  teal: styles.colorTeal,
+  sand: styles.colorSand,
+  lavender: styles.colorLavender,
+  rose: styles.colorRose,
+};
 
-function formatRelativeTime(dateString) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInSeconds = Math.floor((now - date) / 1000);
-
-  if (diffInSeconds < 60) return 'Just now';
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-}
-
+/**
+ * Note card component displaying preview, metadata, and quick actions.
+ * @param {{
+ *   note: { id: string, title?: string, content?: string, color?: string, isPinned?: boolean, tags?: string[], createdAt?: string },
+ *   onSelect: (note: object) => void,
+ *   onTogglePin: (id: string, isPinned: boolean) => void,
+ *   onDelete: (id: string) => void
+ * }} props
+ */
 export default function NoteCard({ note, onSelect, onTogglePin, onDelete }) {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
-  const colorClassMap = {
-    slate: styles.colorSlate,
-    sage: styles.colorSage,
-    teal: styles.colorTeal,
-    sand: styles.colorSand,
-    lavender: styles.colorLavender,
-    rose: styles.colorRose,
-  };
-
-  const cardColorClass = colorClassMap[note.color] || styles.colorSlate;
+  const cardColorClass = COLOR_CLASS_MAP[note.color] || styles.colorSlate;
   const plainPreview = extractPlainText(note.content);
 
   const handleCardClick = () => {
@@ -127,18 +119,10 @@ export default function NoteCard({ note, onSelect, onTogglePin, onDelete }) {
         <div className={styles.deleteConfirm} onClick={(e) => e.stopPropagation()}>
           <p className={styles.confirmMessage}>Delete this note?</p>
           <div className={styles.confirmActions}>
-            <button
-              type="button"
-              className={styles.confirmButton}
-              onClick={handleConfirmDelete}
-            >
+            <button type="button" className={styles.confirmButton} onClick={handleConfirmDelete}>
               Delete
             </button>
-            <button
-              type="button"
-              className={styles.cancelButton}
-              onClick={handleCancelDelete}
-            >
+            <button type="button" className={styles.cancelButton} onClick={handleCancelDelete}>
               Cancel
             </button>
           </div>
@@ -147,3 +131,18 @@ export default function NoteCard({ note, onSelect, onTogglePin, onDelete }) {
     </div>
   );
 }
+
+NoteCard.propTypes = {
+  note: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string,
+    content: PropTypes.string,
+    color: PropTypes.string,
+    isPinned: PropTypes.bool,
+    tags: PropTypes.arrayOf(PropTypes.string),
+    createdAt: PropTypes.string,
+  }).isRequired,
+  onSelect: PropTypes.func.isRequired,
+  onTogglePin: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+};
