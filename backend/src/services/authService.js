@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const AppError = require('../utils/appError');
 
 function generateToken(userId, email) {
   if (!process.env.JWT_SECRET) {
-    throw new Error('JWT_SECRET is not configured');
+    throw new AppError('JWT_SECRET is not configured', 500);
   }
   return jwt.sign(
     { userId, email },
@@ -14,28 +15,20 @@ function generateToken(userId, email) {
 
 async function registerUser(name, email, password) {
   if (!name || typeof name !== 'string' || !name.trim()) {
-    const err = new Error('Name is required');
-    err.status = 400;
-    throw err;
+    throw new AppError('Name is required', 400);
   }
 
   if (!email || typeof email !== 'string' || !email.trim()) {
-    const err = new Error('Email is required');
-    err.status = 400;
-    throw err;
+    throw new AppError('Email is required', 400);
   }
 
   if (!password || typeof password !== 'string' || password.length < 8) {
-    const err = new Error('Password must be at least 8 characters long');
-    err.status = 400;
-    throw err;
+    throw new AppError('Password must be at least 8 characters long', 400);
   }
 
   const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
   if (existingUser) {
-    const err = new Error('Email is already registered');
-    err.status = 409;
-    throw err;
+    throw new AppError('Email is already registered', 409);
   }
 
   const user = new User({
@@ -52,23 +45,18 @@ async function registerUser(name, email, password) {
 
 async function loginUser(email, password) {
   if (!email || !password) {
-    const err = new Error('Email and password are required');
-    err.status = 400;
-    throw err;
+    throw new AppError('Email and password are required', 400);
   }
 
+  /** @type {import('../types').UserDocument | null} */
   const user = await User.findOne({ email: email.toLowerCase().trim() });
   if (!user) {
-    const err = new Error('Invalid email or password');
-    err.status = 401;
-    throw err;
+    throw new AppError('Invalid email or password', 401);
   }
 
   const isPasswordValid = await user.comparePassword(password);
   if (!isPasswordValid) {
-    const err = new Error('Invalid email or password');
-    err.status = 401;
-    throw err;
+    throw new AppError('Invalid email or password', 401);
   }
 
   const token = generateToken(user._id, user.email);

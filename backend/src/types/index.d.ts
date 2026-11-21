@@ -54,3 +54,13 @@ export interface AuthSuccessPayload {
     updatedAt: Date;
   };
 }
+
+export interface AppError extends Error {
+  status: number;
+}
+
+declare global {
+  interface Error {
+    status?: number;
+  }
+}

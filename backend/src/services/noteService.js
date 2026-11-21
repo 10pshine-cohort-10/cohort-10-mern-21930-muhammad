@@ -1,4 +1,5 @@
 const Note = require('../models/Note');
+const AppError = require('../utils/appError');
 const { emitNoteChange } = require('../socket/noteSocket');
 
 const ALLOWED_TAGS = new Set([
@@ -41,9 +42,7 @@ async function getNotes(userId, options = {}) {
 async function getNoteById(noteId, userId) {
   const note = await Note.findOne({ _id: noteId, userId });
   if (!note) {
-    const err = new Error('Note not found');
-    err.status = 404;
-    throw err;
+    throw new AppError('Note not found', 404);
   }
   return note;
 }
@@ -108,9 +107,7 @@ async function updateNote(noteId, userId, updateData) {
   );
 
   if (!note) {
-    const err = new Error('Note not found');
-    err.status = 404;
-    throw err;
+    throw new AppError('Note not found', 404);
   }
 
   const serialized = note.toJSON();
@@ -121,9 +118,7 @@ async function updateNote(noteId, userId, updateData) {
 async function deleteNote(noteId, userId) {
   const note = await Note.findOneAndDelete({ _id: noteId, userId });
   if (!note) {
-    const err = new Error('Note not found');
-    err.status = 404;
-    throw err;
+    throw new AppError('Note not found', 404);
   }
 
   emitNoteChange(userId, 'note:deleted', { id: noteId });
@@ -155,7 +150,7 @@ async function exportNotes(userId, format = 'json') {
   if (format === 'markdown') {
     const markdownContent = notes
       .map((n) => {
-        const plainText = (n.content || '').replace(/<[^>]+>/g, '').trim();
+        const plainText = String(n.content || '').replace(/<[^>]+>/g, '').trim();
         const tagLine = n.tags && n.tags.length ? `\nTags: ${n.tags.join(', ')}` : '';
         return `# ${n.title}\n*Created: ${n.createdAt.toISOString()}*${tagLine}\n\n${plainText}\n\n---`;
       })
@@ -177,9 +172,7 @@ async function exportNotes(userId, format = 'json') {
 
 async function importNotes(userId, importedNotesList) {
   if (!Array.isArray(importedNotesList) || importedNotesList.length === 0) {
-    const err = new Error('Invalid import data: expected an array of notes');
-    err.status = 400;
-    throw err;
+    throw new AppError('Invalid import data: expected an array of notes', 400);
   }
 
   const docsToInsert = importedNotesList.map((item) => ({
