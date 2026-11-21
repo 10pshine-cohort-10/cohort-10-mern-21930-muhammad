@@ -35,6 +35,18 @@ describe('Note Service', () => {
       expect(createdNote.content).to.not.include('onerror');
       expect(createdNote.content).to.include('Clean content');
     });
+
+    it('strips tags not in the editor allowlist including slash-separated attributes', async () => {
+      const createdNote = await noteService.createNote(userIdA, {
+        title: 'XSS Bypass Test',
+        content: '<p>Safe</p><img/onerror=alert(1) src=x><svg onload=alert(2)><iframe src="evil"></iframe>',
+      });
+
+      expect(createdNote.content).to.equal('<p>Safe</p>');
+      expect(createdNote.content).to.not.include('img');
+      expect(createdNote.content).to.not.include('svg');
+      expect(createdNote.content).to.not.include('iframe');
+    });
   });
 
   describe('getNotes', () => {
@@ -143,6 +155,11 @@ describe('Note Service', () => {
     it('returns all notes when search query is empty', async () => {
       const searchResults = await noteService.searchNotes(userIdA, '   ');
       expect(searchResults).to.have.lengthOf(2);
+    });
+
+    it('safely handles special regex characters in search query without injection', async () => {
+      const searchResults = await noteService.searchNotes(userIdA, '.*');
+      expect(searchResults).to.have.lengthOf(0);
     });
   });
 

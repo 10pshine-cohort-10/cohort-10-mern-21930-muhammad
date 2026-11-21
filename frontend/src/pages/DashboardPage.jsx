@@ -57,6 +57,7 @@ export default function DashboardPage() {
       }
     } catch (err) {
       console.error('Failed to save note:', err);
+      throw err;
     }
   };
 

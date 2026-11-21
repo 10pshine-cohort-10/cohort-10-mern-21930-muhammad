@@ -31,7 +31,19 @@ function initSocket(httpServer) {
     socket.join(`user:${socket.userId}`);
     logger.info({ userId: socket.userId, socketId: socket.id }, 'Socket client connected');
 
+    const tokenCheckInterval = setInterval(() => {
+      const socketToken = socket.handshake.auth?.token;
+      try {
+        jwt.verify(socketToken, process.env.JWT_SECRET);
+      } catch (err) {
+        logger.info({ userId: socket.userId, socketId: socket.id, err: err.message }, 'Socket token expired, disconnecting');
+        clearInterval(tokenCheckInterval);
+        socket.disconnect(true);
+      }
+    }, 60000);
+
     socket.on('disconnect', (reason) => {
+      clearInterval(tokenCheckInterval);
       logger.info({ userId: socket.userId, reason }, 'Socket client disconnected');
     });
   });

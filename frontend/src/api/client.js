@@ -1,9 +1,6 @@
 import axios from 'axios';
 
-const apiBaseUrl =
-  typeof process !== 'undefined' && process.env?.VITE_API_URL
-    ? process.env.VITE_API_URL
-    : 'http://localhost:3000/api';
+const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 const client = axios.create({
   baseURL: apiBaseUrl,
@@ -25,8 +22,9 @@ client.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      const isAuthRoute = window.location.pathname.startsWith('/login') ||
-                          window.location.pathname.startsWith('/register');
+      const isAuthRoute =
+        window.location.pathname.startsWith('/login') ||
+        window.location.pathname.startsWith('/register');
       if (!isAuthRoute) {
         localStorage.removeItem('notes_auth_token');
         localStorage.removeItem('notes_user_data');

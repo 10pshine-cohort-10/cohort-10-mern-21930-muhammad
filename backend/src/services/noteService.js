@@ -1,13 +1,33 @@
 const Note = require('../models/Note');
 const { emitNoteChange } = require('../socket/noteSocket');
 
+const ALLOWED_TAGS = new Set([
+  'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+  'ul', 'ol', 'li', 'blockquote', 'pre', 'code',
+  'br', 'strong', 'em', 's', 'hr',
+]);
+
 function sanitizeHtml(content) {
   if (typeof content !== 'string') {
     return '';
   }
-  return content
+
+  const strippedScriptsAndStyles = content
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/\son\w+\s*=\s*(?:'[^']*'|"[^"]*"|[^\s>]+)/gi, '');
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+
+  return strippedScriptsAndStyles.replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/gi, (fullMatch, tagName) => {
+    const lower = tagName.toLowerCase();
+    if (!ALLOWED_TAGS.has(lower)) {
+      return '';
+    }
+    const isClosing = fullMatch.startsWith('</');
+    return isClosing ? `</${lower}>` : `<${lower}>`;
+  });
+}
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 async function getNotes(userId, options = {}) {
@@ -116,12 +136,13 @@ async function searchNotes(userId, queryTerm) {
   }
 
   const cleanTerm = queryTerm.trim();
+  const escapedTerm = escapeRegex(cleanTerm);
   const notes = await Note.find({
     userId,
     $or: [
-      { title: { $regex: cleanTerm, $options: 'i' } },
-      { content: { $regex: cleanTerm, $options: 'i' } },
-      { tags: { $regex: cleanTerm, $options: 'i' } },
+      { title: { $regex: escapedTerm, $options: 'i' } },
+      { content: { $regex: escapedTerm, $options: 'i' } },
+      { tags: { $regex: escapedTerm, $options: 'i' } },
     ],
   }).sort({ isPinned: -1, createdAt: -1 });
 

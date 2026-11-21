@@ -3,6 +3,11 @@ import { io } from 'socket.io-client';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
 
+function resolveSocketUrl() {
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  return apiUrl.replace(/\/api\/?$/, '');
+}
+
 export function useNotes() {
   const [notes, setNotes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,10 +48,7 @@ export function useNotes() {
   useEffect(() => {
     if (!token) return;
 
-    const socketUrl =
-      typeof process !== 'undefined' && process.env?.VITE_API_URL
-        ? process.env.VITE_API_URL.replace(/\/api\/?$/, '')
-        : 'http://localhost:3000';
+    const socketUrl = resolveSocketUrl();
 
     const socket = io(socketUrl, {
       auth: { token },

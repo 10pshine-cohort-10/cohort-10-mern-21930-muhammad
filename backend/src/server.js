@@ -11,7 +11,7 @@ async function startServer() {
   try {
     await connectDB();
     const server = http.createServer(app);
-    initSocket(server);
+    const socketServer = initSocket(server);
 
     server.listen(PORT, () => {
       logger.info({ port: PORT, env: process.env.NODE_ENV || 'development' }, 'Server started');
@@ -21,10 +21,20 @@ async function startServer() {
     for (const signal of shutdownSignals) {
       process.on(signal, () => {
         logger.info({ signal }, 'Graceful shutdown initiated');
+
+        if (socketServer) {
+          socketServer.close();
+        }
+
         server.close(() => {
           logger.info('HTTP server closed');
           process.exit(0);
         });
+
+        setTimeout(() => {
+          logger.warn('Forcing shutdown after timeout');
+          process.exit(1);
+        }, 10000).unref();
       });
     }
   } catch (err) {
