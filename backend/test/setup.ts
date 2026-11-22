@@ -14,25 +14,37 @@ export async function mochaGlobalSetup(): Promise<void> {
   process.env.JWT_EXPIRES_IN = '1d';
   process.env.LOG_LEVEL = 'silent';
 
-  inMemoryMongoServer = await MongoMemoryServer.create({
-    binary: {
-      version: '7.0.14',
-    },
-    spawn: {
-      timeout: 180000,
-    },
-  });
-  const uri = inMemoryMongoServer.getUri();
-  process.env.MONGODB_URI = uri;
+  try {
+    inMemoryMongoServer = await MongoMemoryServer.create({
+      binary: {
+        version: '7.0.14',
+      },
+      spawn: {
+        timeout: 180000,
+      },
+    });
+    const uri = inMemoryMongoServer.getUri();
+    process.env.MONGODB_URI = uri;
 
-  await mongoose.connect(uri);
+    await mongoose.connect(uri);
+  } catch (err) {
+    if (inMemoryMongoServer) {
+      await inMemoryMongoServer.stop();
+      inMemoryMongoServer = null;
+    }
+    throw err;
+  }
 }
 
 export async function mochaGlobalTeardown(): Promise<void> {
-  if (mongoose.connection.readyState !== 0) {
-    await mongoose.disconnect();
-  }
-  if (inMemoryMongoServer) {
-    await inMemoryMongoServer.stop();
+  try {
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.disconnect();
+    }
+  } finally {
+    if (inMemoryMongoServer) {
+      await inMemoryMongoServer.stop();
+      inMemoryMongoServer = null;
+    }
   }
 }

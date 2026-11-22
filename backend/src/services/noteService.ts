@@ -15,18 +15,27 @@ export function sanitizeHtml(content?: string): string {
     return '';
   }
 
-  const strippedScriptsAndStyles = content
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+  let current = content;
+  let previous = '';
+  let passes = 0;
 
-  return strippedScriptsAndStyles.replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/gi, (fullMatch, tagName) => {
-    const lower = tagName.toLowerCase();
-    if (!ALLOWED_TAGS.has(lower)) {
-      return '';
-    }
-    const isClosing = fullMatch.startsWith('</');
-    return isClosing ? `</${lower}>` : `<${lower}>`;
-  });
+  while (current !== previous && passes < 10) {
+    previous = current;
+    passes++;
+
+    current = current
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+      .replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/gi, (fullMatch, tagName) => {
+        const lower = tagName.toLowerCase();
+        if (!ALLOWED_TAGS.has(lower)) {
+          return '';
+        }
+        return fullMatch.startsWith('</') ? `</${lower}>` : `<${lower}>`;
+      });
+  }
+
+  return current;
 }
 
 export function escapeRegex(str: string): string {
@@ -172,26 +181,33 @@ export async function exportNotes(userId: string | Types.ObjectId, format = 'jso
   };
 }
 
-export async function importNotes(userId: string | Types.ObjectId, importedNotesList: any): Promise<{ count: number }> {
+export async function importNotes(userId: string | Types.ObjectId, importedNotesList: unknown): Promise<{ count: number }> {
   if (!Array.isArray(importedNotesList) || importedNotesList.length === 0) {
     throw new AppError('Invalid import data: expected an array of notes', 400);
   }
 
+  for (const item of importedNotesList) {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      throw new AppError('Invalid import data: every entry must be a valid note object', 400);
+    }
+  }
+
   const allowedColors: NoteColor[] = ['slate', 'sage', 'teal', 'sand', 'lavender', 'rose'];
 
-  const docsToInsert = importedNotesList.map((item) => ({
+  const docsToInsert = (importedNotesList as Record<string, unknown>[]).map((item) => ({
     userId,
-    title: (item.title && typeof item.title === 'string') ? item.title.trim() : 'Untitled',
-    content: sanitizeHtml(item.content),
+    title: (typeof item.title === 'string' && item.title.trim()) ? item.title.trim() : 'Untitled',
+    content: sanitizeHtml(typeof item.content === 'string' ? item.content : ''),
     isPinned: Boolean(item.isPinned),
     tags: Array.isArray(item.tags)
-      ? item.tags.map((t: any) => String(t).trim()).filter(Boolean)
+      ? item.tags.map((t) => String(t).trim()).filter(Boolean)
       : [],
-    color: allowedColors.includes(item.color)
-      ? item.color
+    color: allowedColors.includes(item.color as NoteColor)
+      ? (item.color as NoteColor)
       : 'slate',
   }));
 
   const inserted = await Note.insertMany(docsToInsert);
+  emitNoteChange(userId, 'note:imported', { count: inserted.length });
   return { count: inserted.length };
 }

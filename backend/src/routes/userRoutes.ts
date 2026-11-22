@@ -4,7 +4,7 @@ import { handleGetCurrentUser } from '../controllers/userController';
 
 const router = Router();
 
-router.get('/me', authMiddleware as any, handleGetCurrentUser as any);
+router.get('/me', authMiddleware, handleGetCurrentUser);
 
 export default router;
 export { router as userRoutes };

@@ -1,5 +1,14 @@
+import { IncomingMessage } from 'http';
 import pinoHttp from 'pino-http';
 import logger from '../utils/logger';
+
+export type SerializedRequestInput = IncomingMessage & {
+  id?: string | number | object;
+  query?: unknown;
+  params?: unknown;
+  remoteAddress?: string;
+  remotePort?: number;
+};
 
 export const requestLogger = pinoHttp({
   logger,
@@ -7,7 +16,7 @@ export const requestLogger = pinoHttp({
     ignore: (req) => req.url === '/health',
   },
   serializers: {
-    req(req: any) {
+    req(req: SerializedRequestInput) {
       const sanitizedHeaders = { ...req.headers };
       if (sanitizedHeaders.authorization) {
         sanitizedHeaders.authorization = 'Bearer [REDACTED]';

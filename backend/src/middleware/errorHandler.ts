@@ -1,28 +1,47 @@
 import { Request, Response, NextFunction } from 'express';
 import logger from '../utils/logger';
 
-export function errorHandler(err: any, req: Request, res: Response, _next: NextFunction): void {
-  logger.error({ err, method: req.method, url: req.originalUrl }, err.message);
+interface ValidationErrorEntry {
+  message?: string;
+}
 
-  if (err.name === 'ValidationError' && err.errors) {
-    const errorMessages = Object.values(err.errors).map((item: any) => item.message);
+interface CustomErrorShape {
+  name?: string;
+  message?: string;
+  status?: number;
+  kind?: string;
+  code?: number;
+  keyPattern?: Record<string, unknown>;
+  errors?: Record<string, ValidationErrorEntry>;
+}
+
+export function errorHandler(err: unknown, req: Request, res: Response, _next: NextFunction): void {
+  const errorObj = typeof err === 'object' && err !== null ? (err as CustomErrorShape) : {};
+  const errorMessage = typeof errorObj.message === 'string' ? errorObj.message : 'Internal server error';
+
+  logger.error({ err, method: req.method, url: req.originalUrl }, errorMessage);
+
+  if (errorObj.name === 'ValidationError' && errorObj.errors && typeof errorObj.errors === 'object') {
+    const errorMessages = Object.values(errorObj.errors).map(
+      (item: ValidationErrorEntry) => item?.message || 'Validation error'
+    );
     res.status(400).json({ success: false, error: errorMessages.join(', ') });
     return;
   }
 
-  if (err.name === 'CastError' && err.kind === 'ObjectId') {
+  if (errorObj.name === 'CastError' && errorObj.kind === 'ObjectId') {
     res.status(400).json({ success: false, error: 'Invalid ID format' });
     return;
   }
 
-  if (err.code === 11000) {
-    const duplicateField = Object.keys(err.keyPattern || {})[0] || 'Field';
+  if (errorObj.code === 11000) {
+    const duplicateField = Object.keys(errorObj.keyPattern || {})[0] || 'Field';
     res.status(409).json({ success: false, error: `${duplicateField} already exists` });
     return;
   }
 
-  const statusCode = typeof err.status === 'number' ? err.status : 500;
-  const message = statusCode === 500 ? 'Internal server error' : err.message;
+  const statusCode = typeof errorObj.status === 'number' ? errorObj.status : 500;
+  const message = statusCode === 500 ? 'Internal server error' : errorMessage;
   res.status(statusCode).json({ success: false, error: message });
 }
 

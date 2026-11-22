@@ -59,6 +59,7 @@ export default function NoteCard({ note, onSelect, onTogglePin, onDelete }: Note
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.target !== e.currentTarget) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleCardClick();

@@ -118,8 +118,8 @@ export interface TagFilterBarProps {
 }
 
 export interface ExportImportActionsProps {
-  onExport: (format: 'json' | 'markdown') => void;
-  onImport: (file: File) => void;
+  onExport: (format: 'json' | 'markdown') => Promise<void>;
+  onImportFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export interface NotesEmptyStateProps {

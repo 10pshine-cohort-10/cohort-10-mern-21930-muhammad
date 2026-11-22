@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { IUser } from '../types';
+import { IUser, SerializedUser } from '../types';
 
 const userSchema = new Schema<IUser>(
   {
@@ -26,11 +26,14 @@ const userSchema = new Schema<IUser>(
   {
     timestamps: true,
     toJSON: {
-      transform(_doc, ret: Record<string, any>) {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
-        delete ret.passwordHash;
+      transform(_doc, ret: Partial<IUser & { id?: string; __v?: number }>): SerializedUser {
+        return {
+          id: String(ret._id),
+          name: ret.name || '',
+          email: ret.email || '',
+          createdAt: ret.createdAt || new Date(),
+          updatedAt: ret.updatedAt || new Date(),
+        };
       },
     },
   }

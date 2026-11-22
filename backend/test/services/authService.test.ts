@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import jwt from 'jsonwebtoken';
 import User from '../../src/models/User';
+import AppError from '../../src/utils/appError';
 import { registerUser, loginUser } from '../../src/services/authService';
 
 describe('Auth Service', () => {
@@ -18,8 +19,10 @@ describe('Auth Service', () => {
       expect(result.user.email).to.equal('alice@example.com');
       expect(result.user).to.not.have.property('passwordHash');
 
-      const decoded = jwt.verify(result.token, process.env.JWT_SECRET as string) as any;
-      expect(decoded.email).to.equal('alice@example.com');
+      const decoded = jwt.verify(result.token, process.env.JWT_SECRET as string);
+      expect(decoded).to.be.an('object');
+      const payload = decoded as { email: string; userId: string };
+      expect(payload.email).to.equal('alice@example.com');
 
       const savedUser = await User.findOne({ email: 'alice@example.com' });
       expect(savedUser).to.not.be.null;
@@ -32,9 +35,11 @@ describe('Auth Service', () => {
       try {
         await registerUser('Second User', 'duplicate@example.com', 'Password123');
         expect.fail('Should have thrown an error');
-      } catch (err: any) {
-        expect(err.status).to.equal(409);
-        expect(err.message).to.equal('Email is already registered');
+      } catch (err: unknown) {
+        expect(err).to.be.instanceOf(AppError);
+        const appError = err as AppError;
+        expect(appError.status).to.equal(409);
+        expect(appError.message).to.equal('Email is already registered');
       }
     });
 
@@ -42,9 +47,24 @@ describe('Auth Service', () => {
       try {
         await registerUser('Short Pass', 'short@example.com', 'pass');
         expect.fail('Should have thrown an error');
-      } catch (err: any) {
-        expect(err.status).to.equal(400);
-        expect(err.message).to.equal('Password must be at least 8 characters long');
+      } catch (err: unknown) {
+        expect(err).to.be.instanceOf(AppError);
+        const appError = err as AppError;
+        expect(appError.status).to.equal(400);
+        expect(appError.message).to.equal('Password must be at least 8 characters long');
+      }
+    });
+
+    it('throws a 400 bad request error when password exceeds 72 bytes', async () => {
+      const longPassword = 'A'.repeat(73);
+      try {
+        await registerUser('Long Pass', 'long@example.com', longPassword);
+        expect.fail('Should have thrown an error');
+      } catch (err: unknown) {
+        expect(err).to.be.instanceOf(AppError);
+        const appError = err as AppError;
+        expect(appError.status).to.equal(400);
+        expect(appError.message).to.equal('Password cannot exceed 72 bytes');
       }
     });
   });
@@ -65,9 +85,11 @@ describe('Auth Service', () => {
       try {
         await loginUser('logintest@example.com', 'WrongPassword456');
         expect.fail('Should have thrown an error');
-      } catch (err: any) {
-        expect(err.status).to.equal(401);
-        expect(err.message).to.equal('Invalid email or password');
+      } catch (err: unknown) {
+        expect(err).to.be.instanceOf(AppError);
+        const appError = err as AppError;
+        expect(appError.status).to.equal(401);
+        expect(appError.message).to.equal('Invalid email or password');
       }
     });
 
@@ -75,9 +97,23 @@ describe('Auth Service', () => {
       try {
         await loginUser('nonexistent@example.com', 'Password123');
         expect.fail('Should have thrown an error');
-      } catch (err: any) {
-        expect(err.status).to.equal(401);
-        expect(err.message).to.equal('Invalid email or password');
+      } catch (err: unknown) {
+        expect(err).to.be.instanceOf(AppError);
+        const appError = err as AppError;
+        expect(appError.status).to.equal(401);
+        expect(appError.message).to.equal('Invalid email or password');
+      }
+    });
+
+    it('throws 400 error when email is whitespace or empty after normalization', async () => {
+      try {
+        await loginUser('   ', 'Password123');
+        expect.fail('Should have thrown an error');
+      } catch (err: unknown) {
+        expect(err).to.be.instanceOf(AppError);
+        const appError = err as AppError;
+        expect(appError.status).to.equal(400);
+        expect(appError.message).to.equal('Email is required');
       }
     });
   });

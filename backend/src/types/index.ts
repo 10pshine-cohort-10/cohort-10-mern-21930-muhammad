@@ -29,8 +29,24 @@ export interface INote {
 
 export type NoteDocument = Document<unknown, object, INote> & INote;
 
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: string;
+    }
+  }
+}
+
 export interface AuthRequest extends Request {
   userId?: string;
+}
+
+export interface SerializedUser {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface NoteCreateInput {
@@ -57,11 +73,5 @@ export interface ExportResult {
 
 export interface AuthSuccessPayload {
   token: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
+  user: SerializedUser;
 }

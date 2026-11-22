@@ -11,6 +11,10 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 
 async function startServer(): Promise<void> {
   try {
+    if (!process.env.JWT_SECRET || !process.env.JWT_SECRET.trim()) {
+      throw new Error('JWT_SECRET environment variable is missing or empty');
+    }
+
     await connectDB();
     const server = http.createServer(app);
     const socketServer = initSocket(server);

@@ -1,5 +1,6 @@
 import { Response, NextFunction } from 'express';
 import * as noteService from '../services/noteService';
+import AppError from '../utils/appError';
 import { AuthRequest } from '../types';
 
 export async function handleGetNotes(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
@@ -22,6 +23,9 @@ export async function handleGetNoteById(req: AuthRequest, res: Response, next: N
 
 export async function handleCreateNote(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
+    if (!req.body || typeof req.body !== 'object') {
+      throw new AppError('Request body is required', 400);
+    }
     const note = await noteService.createNote(req.userId as string, req.body);
     res.status(201).json({ success: true, data: note });
   } catch (err) {
@@ -31,6 +35,9 @@ export async function handleCreateNote(req: AuthRequest, res: Response, next: Ne
 
 export async function handleUpdateNote(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
+    if (!req.body || typeof req.body !== 'object') {
+      throw new AppError('Request body is required', 400);
+    }
     const note = await noteService.updateNote(req.params.id as string, req.userId as string, req.body);
     res.status(200).json({ success: true, data: note });
   } catch (err) {
@@ -72,7 +79,12 @@ export async function handleExportNotes(req: AuthRequest, res: Response, next: N
 
 export async function handleImportNotes(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
-    const items = Array.isArray(req.body) ? req.body : req.body.notes;
+    if (!req.body) {
+      throw new AppError('Request body is required', 400);
+    }
+    const items = Array.isArray(req.body)
+      ? req.body
+      : (typeof req.body === 'object' && req.body !== null ? (req.body as Record<string, unknown>).notes : undefined);
     const result = await noteService.importNotes(req.userId as string, items);
     res.status(201).json({ success: true, data: result });
   } catch (err) {
