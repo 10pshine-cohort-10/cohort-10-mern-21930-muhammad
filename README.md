@@ -1,16 +1,17 @@
-# Notes App (MERN Stack)
+# Notes App (MERN + TypeScript)
 
-Full-stack note-taking application built with Node.js, Express, MongoDB (Mongoose), React 19, and Vite. Features user authentication with JWT, note pinning, categorization tags, color themes, real-time synchronization with Socket.IO, structured application logging with Pino, and automated testing via Mocha/Chai and Jest.
+Full-stack note-taking application built with Node.js, Express, MongoDB (Mongoose), React 19, Vite, and strict TypeScript. Features user authentication with JWT, note pinning, categorization tags, color themes, real-time synchronization with Socket.IO, structured application logging with Pino, and automated testing via Mocha/Chai and Jest.
 
 ## Tech Stack
 
 | Layer | Technologies |
 | --- | --- |
-| Backend | Node.js (v24), Express (v5), MongoDB / Mongoose (v9), Socket.IO, bcryptjs, jsonwebtoken |
+| Language | TypeScript (strict mode across backend and frontend) |
+| Backend | Node.js (v24), Express (v5), MongoDB / Mongoose (v9), Socket.IO, bcryptjs, jsonwebtoken, tsx |
 | Frontend | React (v19), Vite (v8), TipTap Rich Text Editor, React Router (v7), Axios, Lucide Icons |
 | Logging | Pino, Pino-HTTP, Pino-Pretty |
 | Backend Testing | Mocha, Chai, Supertest, c8 (coverage), mongodb-memory-server |
-| Frontend Testing | Jest, React Testing Library, jest-environment-jsdom |
+| Frontend Testing | Jest, React Testing Library, jest-environment-jsdom, @babel/preset-typescript |
 | Code Quality | SonarQube Scanner |
 
 ## Repository Structure
@@ -18,24 +19,27 @@ Full-stack note-taking application built with Node.js, Express, MongoDB (Mongoos
 ```
 ├── backend/
 │   ├── src/
-│   │   ├── config/          # MongoDB Atlas connection
+│   │   ├── config/          # MongoDB Atlas connection (db.ts)
 │   │   ├── controllers/     # Request handlers (auth, notes, users)
 │   │   ├── middleware/      # Auth, error handling, Pino request logging
-│   │   ├── models/          # Mongoose schemas (User, Note)
+│   │   ├── models/          # Typed Mongoose schemas (User, Note)
 │   │   ├── routes/          # Express route definitions
 │   │   ├── services/        # Business logic and database operations
 │   │   ├── socket/          # Socket.IO real-time event handlers
-│   │   └── utils/           # Shared Pino logger instance
-│   └── test/                # Mocha unit and integration test suites
+│   │   ├── types/           # Backend TypeScript interface definitions
+│   │   └── utils/           # Shared AppError and Pino logger instance
+│   └── test/                # Mocha unit and integration test suites (.ts)
 ├── frontend/
 │   ├── src/
-│   │   ├── api/             # Axios client with interceptors
-│   │   ├── components/      # UI components (Layout, NoteCard, NoteEditor, SearchBar)
-│   │   ├── context/         # AuthContext state provider
-│   │   ├── hooks/           # useNotes and useAuth hooks
-│   │   ├── pages/           # LoginPage, RegisterPage, DashboardPage, ProfilePage
-│   │   └── styles/          # Eye-soothing global styles and CSS modules
-│   └── __tests__/           # Jest unit test suites
+│   │   ├── api/             # Axios client with interceptors (.ts)
+│   │   ├── components/      # UI components (Layout, NoteCard, NoteEditor, etc. .tsx)
+│   │   ├── context/         # AuthContext state provider (.tsx)
+│   │   ├── hooks/           # useNotes and useAuth hooks (.ts)
+│   │   ├── pages/           # LoginPage, RegisterPage, DashboardPage, ProfilePage (.tsx)
+│   │   ├── styles/          # Eye-soothing global styles and CSS modules
+│   │   ├── types/           # Frontend TypeScript type declarations
+│   │   └── utils/           # Formatters and plain text extraction (.ts)
+│   └── __tests__/           # Jest unit test suites (.tsx)
 ├── sonar-project.properties # SonarQube configuration
 └── package.json             # Root workspace orchestrator
 ```

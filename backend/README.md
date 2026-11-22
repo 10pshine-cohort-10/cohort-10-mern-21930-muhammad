@@ -1,6 +1,6 @@
 # Notes App Backend
 
-Express 5 REST API and WebSocket service using MongoDB (Mongoose), Pino logging, and JWT authentication.
+Express 5 REST API and WebSocket service using TypeScript, MongoDB (Mongoose), Pino logging, and JWT authentication.
 
 ## Setup
 
@@ -9,6 +9,12 @@ cd backend
 npm install
 cp .env.example .env
 npm run dev
+```
+
+## Build
+
+```bash
+npm run build
 ```
 
 ## Environment Variables

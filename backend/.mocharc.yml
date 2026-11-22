@@ -1,5 +1,7 @@
-spec: test/**/*.test.js
+spec: test/**/*.test.ts
 timeout: 180000
 exit: true
-require: test/setup.js
+require:
+  - tsx/cjs
+  - test/setup.ts
 recursive: true

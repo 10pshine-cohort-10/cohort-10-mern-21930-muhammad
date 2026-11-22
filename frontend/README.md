@@ -1,6 +1,6 @@
 # Notes App Frontend
 
-Single-page application built with React 19, Vite, and TipTap rich text editor.
+Single-page application built with React 19, Vite, TipTap rich text editor, and TypeScript.
 
 ## Setup
 
@@ -31,14 +31,14 @@ The application runs on `http://localhost:5173`.
 
 ## Application Structure
 
-- `src/components/Layout.jsx`: Responsive layout shell with sidebar, navigation, user avatar, and topbar.
-- `src/components/NoteCard.jsx`: Note display card with pin indicator, color theme, and delete confirmation.
-- `src/components/NoteEditor.jsx`: TipTap headless rich text editor drawer with toolbar, color picker, and tag input.
-- `src/components/SearchBar.jsx`: Search input with clear button.
-- `src/components/ProtectedRoute.jsx`: Authentication gate that redirects unauthenticated users to `/login`.
-- `src/context/AuthContext.jsx`: Authentication context managing tokens and user sessions.
-- `src/hooks/useNotes.js`: Custom hook encapsulating note CRUD, search, export/import, and Socket.IO real-time synchronization.
-- `src/pages/LoginPage.jsx`: Sign-in screen with validation.
-- `src/pages/RegisterPage.jsx`: Registration screen with validation.
-- `src/pages/DashboardPage.jsx`: Workspace dashboard with responsive note grid and filter tabs.
-- `src/pages/ProfilePage.jsx`: User profile screen with note metrics and session logout.
+- `src/components/Layout.tsx`: Responsive layout shell with sidebar, navigation, user avatar, and topbar.
+- `src/components/NoteCard.tsx`: Note display card with pin indicator, color theme, and delete confirmation.
+- `src/components/NoteEditor.tsx`: TipTap headless rich text editor drawer with toolbar, color picker, and tag input.
+- `src/components/SearchBar.tsx`: Search input with clear button.
+- `src/components/ProtectedRoute.tsx`: Authentication gate that redirects unauthenticated users to `/login`.
+- `src/context/AuthContext.tsx`: Authentication context managing tokens and user sessions.
+- `src/hooks/useNotes.ts`: Custom hook encapsulating note CRUD, search, export/import, and Socket.IO real-time synchronization.
+- `src/pages/LoginPage.tsx`: Sign-in screen with validation.
+- `src/pages/RegisterPage.tsx`: Registration screen with validation.
+- `src/pages/DashboardPage.tsx`: Workspace dashboard with responsive note grid and filter tabs.
+- `src/pages/ProfilePage.tsx`: User profile screen with note metrics and session logout.
