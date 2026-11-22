@@ -47,6 +47,17 @@ describe('Note Service', () => {
       expect(createdNote.content).to.not.include('svg');
       expect(createdNote.content).to.not.include('iframe');
     });
+
+    it('throws 400 when note content exceeds processing budget', async () => {
+      const oversizedContent = 'a'.repeat(noteService.MAX_CONTENT_LENGTH + 1);
+      try {
+        await noteService.createNote(userIdA, { content: oversizedContent });
+        expect.fail('Should have thrown an error');
+      } catch (err: any) {
+        expect(err.status).to.equal(400);
+        expect(err.message).to.equal('Note content exceeds processing budget');
+      }
+    });
   });
 
   describe('getNotes', () => {
@@ -209,6 +220,20 @@ describe('Note Service', () => {
       } catch (err: any) {
         expect(err.status).to.equal(400);
         expect(err.message).to.include('expected an array');
+      }
+    });
+
+    it('throws 400 when imported note content exceeds processing budget', async () => {
+      const oversizedPayload = [
+        { title: 'Oversized Note', content: 'b'.repeat(noteService.MAX_CONTENT_LENGTH + 1) },
+      ];
+
+      try {
+        await noteService.importNotes(userIdA, oversizedPayload);
+        expect.fail('Should have thrown an error');
+      } catch (err: any) {
+        expect(err.status).to.equal(400);
+        expect(err.message).to.include('processing budget');
       }
     });
   });

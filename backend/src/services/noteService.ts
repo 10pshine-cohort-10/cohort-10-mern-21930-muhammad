@@ -10,9 +10,15 @@ const ALLOWED_TAGS = new Set([
   'br', 'strong', 'em', 's', 'hr',
 ]);
 
+export const MAX_CONTENT_LENGTH = 50000;
+
 export function sanitizeHtml(content?: string): string {
   if (typeof content !== 'string') {
     return '';
+  }
+
+  if (content.length > MAX_CONTENT_LENGTH) {
+    throw new AppError('Note content exceeds processing budget', 400);
   }
 
   let current = content;
@@ -184,24 +190,28 @@ export async function importNotes(userId: string | Types.ObjectId, importedNotes
     throw new AppError('Invalid import data: expected an array of notes', 400);
   }
 
-  for (const item of importedNotesList) {
-    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+  for (const rawNote of importedNotesList) {
+    if (!rawNote || typeof rawNote !== 'object' || Array.isArray(rawNote)) {
       throw new AppError('Invalid import data: every entry must be a valid note object', 400);
+    }
+    const noteEntry = rawNote as Record<string, unknown>;
+    if (typeof noteEntry.content === 'string' && noteEntry.content.length > MAX_CONTENT_LENGTH) {
+      throw new AppError('Invalid import data: note content exceeds processing budget', 400);
     }
   }
 
   const allowedColors: NoteColor[] = ['slate', 'sage', 'teal', 'sand', 'lavender', 'rose'];
 
-  const docsToInsert = (importedNotesList as Record<string, unknown>[]).map((item) => ({
+  const docsToInsert = (importedNotesList as Record<string, unknown>[]).map((rawNote) => ({
     userId,
-    title: (typeof item.title === 'string' && item.title.trim()) ? item.title.trim() : 'Untitled',
-    content: sanitizeHtml(typeof item.content === 'string' ? item.content : ''),
-    isPinned: Boolean(item.isPinned),
-    tags: Array.isArray(item.tags)
-      ? item.tags.map((t: unknown) => String(t).trim()).filter(Boolean)
+    title: (typeof rawNote.title === 'string' && rawNote.title.trim()) ? rawNote.title.trim() : 'Untitled',
+    content: sanitizeHtml(typeof rawNote.content === 'string' ? rawNote.content : ''),
+    isPinned: Boolean(rawNote.isPinned),
+    tags: Array.isArray(rawNote.tags)
+      ? rawNote.tags.map((t: unknown) => String(t).trim()).filter(Boolean)
       : [],
-    color: allowedColors.includes(item.color as NoteColor)
-      ? (item.color as NoteColor)
+    color: allowedColors.includes(rawNote.color as NoteColor)
+      ? (rawNote.color as NoteColor)
       : 'slate',
   }));
 
