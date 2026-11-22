@@ -20,16 +20,30 @@ export function useNotes() {
 
   const requestIdRef = useRef<number>(0);
   const selectedTagRef = useRef<string>(selectedTag);
+  const searchQueryRef = useRef<string>(searchQuery);
   const { token, isAuthenticated } = useAuth();
 
   useEffect(() => {
     selectedTagRef.current = selectedTag;
   }, [selectedTag]);
 
+  useEffect(() => {
+    searchQueryRef.current = searchQuery;
+  }, [searchQuery]);
+
   const matchesTag = useCallback((note: Note): boolean => {
     const activeTag = selectedTagRef.current;
     if (!activeTag) return true;
     return Array.isArray(note.tags) && note.tags.includes(activeTag);
+  }, []);
+
+  const matchesSearch = useCallback((note: Note): boolean => {
+    const query = searchQueryRef.current.trim().toLowerCase();
+    if (!query) return true;
+    const inTitle = (note.title || '').toLowerCase().includes(query);
+    const inContent = (note.content || '').toLowerCase().includes(query);
+    const inTags = Array.isArray(note.tags) && note.tags.some((t) => t.toLowerCase().includes(query));
+    return inTitle || inContent || inTags;
   }, []);
 
   const fetchNotes = useCallback(async (): Promise<void> => {
@@ -80,7 +94,7 @@ export function useNotes() {
 
     socket.on('note:created', (newNote: Note) => {
       setNotes((prev) => {
-        if (!matchesTag(newNote)) return prev;
+        if (!matchesTag(newNote) || !matchesSearch(newNote)) return prev;
         if (prev.some((n) => n.id === newNote.id)) return prev;
         return [newNote, ...prev];
       });
@@ -88,7 +102,8 @@ export function useNotes() {
 
     socket.on('note:updated', (updatedNote: Note) => {
       setNotes((prev) => {
-        if (!matchesTag(updatedNote)) {
+        const shouldInclude = matchesTag(updatedNote) && matchesSearch(updatedNote);
+        if (!shouldInclude) {
           return prev.filter((n) => n.id !== updatedNote.id);
         }
         const exists = prev.some((n) => n.id === updatedNote.id);
@@ -110,13 +125,13 @@ export function useNotes() {
     return () => {
       socket.disconnect();
     };
-  }, [token, matchesTag, fetchNotes]);
+  }, [token, matchesTag, matchesSearch, fetchNotes]);
 
   const createNote = async (noteData: NoteInput): Promise<Note> => {
     try {
       const response = await client.post<ApiResponse<Note>>('/notes', noteData);
       const created = response.data.data!;
-      if (matchesTag(created)) {
+      if (matchesTag(created) && matchesSearch(created)) {
         setNotes((prev) => [created, ...prev.filter((n) => n.id !== created.id)]);
       }
       return created;
@@ -130,7 +145,7 @@ export function useNotes() {
     try {
       const response = await client.put<ApiResponse<Note>>(`/notes/${id}`, noteData);
       const updated = response.data.data!;
-      if (matchesTag(updated)) {
+      if (matchesTag(updated) && matchesSearch(updated)) {
         setNotes((prev) => prev.map((n) => (n.id === id ? updated : n)));
       } else {
         setNotes((prev) => prev.filter((n) => n.id !== id));

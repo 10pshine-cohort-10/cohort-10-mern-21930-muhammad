@@ -17,16 +17,14 @@ export function sanitizeHtml(content?: string): string {
 
   let current = content;
   let previous = '';
-  let passes = 0;
 
-  while (current !== previous && passes < 10) {
+  while (current !== previous) {
     previous = current;
-    passes++;
 
     current = current
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
       .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-      .replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/gi, (fullMatch, tagName) => {
+      .replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/gi, (fullMatch: string, tagName: string) => {
         const lower = tagName.toLowerCase();
         if (!ALLOWED_TAGS.has(lower)) {
           return '';
@@ -200,14 +198,18 @@ export async function importNotes(userId: string | Types.ObjectId, importedNotes
     content: sanitizeHtml(typeof item.content === 'string' ? item.content : ''),
     isPinned: Boolean(item.isPinned),
     tags: Array.isArray(item.tags)
-      ? item.tags.map((t) => String(t).trim()).filter(Boolean)
+      ? item.tags.map((t: unknown) => String(t).trim()).filter(Boolean)
       : [],
     color: allowedColors.includes(item.color as NoteColor)
       ? (item.color as NoteColor)
       : 'slate',
   }));
 
-  const inserted = await Note.insertMany(docsToInsert);
-  emitNoteChange(userId, 'note:imported', { count: inserted.length });
-  return { count: inserted.length };
+  try {
+    const inserted = await Note.insertMany(docsToInsert);
+    emitNoteChange(userId, 'note:imported', { count: inserted.length });
+    return { count: inserted.length };
+  } catch (err) {
+    throw err;
+  }
 }

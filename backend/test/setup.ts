@@ -19,8 +19,8 @@ export async function mochaGlobalSetup(): Promise<void> {
       binary: {
         version: '7.0.14',
       },
-      spawn: {
-        timeout: 180000,
+      instance: {
+        launchTimeout: 180000,
       },
     });
     const uri = inMemoryMongoServer.getUri();
@@ -37,14 +37,36 @@ export async function mochaGlobalSetup(): Promise<void> {
 }
 
 export async function mochaGlobalTeardown(): Promise<void> {
+  let disconnectError: unknown = null;
+  let stopError: unknown = null;
+
   try {
     if (mongoose.connection.readyState !== 0) {
       await mongoose.disconnect();
     }
-  } finally {
+  } catch (err) {
+    disconnectError = err;
+  }
+
+  try {
     if (inMemoryMongoServer) {
       await inMemoryMongoServer.stop();
       inMemoryMongoServer = null;
     }
+  } catch (err) {
+    stopError = err;
+  }
+
+  if (disconnectError && stopError) {
+    const combined = new Error(
+      `Teardown failed: [Disconnect Error]: ${disconnectError instanceof Error ? disconnectError.message : String(disconnectError)}; [Stop Error]: ${stopError instanceof Error ? stopError.message : String(stopError)}`
+    );
+    throw combined;
+  }
+  if (disconnectError) {
+    throw disconnectError;
+  }
+  if (stopError) {
+    throw stopError;
   }
 }
