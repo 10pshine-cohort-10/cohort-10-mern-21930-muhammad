@@ -1,53 +1,43 @@
 :root {
-  --bg-app: #f8fafc;
+  --bg-app: #fafafa;
   --bg-surface: #ffffff;
-  --bg-subtle: #f1f5f9;
-  --bg-muted: #e2e8f0;
+  --bg-subtle: #f4f4f5;
+  --bg-muted: #e4e4e7;
 
-  --border-subtle: #e2e8f0;
-  --border-hover: #cbd5e1;
-  --border-focus: #0f766e;
+  --border-subtle: #e4e4e7;
+  --border-hover: #18181b;
+  --border-focus: #18181b;
+  --border-dark: #18181b;
 
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --text-subtle: #94a3b8;
+  --text-main: #18181b;
+  --text-muted: #52525b;
+  --text-subtle: #71717a;
 
-  --teal-primary: #0f766e;
-  --teal-hover: #115e59;
-  --teal-tint: #f0fdfa;
-  --teal-border: #99f6e4;
+  --card-border: #18181b;
+  --card-shadow: 3px 3px 0px #18181b;
+  --card-shadow-hover: 4px 5px 0px #18181b;
 
-  --sage-tint: #f7fee7;
-  --sage-border: #d9f99d;
-
-  --rose-tint: #fff1f2;
-  --rose-border: #fecdd3;
-  --rose-text: #be123c;
-
-  --sand-tint: #fefce8;
-  --sand-border: #fef08a;
-
-  --lavender-tint: #f5f3ff;
-  --lavender-border: #ddd6fe;
+  --color-slate-bg: #ffffff;
+  --color-sage-bg: #dcfce7;
+  --color-teal-bg: #e0f2fe;
+  --color-sand-bg: #fef9c3;
+  --color-lavender-bg: #ede9fe;
+  --color-rose-bg: #ffe4e6;
 
   --danger-bg: #fef2f2;
-  --danger-border: #fecaca;
+  --danger-border: #18181b;
   --danger-text: #b91c1c;
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
   --radius-full: 9999px;
-
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
 
   --font-family-base: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-family-mono: 'JetBrains Mono', monospace;
 
   --ease-tactile: cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-tactile: 200ms var(--ease-tactile);
+  --transition-tactile: 180ms var(--ease-tactile);
 }
 
 *,
@@ -73,6 +63,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--bg-app);
 }
 
 button {
@@ -81,7 +72,7 @@ button {
   background: none;
   font-family: inherit;
   font-size: inherit;
-  transition: all 150ms ease-in-out;
+  transition: all 120ms ease;
 }
 
 input,
@@ -89,11 +80,11 @@ textarea,
 select {
   font-family: inherit;
   font-size: inherit;
-  border: 1px solid var(--border-subtle);
+  border: 1.5px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   background-color: var(--bg-surface);
   color: var(--text-main);
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition: border-color 120ms ease;
 }
 
 input:focus,
@@ -101,21 +92,20 @@ textarea:focus,
 select:focus {
   outline: none;
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
 }
 
 a {
-  color: var(--teal-primary);
+  color: var(--text-main);
   text-decoration: none;
-  transition: color 150ms ease;
+  font-weight: 500;
 }
 
 a:hover {
-  color: var(--teal-hover);
+  text-decoration: underline;
 }
 
 :focus-visible {
-  outline: 2px solid var(--teal-primary);
+  outline: 2px solid var(--border-dark);
   outline-offset: 2px;
 }
 
@@ -130,8 +120,34 @@ a:hover {
   }
 }
 
-@keyframes pinBounce {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.22); }
-  100% { transform: scale(1); }
+@keyframes thunkPinStrike {
+  0% {
+    transform: translateY(-8px) scale(1.25);
+    opacity: 0.6;
+  }
+  65% {
+    transform: translateY(2px) scale(0.9);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes hangingCardSwing {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-2.5deg);
+  }
+  50% {
+    transform: rotate(1.8deg);
+  }
+  75% {
+    transform: rotate(-0.8deg);
+  }
+  100% {
+    transform: rotate(-1.2deg);
+  }
 }

@@ -28,8 +28,8 @@
   width: 32px;
   height: 32px;
   border-radius: var(--radius-sm);
-  background-color: var(--teal-tint);
-  color: var(--teal-primary);
+  background-color: var(--border-dark);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -70,8 +70,8 @@
 }
 
 .navItemActive {
-  background-color: var(--teal-tint);
-  color: var(--teal-primary);
+  background-color: var(--border-dark);
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -95,9 +95,9 @@
   width: 34px;
   height: 34px;
   border-radius: var(--radius-full);
-  background-color: var(--teal-primary);
+  background-color: var(--border-dark);
   color: #ffffff;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 13px;
   display: flex;
   align-items: center;
@@ -152,7 +152,7 @@
 .topbar {
   height: 64px;
   background-color: var(--bg-surface);
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1.5px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -173,16 +173,19 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background-color: var(--teal-primary);
+  background-color: var(--border-dark);
   color: #ffffff;
+  border: 1.5px solid var(--border-dark);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4);
   border-radius: var(--radius-sm);
   font-weight: 600;
   font-size: 13px;
-  box-shadow: var(--shadow-sm);
+  transition: all 120ms ease;
 }
 
 .newNoteButton:hover {
-  background-color: var(--teal-hover);
+  background-color: #27272a;
+  transform: translateY(-1px);
 }
 
 .pageBody {

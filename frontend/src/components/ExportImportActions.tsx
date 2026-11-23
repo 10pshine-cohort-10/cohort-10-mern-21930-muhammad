@@ -24,7 +24,7 @@ export default function ExportImportActions({ onExport, onImportFile }: ExportIm
 
   return (
     <div className={styles.actionsGroup}>
-      {exportError && <span role="alert" style={{ color: 'var(--rose-text)', fontSize: '0.8rem' }}>{exportError}</span>}
+      {exportError && <span role="alert" style={{ color: 'var(--danger-text)', fontSize: '0.8rem' }}>{exportError}</span>}
       <button
         type="button"
         className={styles.secondaryBtn}

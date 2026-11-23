@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
 }
 
 .controlsBar {
@@ -10,6 +10,16 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.sectionHeading {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .bentoStatsBar {
@@ -25,18 +35,20 @@
   gap: 8px;
   padding: 8px 14px;
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1.5px solid var(--border-dark);
   border-radius: var(--radius-sm);
+  box-shadow: 2px 2px 0px var(--border-dark);
   font-size: 13px;
 }
 
 .statValue {
-  font-weight: 700;
-  color: var(--teal-primary);
+  font-weight: 800;
+  color: var(--text-main);
 }
 
 .statLabel {
   color: var(--text-muted);
+  font-weight: 500;
 }
 
 .cmdButton {
@@ -44,30 +56,30 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 12px;
+  padding: 7px 14px;
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1.5px solid var(--border-dark);
   border-radius: var(--radius-sm);
-  color: var(--text-muted);
+  box-shadow: 2px 2px 0px var(--border-dark);
+  color: var(--text-main);
   font-size: 13px;
-  font-weight: 500;
-  transition: all 150ms ease;
+  font-weight: 600;
+  transition: all 120ms ease;
 }
 
 .cmdButton:hover {
   background-color: var(--bg-subtle);
-  color: var(--text-main);
-  border-color: var(--border-hover);
+  transform: translateY(-1px);
 }
 
 .cmdKbd {
   font-family: var(--font-family-mono);
   font-size: 11px;
-  padding: 2px 5px;
+  padding: 2px 6px;
   background-color: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-dark);
   border-radius: var(--radius-sm);
-  color: var(--text-muted);
+  color: var(--text-main);
 }
 
 .actionsGroup {
@@ -80,18 +92,19 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 12px;
+  padding: 8px 14px;
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1.5px solid var(--border-dark);
   border-radius: var(--radius-sm);
+  box-shadow: 2px 2px 0px var(--border-dark);
   color: var(--text-main);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .secondaryBtn:hover {
   background-color: var(--bg-subtle);
-  border-color: var(--border-hover);
+  transform: translateY(-1px);
 }
 
 .hiddenInput {
@@ -101,46 +114,49 @@
 .tagFilterBar {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
 }
 
 .tagChip {
-  padding: 6px 14px;
+  padding: 6px 16px;
   border-radius: var(--radius-full);
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 500;
+  background-color: #ffffff;
+  border: 1.5px solid var(--border-dark);
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 600;
   white-space: nowrap;
+  box-shadow: 2px 2px 0px var(--border-dark);
+  transition: all 120ms ease;
 }
 
 .tagChip:hover {
   background-color: var(--bg-subtle);
-  color: var(--text-main);
+  transform: translateY(-1px);
 }
 
 .tagChipActive {
-  background-color: var(--teal-tint);
-  border-color: var(--teal-border);
-  color: var(--teal-primary);
-  font-weight: 600;
+  background-color: var(--border-dark);
+  color: #ffffff;
+  border-color: var(--border-dark);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4);
 }
 
 .notesGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 20px;
 }
 
 .emptyState {
   padding: 64px 24px;
   text-align: center;
   background-color: var(--bg-surface);
-  border: 1px dashed var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border: 2px dashed var(--border-dark);
+  border-radius: var(--radius-md);
+  box-shadow: 3px 3px 0px var(--border-dark);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -150,45 +166,40 @@
 
 .emptyTitle {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
 }
 
 .emptySubtitle {
   font-size: 13px;
   color: var(--text-muted);
-  max-width: 320px;
 }
 
-.createFirstBtn {
-  margin-top: 8px;
-  padding: 8px 18px;
-  background-color: var(--teal-primary);
-  color: #ffffff;
+.primaryButton {
+  padding: 10px 18px;
+  background-color: var(--border-dark);
+  border: 1.5px solid var(--border-dark);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  color: #ffffff;
   font-weight: 600;
+  font-size: 14px;
 }
 
-.createFirstBtn:hover {
-  background-color: var(--teal-hover);
+.primaryButton:hover {
+  background-color: #27272a;
 }
 
 .skeletonGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 20px;
 }
 
 .skeletonCard {
-  height: 180px;
+  height: 170px;
+  background-color: var(--bg-subtle);
+  border: 2px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+  box-shadow: 2px 2px 0px var(--border-subtle);
 }

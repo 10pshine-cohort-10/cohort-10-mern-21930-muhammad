@@ -24,14 +24,7 @@ interface PaletteAction {
 }
 
 export default function CommandPalette({
-  isOpen,
-  onClose,
-  notes,
-  onSelectNote,
-  onCreateNote,
-  onTogglePinnedFilter,
-  onExportNotes,
-  onLogout,
+  isOpen, onClose, notes, onSelectNote, onCreateNote, onTogglePinnedFilter, onExportNotes, onLogout,
 }: CommandPaletteProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -81,8 +74,7 @@ export default function CommandPalette({
       if (selectedIndex < filteredActions.length) {
         filteredActions[selectedIndex]?.run();
       } else {
-        const selectedNoteIndex = selectedIndex - filteredActions.length;
-        const selectedNote = filteredNotes[selectedNoteIndex];
+        const selectedNote = filteredNotes[selectedIndex - filteredActions.length];
         if (selectedNote) {
           onSelectNote(selectedNote);
           onClose();

@@ -1,23 +1,22 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(6px);
+  background-color: rgba(24, 24, 27, 0.4);
   display: flex;
   align-items: flex-start;
   justify-content: center;
   padding-top: 15vh;
   z-index: 1000;
-  animation: fadeIn 150ms ease-out;
+  animation: fadeIn 120ms ease-out;
 }
 
 .modal {
   width: 100%;
   max-width: 580px;
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  box-shadow: 4px 5px 0px var(--border-dark);
   overflow: hidden;
   animation: fadeInScale 180ms var(--ease-tactile);
 }
@@ -85,8 +84,8 @@
 }
 
 .commandItemActive {
-  background-color: var(--bg-subtle);
-  color: var(--teal-primary);
+  background-color: var(--border-dark);
+  color: #ffffff;
 }
 
 .itemLabelGroup {

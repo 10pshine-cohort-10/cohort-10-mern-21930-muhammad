@@ -1,6 +1,6 @@
 import { useState, type KeyboardEvent, type MouseEvent } from 'react';
-import PropTypes from 'prop-types';
 import { Pin, Trash2 } from 'lucide-react';
+import NoteCardDeleteConfirm from './NoteCardDeleteConfirm';
 import type { Note } from '../types';
 import { extractPlainText, formatRelativeTime } from '../utils/formatters';
 import styles from './NoteCard.module.css';
@@ -14,6 +14,15 @@ const COLOR_CLASS_MAP: Record<string, string> = {
   rose: styles.colorRose,
 };
 
+const NOTE_BADGE_MAP: Record<string, string> = {
+  slate: '📝',
+  sage: '🌿',
+  teal: '💧',
+  sand: '⭐',
+  lavender: '🎨',
+  rose: '💡',
+};
+
 export interface NoteCardProps {
   note: Note;
   onSelect: (note: Note) => void;
@@ -25,19 +34,16 @@ export default function NoteCard({ note, onSelect, onTogglePin, onDelete }: Note
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
   const cardColorClass = (note.color && COLOR_CLASS_MAP[note.color]) || styles.colorSlate;
+  const noteBadge = note.isPinned ? '📌' : (note.color && NOTE_BADGE_MAP[note.color]) || '📝';
   const plainPreview = extractPlainText(note.content || '');
 
   const handleCardClick = () => {
-    if (!isConfirmingDelete && onSelect) {
-      onSelect(note);
-    }
+    if (!isConfirmingDelete && onSelect) onSelect(note);
   };
 
   const handlePinClick = (event: MouseEvent) => {
     event.stopPropagation();
-    if (onTogglePin) {
-      onTogglePin(note.id, !note.isPinned);
-    }
+    onTogglePin?.(note.id, !note.isPinned);
   };
 
   const handleDeleteTrigger = (event: MouseEvent) => {
@@ -47,9 +53,7 @@ export default function NoteCard({ note, onSelect, onTogglePin, onDelete }: Note
 
   const handleConfirmDelete = (event: MouseEvent) => {
     event.stopPropagation();
-    if (onDelete) {
-      onDelete(note.id);
-    }
+    onDelete?.(note.id);
     setIsConfirmingDelete(false);
   };
 
@@ -74,8 +78,17 @@ export default function NoteCard({ note, onSelect, onTogglePin, onDelete }: Note
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
+      {note.isPinned && (
+        <div className={styles.hangingPinIndicator} title="Pinned to board">
+          <div className={styles.hangingPinHole} />
+        </div>
+      )}
+
       <div className={styles.cardHeader}>
-        <h3 className={styles.title}>{note.title || 'Untitled'}</h3>
+        <div className={styles.headerLeft}>
+          <span className={styles.iconBadge}>{noteBadge}</span>
+          <h3 className={styles.title}>{note.title || 'Untitled'}</h3>
+        </div>
 
         <div className={styles.actions}>
           <button
@@ -85,7 +98,7 @@ export default function NoteCard({ note, onSelect, onTogglePin, onDelete }: Note
             title={note.isPinned ? 'Unpin note' : 'Pin note'}
             aria-label={note.isPinned ? 'Unpin note' : 'Pin note'}
           >
-            <Pin size={14} fill={note.isPinned ? 'currentColor' : 'none'} />
+            <Pin size={15} fill={note.isPinned ? 'currentColor' : 'none'} />
           </button>
 
           <button
@@ -95,7 +108,7 @@ export default function NoteCard({ note, onSelect, onTogglePin, onDelete }: Note
             title="Delete note"
             aria-label="Delete note"
           >
-            <Trash2 size={14} />
+            <Trash2 size={15} />
           </button>
         </div>
       </div>
@@ -106,45 +119,19 @@ export default function NoteCard({ note, onSelect, onTogglePin, onDelete }: Note
 
       <div className={styles.cardFooter}>
         <div className={styles.tagsList}>
-          {note.tags &&
-            note.tags.map((tag) => (
-              <span key={tag} className={styles.tagPill}>
-                #{tag}
-              </span>
-            ))}
+          {note.tags?.map((tag) => (
+            <span key={tag} className={styles.tagPill}>
+              #{tag}
+            </span>
+          ))}
         </div>
 
         <span className={styles.timestamp}>{formatRelativeTime(note.createdAt || '')}</span>
       </div>
 
       {isConfirmingDelete && (
-        <div className={styles.deleteConfirm} onClick={(e) => e.stopPropagation()}>
-          <p className={styles.confirmMessage}>Delete this note?</p>
-          <div className={styles.confirmActions}>
-            <button type="button" className={styles.confirmButton} onClick={handleConfirmDelete}>
-              Delete
-            </button>
-            <button type="button" className={styles.cancelButton} onClick={handleCancelDelete}>
-              Cancel
-            </button>
-          </div>
-        </div>
+        <NoteCardDeleteConfirm onConfirm={handleConfirmDelete} onCancel={handleCancelDelete} />
       )}
     </div>
   );
 }
-
-NoteCard.propTypes = {
-  note: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    title: PropTypes.string,
-    content: PropTypes.string,
-    color: PropTypes.string,
-    isPinned: PropTypes.bool,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    createdAt: PropTypes.string,
-  }).isRequired,
-  onSelect: PropTypes.func.isRequired,
-  onTogglePin: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-};

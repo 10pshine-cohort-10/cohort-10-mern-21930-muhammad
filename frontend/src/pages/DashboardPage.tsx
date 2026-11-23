@@ -80,6 +80,7 @@ export default function DashboardPage() {
           onOpenCommandPalette={() => setIsPaletteOpen(true)}
         />
 
+        <div className={styles.sectionHeading}>My folders</div>
         <TagFilterBar
           filterMode={filterMode}
           selectedTag={selectedTag}
@@ -87,6 +88,8 @@ export default function DashboardPage() {
           onSelectFilterMode={setFilterMode}
           onSelectTag={setSelectedTag}
         />
+
+        <div className={styles.sectionHeading}>Recent notes</div>
 
         {isLoading ? (
           <div className={styles.skeletonGrid}>

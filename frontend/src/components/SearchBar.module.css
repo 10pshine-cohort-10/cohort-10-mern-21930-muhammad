@@ -17,16 +17,17 @@
   width: 100%;
   padding: 8px 36px 8px 36px;
   border-radius: var(--radius-sm);
-  background-color: var(--bg-subtle);
-  border: 1px solid transparent;
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--border-dark);
+  box-shadow: 2px 2px 0px var(--border-dark);
   font-size: 13px;
   color: var(--text-main);
-  transition: all 150ms ease;
+  transition: all 120ms ease;
 }
 
 .searchInput:focus {
   background-color: var(--bg-surface);
-  border-color: var(--border-focus);
+  border-color: var(--border-dark);
 }
 
 .clearButton {
