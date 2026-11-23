@@ -45,6 +45,9 @@
 
   --font-family-base: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-family-mono: 'JetBrains Mono', monospace;
+
+  --ease-tactile: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-tactile: 200ms var(--ease-tactile);
 }
 
 *,
@@ -109,4 +112,26 @@ a {
 
 a:hover {
   color: var(--teal-hover);
+}
+
+:focus-visible {
+  outline: 2px solid var(--teal-primary);
+  outline-offset: 2px;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pinBounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.22); }
+  100% { transform: scale(1); }
 }

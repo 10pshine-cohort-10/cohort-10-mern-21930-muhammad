@@ -110,7 +110,8 @@ export default function LoginPage() {
         </form>
 
         <p className={styles.footer}>
-          Don&apos;t have an account? <Link to="/register">Create one</Link>
+          Don&apos;t have an account? <Link to="/register">Create one</Link> or{' '}
+          <Link to="/scratchpad">try as guest</Link>
         </p>
       </div>
     </div>

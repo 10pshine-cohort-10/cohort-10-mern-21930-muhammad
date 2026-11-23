@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { X } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
+import NoteEditorHeader from './NoteEditorHeader';
 import EditorToolbar from './EditorToolbar';
 import NoteMetaRow from './NoteMetaRow';
 import NoteTagList from './NoteTagList';
@@ -22,15 +23,13 @@ export default function NoteEditor({ note, isOpen, onClose, onSave }: NoteEditor
   const [isPinned, setIsPinned] = useState<boolean>(false);
   const [tags, setTags] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isFocusMode, setIsFocusMode] = useState<boolean>(false);
+  const [showMetadata, setShowMetadata] = useState<boolean>(false);
 
   const editor = useEditor({
     extensions: [StarterKit],
     content: note?.content || '',
-    editorProps: {
-      attributes: {
-        class: styles.tiptapEditor,
-      },
-    },
+    editorProps: { attributes: { class: styles.tiptapEditor } },
   });
 
   useEffect(() => {
@@ -75,18 +74,13 @@ export default function NoteEditor({ note, isOpen, onClose, onSave }: NoteEditor
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.drawer} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.drawerHeader}>
-          <span className={styles.headerTitle}>{note ? 'Edit Note' : 'Create Note'}</span>
-          <button
-            type="button"
-            className={styles.closeButton}
-            onClick={onClose}
-            aria-label="Close editor"
-          >
-            <X size={18} />
-          </button>
-        </div>
+      <div className={`${styles.drawer} ${isFocusMode ? styles.drawerFocus : ''}`} onClick={(e) => e.stopPropagation()}>
+        <NoteEditorHeader
+          isEditing={Boolean(note?.id)}
+          isFocusMode={isFocusMode}
+          onToggleFocusMode={() => setIsFocusMode(!isFocusMode)}
+          onClose={onClose}
+        />
 
         <div className={styles.drawerBody}>
           <input
@@ -97,20 +91,31 @@ export default function NoteEditor({ note, isOpen, onClose, onSave }: NoteEditor
             placeholder="Note title..."
           />
 
-          <NoteMetaRow
-            color={color}
-            isPinned={isPinned}
-            onColorChange={setColor}
-            onTogglePin={() => setIsPinned(!isPinned)}
-          />
+          <div>
+            <button
+              type="button"
+              className={styles.collapsibleToggle}
+              onClick={() => setShowMetadata(!showMetadata)}
+              aria-expanded={showMetadata}
+            >
+              {showMetadata ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              <span>{showMetadata ? 'Hide Details' : 'Details & Tags'}</span>
+            </button>
+          </div>
 
-          <NoteTagList
-            tags={tags}
-            onAddTag={handleAddTag}
-            onRemoveTag={handleRemoveTag}
-          />
+          {showMetadata && (
+            <>
+              <NoteMetaRow
+                color={color}
+                isPinned={isPinned}
+                onColorChange={setColor}
+                onTogglePin={() => setIsPinned(!isPinned)}
+              />
+              <NoteTagList tags={tags} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
+            </>
+          )}
 
-          <EditorToolbar editor={editor} />
+          {!isFocusMode && <EditorToolbar editor={editor} />}
 
           <div className={styles.editorContent}>
             <EditorContent editor={editor} />
@@ -118,9 +123,7 @@ export default function NoteEditor({ note, isOpen, onClose, onSave }: NoteEditor
         </div>
 
         <div className={styles.drawerFooter}>
-          <button type="button" className={styles.cancelBtn} onClick={onClose} disabled={isSaving}>
-            Cancel
-          </button>
+          <button type="button" className={styles.cancelBtn} onClick={onClose} disabled={isSaving}>Cancel</button>
           <button type="button" className={styles.saveBtn} onClick={handleSave} disabled={isSaving}>
             {isSaving ? 'Saving...' : 'Save Note'}
           </button>

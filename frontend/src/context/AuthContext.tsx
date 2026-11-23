@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import client from '../api/client';
+import { syncGuestNotesIfAny } from '../utils/guestSync';
 import type { User, AuthContextValue, ApiResponse, AuthResponseData } from '../types';
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -76,6 +77,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.setItem('notes_user_data', JSON.stringify(receivedUser));
       setToken(receivedToken);
       setUser(receivedUser);
+      syncGuestNotesIfAny(receivedToken);
       return receivedUser;
     } catch (err) {
       console.error('Login request failed:', err);
@@ -93,6 +95,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.setItem('notes_user_data', JSON.stringify(receivedUser));
       setToken(receivedToken);
       setUser(receivedUser);
+      syncGuestNotesIfAny(receivedToken);
       return receivedUser;
     } catch (err) {
       console.error('Registration request failed:', err);
