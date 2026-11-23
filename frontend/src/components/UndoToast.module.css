@@ -1,0 +1,79 @@
+.toastContainer {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--color-surface);
+  border: 2px solid var(--border-dark);
+  box-shadow: 4px 4px 0px var(--shadow-dark);
+  border-radius: 8px;
+  padding: 10px 16px;
+  animation: slideInUp 0.15s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.message {
+  font-size: 0.9rem;
+  color: var(--text-dark);
+}
+
+.countdownBadge {
+  font-size: 0.8rem;
+  font-family: monospace;
+  font-weight: 700;
+  padding: 2px 6px;
+  background: #f4f4f5;
+  border: 1px solid var(--border-dark);
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+.undoBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--color-accent-dark);
+  color: #ffffff;
+  border: 1.5px solid var(--border-dark);
+  box-shadow: 2px 2px 0px var(--shadow-dark);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.undoBtn:hover {
+  transform: translate(-1px, -1px);
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.closeBtn:hover {
+  color: var(--text-dark);
+  background-color: #f4f4f5;
+}

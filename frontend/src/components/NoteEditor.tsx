@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { useState, useEffect, useCallback } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { ChevronDown, ChevronRight } from 'lucide-react';
@@ -7,6 +6,7 @@ import NoteEditorHeader from './NoteEditorHeader';
 import EditorToolbar from './EditorToolbar';
 import NoteMetaRow from './NoteMetaRow';
 import NoteTagList from './NoteTagList';
+import { useDebouncedAutosave } from '../hooks/useDebouncedAutosave';
 import type { Note, NoteInput, NoteColor } from '../types';
 import styles from './NoteEditor.module.css';
 
@@ -14,7 +14,7 @@ export interface NoteEditorProps {
   note: Note | NoteInput | null;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: NoteInput) => Promise<void>;
+  onSave: (notePayload: NoteInput) => Promise<void>;
 }
 
 export default function NoteEditor({ note, isOpen, onClose, onSave }: NoteEditorProps) {
@@ -22,7 +22,6 @@ export default function NoteEditor({ note, isOpen, onClose, onSave }: NoteEditor
   const [color, setColor] = useState<NoteColor>('slate');
   const [isPinned, setIsPinned] = useState<boolean>(false);
   const [tags, setTags] = useState<string[]>([]);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isFocusMode, setIsFocusMode] = useState<boolean>(false);
   const [showMetadata, setShowMetadata] = useState<boolean>(false);
 
@@ -32,43 +31,46 @@ export default function NoteEditor({ note, isOpen, onClose, onSave }: NoteEditor
     editorProps: { attributes: { class: styles.tiptapEditor } },
   });
 
+  const getEditorContent = useCallback(() => (editor ? editor.getHTML() : ''), [editor]);
+
+  const { saveStatus, setSaveStatus, clearTimer } = useDebouncedAutosave({
+    noteId: note?.id,
+    isOpen,
+    title,
+    color,
+    isPinned,
+    tags,
+    getContent: getEditorContent,
+    onSave,
+  });
+
   useEffect(() => {
     setTitle(note?.title || '');
     setColor(note?.color || 'slate');
     setIsPinned(Boolean(note?.isPinned));
     setTags(Array.isArray(note?.tags) ? note.tags : []);
-    if (editor) {
-      editor.commands.setContent(note?.content || '');
-    }
+    if (editor) editor.commands.setContent(note?.content || '');
   }, [note, editor]);
 
   if (!isOpen) return null;
 
-  const handleAddTag = (newTag: string) => {
-    if (!tags.includes(newTag)) setTags([...tags, newTag]);
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter((t) => t !== tagToRemove));
-  };
-
-  const handleSave = async () => {
-    const htmlContent = editor ? editor.getHTML() : '';
-    setIsSaving(true);
+  const handleManualSave = async () => {
+    clearTimer();
+    setSaveStatus('saving');
     try {
       await onSave({
         id: note?.id,
         title: title.trim() || 'Untitled',
-        content: htmlContent,
+        content: getEditorContent(),
         color,
         isPinned,
         tags,
       });
+      setSaveStatus('saved');
       onClose();
     } catch (err) {
-      console.error('Failed to save note in editor:', err);
-    } finally {
-      setIsSaving(false);
+      console.error('Failed to save note:', err);
+      setSaveStatus('idle');
     }
   };
 
@@ -78,6 +80,7 @@ export default function NoteEditor({ note, isOpen, onClose, onSave }: NoteEditor
         <NoteEditorHeader
           isEditing={Boolean(note?.id)}
           isFocusMode={isFocusMode}
+          saveStatus={saveStatus}
           onToggleFocusMode={() => setIsFocusMode(!isFocusMode)}
           onClose={onClose}
         />
@@ -111,7 +114,11 @@ export default function NoteEditor({ note, isOpen, onClose, onSave }: NoteEditor
                 onColorChange={setColor}
                 onTogglePin={() => setIsPinned(!isPinned)}
               />
-              <NoteTagList tags={tags} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
+              <NoteTagList
+                tags={tags}
+                onAddTag={(tag) => !tags.includes(tag) && setTags([...tags, tag])}
+                onRemoveTag={(tag) => setTags(tags.filter((t) => t !== tag))}
+              />
             </>
           )}
 
@@ -123,26 +130,14 @@ export default function NoteEditor({ note, isOpen, onClose, onSave }: NoteEditor
         </div>
 
         <div className={styles.drawerFooter}>
-          <button type="button" className={styles.cancelBtn} onClick={onClose} disabled={isSaving}>Cancel</button>
-          <button type="button" className={styles.saveBtn} onClick={handleSave} disabled={isSaving}>
-            {isSaving ? 'Saving...' : 'Save Note'}
+          <button type="button" className={styles.cancelBtn} onClick={onClose} disabled={saveStatus === 'saving'}>
+            Cancel
+          </button>
+          <button type="button" className={styles.saveBtn} onClick={handleManualSave} disabled={saveStatus === 'saving'}>
+            {saveStatus === 'saving' ? 'Saving...' : 'Save Note'}
           </button>
         </div>
       </div>
     </div>
   );
 }
-
-NoteEditor.propTypes = {
-  note: PropTypes.shape({
-    id: PropTypes.string,
-    title: PropTypes.string,
-    content: PropTypes.string,
-    color: PropTypes.string,
-    isPinned: PropTypes.bool,
-    tags: PropTypes.arrayOf(PropTypes.string),
-  }),
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
-};

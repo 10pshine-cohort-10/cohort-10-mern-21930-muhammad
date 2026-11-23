@@ -1,10 +1,12 @@
-import PropTypes from 'prop-types';
 import { X, Maximize2, Minimize2 } from 'lucide-react';
 import styles from './NoteEditor.module.css';
+
+export type SaveStatus = 'idle' | 'saving' | 'saved' | 'draft';
 
 export interface NoteEditorHeaderProps {
   isEditing: boolean;
   isFocusMode: boolean;
+  saveStatus?: SaveStatus;
   onToggleFocusMode: () => void;
   onClose: () => void;
 }
@@ -12,12 +14,30 @@ export interface NoteEditorHeaderProps {
 export default function NoteEditorHeader({
   isEditing,
   isFocusMode,
+  saveStatus = 'idle',
   onToggleFocusMode,
   onClose,
 }: NoteEditorHeaderProps) {
+  let stampLabel = '';
+  let stampClass = styles.saveStamp;
+
+  if (saveStatus === 'saving') {
+    stampLabel = '[ SAVING... ]';
+    stampClass = `${styles.saveStamp} ${styles.saveStampActive}`;
+  } else if (saveStatus === 'saved') {
+    stampLabel = '[ STAMPED ]';
+    stampClass = `${styles.saveStamp} ${styles.saveStampSaved}`;
+  } else if (saveStatus === 'draft') {
+    stampLabel = '[ DRAFT ]';
+  }
+
   return (
     <div className={styles.drawerHeader}>
-      <span className={styles.headerTitle}>{isEditing ? 'Edit Note' : 'Create Note'}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span className={styles.headerTitle}>{isEditing ? 'Edit Note' : 'Create Note'}</span>
+        {stampLabel && <span className={stampClass}>{stampLabel}</span>}
+      </div>
+
       <div className={styles.headerActions}>
         <button
           type="button"
@@ -40,10 +60,3 @@ export default function NoteEditorHeader({
     </div>
   );
 }
-
-NoteEditorHeader.propTypes = {
-  isEditing: PropTypes.bool.isRequired,
-  isFocusMode: PropTypes.bool.isRequired,
-  onToggleFocusMode: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
-};

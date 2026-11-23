@@ -1,0 +1,36 @@
+.toggleContainer {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--color-surface);
+  border: 1.5px solid var(--border-dark);
+  box-shadow: 2px 2px 0px var(--shadow-dark);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.toggleBtn:hover {
+  color: var(--text-dark);
+}
+
+.toggleBtnActive {
+  background-color: var(--color-accent-dark);
+  color: #ffffff !important;
+  box-shadow: 1px 1px 0px var(--shadow-dark);
+}

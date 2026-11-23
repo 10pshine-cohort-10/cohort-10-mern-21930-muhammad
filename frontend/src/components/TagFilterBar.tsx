@@ -1,10 +1,12 @@
-import PropTypes from 'prop-types';
 import styles from '../pages/DashboardPage.module.css';
 
 export interface TagFilterBarProps {
   filterMode: string;
   selectedTag: string;
   allTags: string[];
+  totalCount?: number;
+  pinnedCount?: number;
+  tagCounts?: Record<string, number>;
   onSelectFilterMode: (mode: string) => void;
   onSelectTag: (tag: string) => void;
 }
@@ -13,6 +15,9 @@ export default function TagFilterBar({
   filterMode,
   selectedTag,
   allTags,
+  totalCount,
+  pinnedCount,
+  tagCounts = {},
   onSelectFilterMode,
   onSelectTag,
 }: TagFilterBarProps) {
@@ -26,7 +31,7 @@ export default function TagFilterBar({
           onSelectTag('');
         }}
       >
-        All Notes
+        All Notes {typeof totalCount === 'number' ? `(${totalCount})` : ''}
       </button>
 
       <button
@@ -37,30 +42,25 @@ export default function TagFilterBar({
           onSelectTag('');
         }}
       >
-        Pinned
+        Pinned {typeof pinnedCount === 'number' ? `(${pinnedCount})` : ''}
       </button>
 
-      {allTags.map((tag) => (
-        <button
-          key={tag}
-          type="button"
-          className={`${styles.tagChip} ${selectedTag === tag ? styles.tagChipActive : ''}`}
-          onClick={() => {
-            onSelectFilterMode('all');
-            onSelectTag(selectedTag === tag ? '' : tag);
-          }}
-        >
-          #{tag}
-        </button>
-      ))}
+      {allTags.map((tag) => {
+        const count = tagCounts[tag];
+        return (
+          <button
+            key={tag}
+            type="button"
+            className={`${styles.tagChip} ${selectedTag === tag ? styles.tagChipActive : ''}`}
+            onClick={() => {
+              onSelectFilterMode('all');
+              onSelectTag(selectedTag === tag ? '' : tag);
+            }}
+          >
+            #{tag} {typeof count === 'number' ? `(${count})` : ''}
+          </button>
+        );
+      })}
     </div>
   );
 }
-
-TagFilterBar.propTypes = {
-  filterMode: PropTypes.string.isRequired,
-  selectedTag: PropTypes.string.isRequired,
-  allTags: PropTypes.arrayOf(PropTypes.string).isRequired,
-  onSelectFilterMode: PropTypes.func.isRequired,
-  onSelectTag: PropTypes.func.isRequired,
-};

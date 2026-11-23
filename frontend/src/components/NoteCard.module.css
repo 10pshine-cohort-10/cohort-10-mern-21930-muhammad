@@ -18,6 +18,13 @@
   box-shadow: var(--card-shadow-hover);
 }
 
+.cardFocused {
+  outline: 3px solid var(--border-dark);
+  outline-offset: 3px;
+  box-shadow: 5px 5px 0px var(--shadow-dark) !important;
+  transform: translateY(-2px);
+}
+
 .cardPinned {
   transform: rotate(-1.2deg);
   animation: hangingCardSwing 360ms var(--ease-tactile);

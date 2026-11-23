@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import { forwardRef } from 'react';
 import { Search, X } from 'lucide-react';
 import styles from './SearchBar.module.css';
 
@@ -9,16 +9,15 @@ export interface SearchBarProps {
   placeholder?: string;
 }
 
-export default function SearchBar({
-  value,
-  onChange,
-  onClear,
-  placeholder = 'Search notes...',
-}: SearchBarProps) {
+const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function SearchBar(
+  { value, onChange, onClear, placeholder = 'Search notes...' },
+  ref
+) {
   return (
     <div className={styles.searchContainer}>
       <Search size={16} className={styles.searchIcon} />
       <input
+        ref={ref}
         type="text"
         className={styles.searchInput}
         value={value}
@@ -37,11 +36,6 @@ export default function SearchBar({
       )}
     </div>
   );
-}
+});
 
-SearchBar.propTypes = {
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onClear: PropTypes.func.isRequired,
-  placeholder: PropTypes.string,
-};
+export default SearchBar;

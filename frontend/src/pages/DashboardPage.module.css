@@ -203,3 +203,45 @@
   border-radius: var(--radius-md);
   box-shadow: 2px 2px 0px var(--border-subtle);
 }
+
+.notesStream {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.headerWithAction {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+.starterTemplatesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.templateBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  border: 1.5px solid var(--border-dark);
+  box-shadow: 2px 2px 0px var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.templateBtn:hover {
+  transform: translate(-1px, -1px);
+}

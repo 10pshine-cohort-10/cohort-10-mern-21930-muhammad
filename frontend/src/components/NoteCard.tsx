@@ -25,12 +25,19 @@ const NOTE_BADGE_MAP: Record<string, string> = {
 
 export interface NoteCardProps {
   note: Note;
+  isFocused?: boolean;
   onSelect: (note: Note) => void;
   onTogglePin: (id: string, isPinned: boolean) => void;
   onDelete: (id: string) => void;
 }
 
-export default function NoteCard({ note, onSelect, onTogglePin, onDelete }: NoteCardProps) {
+export default function NoteCard({
+  note,
+  isFocused = false,
+  onSelect,
+  onTogglePin,
+  onDelete,
+}: NoteCardProps) {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
   const cardColorClass = (note.color && COLOR_CLASS_MAP[note.color]) || styles.colorSlate;
@@ -72,7 +79,7 @@ export default function NoteCard({ note, onSelect, onTogglePin, onDelete }: Note
 
   return (
     <div
-      className={`${styles.card} ${cardColorClass} ${note.isPinned ? styles.cardPinned : ''}`}
+      className={`${styles.card} ${cardColorClass} ${note.isPinned ? styles.cardPinned : ''} ${isFocused ? styles.cardFocused : ''}`}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}

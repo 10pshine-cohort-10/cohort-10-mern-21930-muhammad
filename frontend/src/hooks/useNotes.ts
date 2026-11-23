@@ -222,6 +222,14 @@ export function useNotes() {
     new Set(notes.flatMap((n) => (Array.isArray(n.tags) ? n.tags : [])))
   ).sort();
 
+  const removeNoteLocally = useCallback((id: string) => {
+    setNotes((prev) => prev.filter((n) => n.id !== id));
+  }, []);
+
+  const restoreNoteLocally = useCallback((note: Note) => {
+    setNotes((prev) => [note, ...prev.filter((n) => n.id !== note.id)]);
+  }, []);
+
   return {
     notes,
     isLoading,
@@ -238,5 +246,7 @@ export function useNotes() {
     togglePin,
     exportNotes,
     importNotes,
+    removeNoteLocally,
+    restoreNoteLocally,
   };
 }
