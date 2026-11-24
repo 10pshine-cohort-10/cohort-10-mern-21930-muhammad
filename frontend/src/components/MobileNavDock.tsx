@@ -1,0 +1,58 @@
+import { Link, useLocation } from 'react-router-dom';
+import { Home, Edit3, Plus, Archive, User } from 'lucide-react';
+import styles from './MobileNavDock.module.css';
+
+export interface MobileNavDockProps {
+  onQuickAddClick?: () => void;
+}
+
+export default function MobileNavDock({ onQuickAddClick }: MobileNavDockProps) {
+  const location = useLocation();
+
+  return (
+    <nav className={styles.dock} aria-label="Mobile Navigation">
+      <Link
+        to="/dashboard"
+        className={`${styles.item} ${location.pathname === '/dashboard' ? styles.active : ''}`}
+        title="Dashboard"
+      >
+        <Home size={20} />
+      </Link>
+
+      <Link
+        to="/scratchpad"
+        className={`${styles.item} ${location.pathname === '/scratchpad' ? styles.active : ''}`}
+        title="Scratchpad"
+      >
+        <Edit3 size={20} />
+      </Link>
+
+      {onQuickAddClick && (
+        <button
+          type="button"
+          className={styles.centerAddBtn}
+          onClick={onQuickAddClick}
+          aria-label="Create new note"
+        >
+          <Plus size={22} />
+        </button>
+      )}
+
+      <Link
+        to="/archive"
+        className={`${styles.item} ${location.pathname === '/archive' ? styles.active : ''}`}
+        title="Archive"
+      >
+        <Archive size={20} />
+      </Link>
+
+      <Link
+        to="/profile"
+        className={`${styles.item} ${location.pathname === '/profile' ? styles.active : ''}`}
+        title="Profile"
+      >
+        <User size={20} />
+      </Link>
+    </nav>
+  );
+}

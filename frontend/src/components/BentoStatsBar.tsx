@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { Terminal } from 'lucide-react';
 import styles from '../pages/DashboardPage.module.css';
 
@@ -7,6 +6,8 @@ export interface BentoStatsBarProps {
   pinnedCount: number;
   totalTags: number;
   onOpenCommandPalette: () => void;
+  onFilterAll?: () => void;
+  onFilterPinned?: () => void;
 }
 
 export default function BentoStatsBar({
@@ -14,21 +15,40 @@ export default function BentoStatsBar({
   pinnedCount,
   totalTags,
   onOpenCommandPalette,
+  onFilterAll,
+  onFilterPinned,
 }: BentoStatsBarProps) {
   return (
     <div className={styles.bentoStatsBar}>
-      <div className={styles.statCard}>
+      <div
+        className={styles.statCard}
+        onClick={onFilterAll}
+        role={onFilterAll ? 'button' : undefined}
+        tabIndex={onFilterAll ? 0 : undefined}
+        style={{ cursor: onFilterAll ? 'pointer' : 'default' }}
+        title={onFilterAll ? 'Show all notes' : undefined}
+      >
         <span className={styles.statValue}>{totalNotes}</span>
         <span className={styles.statLabel}>Total Notes</span>
       </div>
-      <div className={styles.statCard}>
+
+      <div
+        className={styles.statCard}
+        onClick={onFilterPinned}
+        role={onFilterPinned ? 'button' : undefined}
+        tabIndex={onFilterPinned ? 0 : undefined}
+        style={{ cursor: onFilterPinned ? 'pointer' : 'default' }}
+        title={onFilterPinned ? 'Filter pinned notes' : undefined}
+      >
         <span className={styles.statValue}>{pinnedCount}</span>
         <span className={styles.statLabel}>Pinned</span>
       </div>
+
       <div className={styles.statCard}>
         <span className={styles.statValue}>{totalTags}</span>
-        <span className={styles.statLabel}>Tags</span>
+        <span className={styles.statLabel}>Folders</span>
       </div>
+
       <button
         type="button"
         className={styles.cmdButton}
@@ -43,10 +63,3 @@ export default function BentoStatsBar({
     </div>
   );
 }
-
-BentoStatsBar.propTypes = {
-  totalNotes: PropTypes.number.isRequired,
-  pinnedCount: PropTypes.number.isRequired,
-  totalTags: PropTypes.number.isRequired,
-  onOpenCommandPalette: PropTypes.func.isRequired,
-};

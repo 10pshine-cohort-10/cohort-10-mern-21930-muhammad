@@ -1,0 +1,30 @@
+import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import MobileNavDock from '../components/MobileNavDock';
+
+describe('MobileNavDock Component', () => {
+  it('renders all primary navigation links', () => {
+    render(
+      <MemoryRouter initialEntries={['/dashboard']}>
+        <MobileNavDock onQuickAddClick={jest.fn()} />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByTitle('Dashboard')).toBeInTheDocument();
+    expect(screen.getByTitle('Scratchpad')).toBeInTheDocument();
+    expect(screen.getByTitle('Archive')).toBeInTheDocument();
+    expect(screen.getByTitle('Profile')).toBeInTheDocument();
+  });
+
+  it('triggers onQuickAddClick when center plus button is clicked', () => {
+    const handleAdd = jest.fn();
+    render(
+      <MemoryRouter initialEntries={['/dashboard']}>
+        <MobileNavDock onQuickAddClick={handleAdd} />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByLabelText('Create new note'));
+    expect(handleAdd).toHaveBeenCalledTimes(1);
+  });
+});

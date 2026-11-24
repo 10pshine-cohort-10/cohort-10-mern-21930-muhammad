@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, FileText, User as UserIcon, LogOut, Plus } from 'lucide-react';
+import { BookOpen, FileText, Edit3, Archive, User as UserIcon, LogOut, Plus } from 'lucide-react';
+import MobileNavDock from './MobileNavDock';
 import { useAuth } from '../context/AuthContext';
 import styles from './Layout.module.css';
 
@@ -33,6 +33,22 @@ export default function Layout({ children, onNewNoteClick }: LayoutProps) {
           >
             <FileText size={18} />
             <span>All Notes</span>
+          </Link>
+
+          <Link
+            to="/scratchpad"
+            className={`${styles.navItem} ${location.pathname === '/scratchpad' ? styles.navItemActive : ''}`}
+          >
+            <Edit3 size={18} />
+            <span>Scratchpad</span>
+          </Link>
+
+          <Link
+            to="/archive"
+            className={`${styles.navItem} ${location.pathname === '/archive' ? styles.navItemActive : ''}`}
+          >
+            <Archive size={18} />
+            <span>Archive</span>
           </Link>
 
           <Link
@@ -83,11 +99,8 @@ export default function Layout({ children, onNewNoteClick }: LayoutProps) {
 
         <main className={styles.pageBody}>{children}</main>
       </div>
+
+      <MobileNavDock onQuickAddClick={onNewNoteClick} />
     </div>
   );
 }
-
-Layout.propTypes = {
-  children: PropTypes.node.isRequired,
-  onNewNoteClick: PropTypes.func,
-};

@@ -9,6 +9,7 @@ export interface TagFilterBarProps {
   tagCounts?: Record<string, number>;
   onSelectFilterMode: (mode: string) => void;
   onSelectTag: (tag: string) => void;
+  onAddNewFolder?: (folderName: string) => void;
 }
 
 export default function TagFilterBar({
@@ -20,7 +21,15 @@ export default function TagFilterBar({
   tagCounts = {},
   onSelectFilterMode,
   onSelectTag,
+  onAddNewFolder,
 }: TagFilterBarProps) {
+  const handleCreateFolder = () => {
+    const input = window.prompt('Enter new folder name:');
+    if (input && input.trim()) {
+      onAddNewFolder?.(input.trim().toLowerCase().replace(/^#/, ''));
+    }
+  };
+
   return (
     <div className={styles.tagFilterBar}>
       <button
@@ -61,6 +70,17 @@ export default function TagFilterBar({
           </button>
         );
       })}
+
+      {onAddNewFolder && (
+        <button
+          type="button"
+          className={styles.tagChip}
+          onClick={handleCreateFolder}
+          title="Create a new folder"
+        >
+          + Folder
+        </button>
+      )}
     </div>
   );
 }

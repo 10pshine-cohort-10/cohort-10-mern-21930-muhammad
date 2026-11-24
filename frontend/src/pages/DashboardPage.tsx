@@ -34,20 +34,17 @@ export default function DashboardPage() {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [filterMode, setFilterMode] = useState('all');
   const [viewMode, setViewMode] = useState<ViewMode>(() => (localStorage.getItem('notes_view_mode') as ViewMode) || 'grid');
-
   const searchInputRef = useRef<HTMLInputElement>(null);
   const quickTackInputRef = useRef<HTMLInputElement>(null);
 
   usePaletteShortcut(() => setIsPaletteOpen(true));
 
   const { deletedNote, triggerSoftDelete, undoDelete, dismissToast } = useSoftDelete({
-    onPermanentDelete: deleteNote,
-    onRestoreNote: restoreNoteLocally,
-    onRemoveFromState: removeNoteLocally,
+    onPermanentDelete: deleteNote, onRestoreNote: restoreNoteLocally, onRemoveFromState: removeNoteLocally,
   });
 
-  const displayedNotes = notes.filter((n: Note) => (filterMode === 'pinned' ? n.isPinned : true));
-  const pinnedCount = notes.filter((n) => n.isPinned).length;
+  const displayedNotes = notes.filter((n: Note) => !selectedTag && n.tags?.includes('archive') ? false : filterMode === 'pinned' ? n.isPinned : true);
+  const pinnedCount = notes.filter((n) => n.isPinned && !n.tags?.includes('archive')).length;
 
   const openEditor = (targetNote: Note | NoteInput | null = null) => {
     setActiveNoteForEdit(targetNote);
@@ -75,9 +72,7 @@ export default function DashboardPage() {
   };
 
   const tagCounts: Record<string, number> = {};
-  for (const t of allTags) {
-    tagCounts[t] = notes.filter((n) => Array.isArray(n.tags) && n.tags.includes(t)).length;
-  }
+  for (const t of allTags) tagCounts[t] = notes.filter((n) => n.tags?.includes(t)).length;
 
   return (
     <Layout onNewNoteClick={() => openEditor(null)}>
@@ -87,13 +82,18 @@ export default function DashboardPage() {
           <ExportImportActions onExport={exportNotes} onImportFile={handleImportFileChange} />
         </div>
 
-        <BentoStatsBar totalNotes={notes.length} pinnedCount={pinnedCount} totalTags={allTags.length} onOpenCommandPalette={() => setIsPaletteOpen(true)} />
+        <BentoStatsBar
+          totalNotes={notes.length} pinnedCount={pinnedCount} totalTags={allTags.length}
+          onOpenCommandPalette={() => setIsPaletteOpen(true)}
+          onFilterAll={() => { setFilterMode('all'); setSelectedTag(''); }}
+          onFilterPinned={() => setFilterMode('pinned')}
+        />
 
         <div className={styles.sectionHeading}>My folders</div>
         <TagFilterBar
           filterMode={filterMode} selectedTag={selectedTag} allTags={allTags}
           totalCount={notes.length} pinnedCount={pinnedCount} tagCounts={tagCounts}
-          onSelectFilterMode={setFilterMode} onSelectTag={setSelectedTag}
+          onSelectFilterMode={setFilterMode} onSelectTag={setSelectedTag} onAddNewFolder={setSelectedTag}
         />
 
         <div className={styles.headerWithAction}>

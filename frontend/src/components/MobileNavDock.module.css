@@ -1,0 +1,61 @@
+.dock {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #18181b;
+  border: 2px solid #18181b;
+  border-radius: var(--radius-full);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25), 3px 3px 0px rgba(0, 0, 0, 0.4);
+  padding: 6px 16px;
+  align-items: center;
+  gap: 18px;
+  z-index: 100;
+}
+
+@media (max-width: 768px) {
+  .dock {
+    display: flex;
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a1a1aa;
+  padding: 8px;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.item:hover {
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.active {
+  color: #ffffff;
+}
+
+.centerAddBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-full);
+  background-color: #ffffff;
+  color: #18181b;
+  border: 2px solid #18181b;
+  box-shadow: 1px 1px 0px #18181b;
+  cursor: pointer;
+  margin: 0 4px;
+  transition: transform 0.1s ease;
+}
+
+.centerAddBtn:hover {
+  transform: scale(1.08);
+}

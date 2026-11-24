@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
 import ScratchpadPage from './pages/ScratchpadPage';
+import ArchivePage from './pages/ArchivePage';
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/archive" element={<ArchivePage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
 
