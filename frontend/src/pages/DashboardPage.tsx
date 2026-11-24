@@ -1,10 +1,9 @@
 import { useState, useRef, type ChangeEvent } from 'react';
 import Layout from '../components/Layout';
-import SearchBar from '../components/SearchBar';
+import DashboardControls from '../components/DashboardControls';
 import NoteCard from '../components/NoteCard';
 import NoteEditor from '../components/NoteEditor';
 import TagFilterBar from '../components/TagFilterBar';
-import ExportImportActions from '../components/ExportImportActions';
 import NotesEmptyState from '../components/NotesEmptyState';
 import BentoStatsBar from '../components/BentoStatsBar';
 import CommandPalette from '../components/CommandPalette';
@@ -49,8 +48,15 @@ export default function DashboardPage() {
     onPermanentDelete: deleteNote, onRestoreNote: restoreNoteLocally, onRemoveFromState: removeNoteLocally,
   });
 
-  const displayedNotes = notes.filter((n: Note) => !selectedTag && n.tags?.includes('archive') ? false : filterMode === 'pinned' ? n.isPinned : true);
-  const pinnedCount = notes.filter((n) => n.isPinned && !n.tags?.includes('archive')).length;
+  const safeNotes = Array.isArray(notes) ? notes : [];
+  const safeTags = Array.isArray(allTags) ? allTags : [];
+  const displayedNotes = safeNotes.filter((n: Note) => {
+    if (!n) return false;
+    const tags = Array.isArray(n.tags) ? n.tags : [];
+    if (!selectedTag && tags.includes('archive')) return false;
+    return filterMode === 'pinned' ? Boolean(n.isPinned) : true;
+  });
+  const pinnedCount = safeNotes.filter((n) => n && n.isPinned && !(Array.isArray(n.tags) && n.tags.includes('archive'))).length;
 
   const openEditor = (targetNote: Note | NoteInput | null = null) => {
     setActiveNoteForEdit(targetNote);
@@ -62,7 +68,7 @@ export default function DashboardPage() {
     isModalOpen: isEditorOpen || isPaletteOpen || isHelpOpen,
     onSelectNote: openEditor,
     onTogglePin: togglePin,
-    onDeleteNote: (id) => { const n = notes.find((item) => item.id === id); if (n) triggerSoftDelete(n); },
+    onDeleteNote: (id) => { const n = safeNotes.find((item) => item.id === id); if (n) triggerSoftDelete(n); },
     onUndoDelete: undoDelete,
     onOpenNewNote: () => openEditor(null),
     onToggleHelp: () => setIsHelpOpen((prev) => !prev),
@@ -78,18 +84,24 @@ export default function DashboardPage() {
   };
 
   const tagCounts: Record<string, number> = {};
-  for (const t of allTags) tagCounts[t] = notes.filter((n) => n.tags?.includes(t)).length;
+  for (const t of safeTags) {
+    tagCounts[t] = safeNotes.filter((n) => n && Array.isArray(n.tags) && n.tags.includes(t)).length;
+  }
 
   return (
     <Layout onNewNoteClick={() => openEditor(null)}>
       <div className={styles.container}>
-        <div className={styles.controlsBar}>
-          <SearchBar ref={searchInputRef} value={searchQuery} onChange={setSearchQuery} onClear={() => setSearchQuery('')} />
-          <ExportImportActions onExport={exportNotes} onImportFile={handleImportFileChange} />
-        </div>
+        <DashboardControls
+          searchInputRef={searchInputRef}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSearchClear={() => setSearchQuery('')}
+          onExportNotes={exportNotes}
+          onImportFileChange={handleImportFileChange}
+        />
 
         <BentoStatsBar
-          totalNotes={notes.length} pinnedCount={pinnedCount} totalTags={allTags.length}
+          totalNotes={safeNotes.length} pinnedCount={pinnedCount} totalTags={safeTags.length}
           onOpenCommandPalette={() => setIsPaletteOpen(true)}
           onFilterAll={() => { setFilterMode('all'); setSelectedTag(''); }}
           onFilterPinned={() => setFilterMode('pinned')}
@@ -97,8 +109,8 @@ export default function DashboardPage() {
 
         <div className={styles.sectionHeading}>My folders</div>
         <TagFilterBar
-          filterMode={filterMode} selectedTag={selectedTag} allTags={allTags}
-          totalCount={notes.length} pinnedCount={pinnedCount} tagCounts={tagCounts}
+          filterMode={filterMode} selectedTag={selectedTag} allTags={safeTags}
+          totalCount={safeNotes.length} pinnedCount={pinnedCount} tagCounts={tagCounts}
           onSelectFilterMode={setFilterMode} onSelectTag={setSelectedTag} onAddNewFolder={setSelectedTag}
         />
 
@@ -138,7 +150,7 @@ export default function DashboardPage() {
         />
 
         <CommandPalette
-          isOpen={isPaletteOpen} onClose={() => setIsPaletteOpen(false)} notes={notes}
+          isOpen={isPaletteOpen} onClose={() => setIsPaletteOpen(false)} notes={safeNotes}
           onSelectNote={openEditor} onCreateNote={() => openEditor(null)}
           onTogglePinnedFilter={() => setFilterMode((prev) => (prev === 'pinned' ? 'all' : 'pinned'))}
           onExportNotes={exportNotes} onLogout={logout}

@@ -65,7 +65,7 @@ export default function ScratchpadPage() {
         title: noteToTack.title,
         content: noteToTack.content,
         color: noteToTack.color,
-        tags: noteToTack.tags?.length ? noteToTack.tags : ['scratch'],
+        tags: Array.isArray(noteToTack.tags) && noteToTack.tags.length ? noteToTack.tags : ['scratch'],
         isPinned: noteToTack.isPinned,
       });
       handleDelete(noteToTack.id);
@@ -74,8 +74,9 @@ export default function ScratchpadPage() {
     }
   };
 
-  const pinnedCount = notes.filter((n) => n.isPinned).length;
-  const allTags = Array.from(new Set(notes.flatMap((n) => n.tags || [])));
+  const safeNotes = Array.isArray(notes) ? notes : [];
+  const pinnedCount = safeNotes.filter((n) => n?.isPinned).length;
+  const allTags = Array.from(new Set(safeNotes.flatMap((n) => (Array.isArray(n?.tags) ? n.tags : []))));
 
   const content = (
     <div className={styles.container}>

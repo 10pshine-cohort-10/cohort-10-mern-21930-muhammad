@@ -126,11 +126,12 @@ export default function NoteCard({
 
       <div className={styles.cardFooter}>
         <div className={styles.tagsList}>
-          {note.tags?.map((tag) => (
-            <span key={tag} className={styles.tagPill}>
-              #{tag}
-            </span>
-          ))}
+          {Array.isArray(note.tags) &&
+            note.tags.map((tag) => (
+              <span key={tag} className={styles.tagPill}>
+                #{tag}
+              </span>
+            ))}
         </div>
 
         <span className={styles.timestamp}>{formatRelativeTime(note.createdAt || '')}</span>

@@ -169,7 +169,7 @@
   justify-content: space-between;
   gap: 8px;
   padding-top: 10px;
-  border-top: 1.5px dashed rgba(24, 24, 27, 0.15);
+  border-top: 1.5px dashed rgba(24, 24, 27, 0.25);
 }
 
 .tagsList {
@@ -183,7 +183,7 @@
   font-weight: 600;
   padding: 3px 8px;
   border-radius: var(--radius-full);
-  background-color: #ffffff;
+  background-color: var(--bg-subtle);
   border: 1px solid var(--card-border);
   color: var(--text-main);
   box-shadow: 1px 1px 0px var(--card-border);

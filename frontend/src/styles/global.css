@@ -1,17 +1,22 @@
 :root {
-  --bg-app: #fafafa;
+  --bg-app: #f4f3ef;
   --bg-surface: #ffffff;
   --bg-subtle: #f4f4f5;
   --bg-muted: #e4e4e7;
 
-  --border-subtle: #e4e4e7;
+  --color-surface: #ffffff;
+  --color-accent-dark: #18181b;
+  --shadow-dark: #18181b;
+
+  --border-subtle: #d4d4d8;
   --border-hover: #18181b;
   --border-focus: #18181b;
   --border-dark: #18181b;
 
   --text-main: #18181b;
-  --text-muted: #52525b;
-  --text-subtle: #71717a;
+  --text-dark: #18181b;
+  --text-muted: #3f3f46;
+  --text-subtle: #52525b;
 
   --card-border: #18181b;
   --card-shadow: 3px 3px 0px #18181b;

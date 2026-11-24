@@ -76,4 +76,24 @@ describe('NoteCard Component', () => {
     fireEvent.click(screen.getByText('Delete'));
     expect(deletedId).toBe('note-123');
   });
+
+  it('renders safely when tags is not an array or undefined', () => {
+    const noteWithInvalidTags = {
+      ...sampleNote,
+      tags: 'not-an-array' as unknown as string[],
+    };
+
+    expect(() => {
+      render(
+        <NoteCard
+          note={noteWithInvalidTags}
+          onSelect={() => {}}
+          onTogglePin={() => {}}
+          onDelete={() => {}}
+        />
+      );
+    }).not.toThrow();
+
+    expect(screen.getByText('Design System Discussion')).toBeInTheDocument();
+  });
 });

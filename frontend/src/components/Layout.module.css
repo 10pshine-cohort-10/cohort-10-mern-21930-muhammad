@@ -7,7 +7,7 @@
 .sidebar {
   width: 260px;
   background-color: var(--bg-surface);
-  border-right: 1px solid var(--border-subtle);
+  border-right: 1.5px solid var(--border-dark);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -21,7 +21,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1.5px solid var(--border-dark);
 }
 
 .logoIcon {
@@ -77,7 +77,7 @@
 
 .sidebarFooter {
   padding: 16px;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1.5px solid var(--border-dark);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -152,7 +152,7 @@
 .topbar {
   height: 64px;
   background-color: var(--bg-surface);
-  border-bottom: 1.5px solid var(--border-subtle);
+  border-bottom: 1.5px solid var(--border-dark);
   display: flex;
   align-items: center;
   justify-content: space-between;

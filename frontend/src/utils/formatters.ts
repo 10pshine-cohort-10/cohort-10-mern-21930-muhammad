@@ -29,3 +29,14 @@ export function formatRelativeTime(dateString: string): string {
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
   return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
+
+export function formatDate(dateString?: string): string {
+  if (!dateString) return 'Recent';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return 'Recent';
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}

@@ -1,21 +1,18 @@
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import { useNotes } from '../hooks/useNotes';
+import { formatDate } from '../utils/formatters';
 import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
   const { notes, allTags } = useNotes();
 
+  const safeNotes = Array.isArray(notes) ? notes : [];
+  const safeTags = Array.isArray(allTags) ? allTags : [];
   const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'U';
-  const pinnedCount = notes.filter((n) => n.isPinned).length;
-  const memberSince = user?.createdAt
-    ? new Date(user.createdAt).toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : 'Recent';
+  const pinnedCount = safeNotes.filter((n) => n?.isPinned).length;
+  const memberSince = formatDate(user?.createdAt);
 
   return (
     <Layout>
@@ -31,7 +28,7 @@ export default function ProfilePage() {
 
           <div className={styles.infoGrid}>
             <div className={styles.statBox}>
-              <span className={styles.statValue}>{notes.length}</span>
+              <span className={styles.statValue}>{safeNotes.length}</span>
               <span className={styles.statLabel}>Total Notes</span>
             </div>
             <div className={styles.statBox}>
@@ -39,7 +36,7 @@ export default function ProfilePage() {
               <span className={styles.statLabel}>Pinned Notes</span>
             </div>
             <div className={styles.statBox}>
-              <span className={styles.statValue}>{allTags.length}</span>
+              <span className={styles.statValue}>{safeTags.length}</span>
               <span className={styles.statLabel}>Unique Tags</span>
             </div>
           </div>

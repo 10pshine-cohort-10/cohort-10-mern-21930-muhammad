@@ -1,10 +1,11 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { AlertTriangle, RotateCcw } from 'lucide-react';
+import { AlertTriangle, RotateCcw, Home } from 'lucide-react';
 import styles from './ErrorBoundary.module.css';
 
 export interface ErrorBoundaryProps {
   children: ReactNode;
   onReload?: () => void;
+  onNavigateHome?: () => void;
 }
 
 interface ErrorBoundaryState {
@@ -38,6 +39,15 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
     }
   };
 
+  handleReturnToDesk = () => {
+    this.setState({ hasError: false, errorMessage: '' });
+    if (this.props.onNavigateHome) {
+      this.props.onNavigateHome();
+    } else {
+      window.location.href = '/dashboard';
+    }
+  };
+
   render() {
     if (this.state.hasError) {
       return (
@@ -48,14 +58,32 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
             <p className={styles.subtitle}>
               An unexpected render issue occurred. Your saved notes are completely safe.
             </p>
-            <button
-              type="button"
-              className={styles.reloadBtn}
-              onClick={this.handleReload}
-            >
-              <RotateCcw size={15} />
-              <span>Reload Workspace</span>
-            </button>
+
+            {this.state.errorMessage && (
+              <div className={styles.errorTrace}>
+                <code>{this.state.errorMessage}</code>
+              </div>
+            )}
+
+            <div className={styles.actionsGroup}>
+              <button
+                type="button"
+                className={styles.reloadBtn}
+                onClick={this.handleReload}
+              >
+                <RotateCcw size={15} />
+                <span>Reload Workspace</span>
+              </button>
+
+              <button
+                type="button"
+                className={styles.deskBtn}
+                onClick={this.handleReturnToDesk}
+              >
+                <Home size={15} />
+                <span>Return to Desk</span>
+              </button>
+            </div>
           </div>
         </div>
       );
