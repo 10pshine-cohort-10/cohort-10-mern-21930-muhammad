@@ -3,18 +3,23 @@ import type { Note, NoteInput } from '../types';
 const GUEST_STORAGE_KEY = 'notes_guest_drafts';
 
 export function getGuestNotes(): Note[] {
-  const serialized = localStorage.getItem(GUEST_STORAGE_KEY);
-  if (!serialized) return [];
   try {
+    const serialized = localStorage.getItem(GUEST_STORAGE_KEY);
+    if (!serialized) return [];
     const parsed = JSON.parse(serialized);
     return Array.isArray(parsed) ? (parsed as Note[]) : [];
-  } catch {
+  } catch (err) {
+    console.error('Failed to read local guest notes:', err);
     return [];
   }
 }
 
 export function saveGuestNotesList(notesList: Note[]): void {
-  localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(notesList));
+  try {
+    localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(notesList));
+  } catch (err) {
+    console.error('Failed to persist local guest notes:', err);
+  }
 }
 
 export function createGuestNote(noteInput: NoteInput): Note {
@@ -66,5 +71,9 @@ export function deleteGuestNote(noteId: string): void {
 }
 
 export function clearGuestNotes(): void {
-  localStorage.removeItem(GUEST_STORAGE_KEY);
+  try {
+    localStorage.removeItem(GUEST_STORAGE_KEY);
+  } catch (err) {
+    console.error('Failed to clear local guest notes:', err);
+  }
 }

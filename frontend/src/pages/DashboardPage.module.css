@@ -245,3 +245,49 @@
 .templateBtn:hover {
   transform: translate(-1px, -1px);
 }
+
+@media (max-width: 640px) {
+  .controlsBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .bentoStatsBar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .statCard {
+    padding: 8px 6px;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+    text-align: center;
+    font-size: 11px;
+  }
+  .cmdButton {
+    grid-column: span 3;
+    justify-content: center;
+    margin-left: 0;
+    width: 100%;
+  }
+  .notesGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .tagFilterBar {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .tagFilterBar::-webkit-scrollbar {
+    display: none;
+  }
+  .starterTemplatesGrid {
+    flex-direction: column;
+  }
+  .templateBtn {
+    justify-content: center;
+    width: 100%;
+  }
+}

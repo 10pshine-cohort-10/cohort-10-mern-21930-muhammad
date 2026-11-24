@@ -33,7 +33,13 @@ export default function DashboardPage() {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [filterMode, setFilterMode] = useState('all');
-  const [viewMode, setViewMode] = useState<ViewMode>(() => (localStorage.getItem('notes_view_mode') as ViewMode) || 'grid');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    try {
+      return (localStorage.getItem('notes_view_mode') as ViewMode) || 'grid';
+    } catch {
+      return 'grid';
+    }
+  });
   const searchInputRef = useRef<HTMLInputElement>(null);
   const quickTackInputRef = useRef<HTMLInputElement>(null);
 

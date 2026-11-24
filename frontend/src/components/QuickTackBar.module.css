@@ -49,3 +49,13 @@
   color: var(--text-muted);
   box-shadow: 1px 1px 0px var(--shadow-dark);
 }
+
+@media (max-width: 640px) {
+  .container {
+    padding: 6px 10px;
+    margin-bottom: 14px;
+  }
+  .hintKey {
+    display: none;
+  }
+}

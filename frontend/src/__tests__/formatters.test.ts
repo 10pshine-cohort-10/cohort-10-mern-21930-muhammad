@@ -35,6 +35,11 @@ describe('formatters', () => {
       expect(formatRelativeTime('')).toBe('');
     });
 
+    it('returns empty string for invalid date string', () => {
+      expect(formatRelativeTime('not-a-valid-date')).toBe('');
+      expect(formatRelativeTime('2026-99-99T99:99:99')).toBe('');
+    });
+
     it('returns Just now for recent dates', () => {
       const now = new Date().toISOString();
       expect(formatRelativeTime(now)).toBe('Just now');

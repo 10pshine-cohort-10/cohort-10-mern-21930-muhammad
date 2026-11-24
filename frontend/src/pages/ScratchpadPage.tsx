@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Sparkles } from 'lucide-react';
+import { Plus, Pin } from 'lucide-react';
+import Layout from '../components/Layout';
 import NoteCard from '../components/NoteCard';
 import NoteEditor from '../components/NoteEditor';
 import BentoStatsBar from '../components/BentoStatsBar';
 import CommandPalette from '../components/CommandPalette';
 import NotesEmptyState from '../components/NotesEmptyState';
+import ScratchpadBanner from '../components/ScratchpadBanner';
 import { usePaletteShortcut } from '../hooks/usePaletteShortcut';
+import { useAuth } from '../context/AuthContext';
+import { useNotes } from '../hooks/useNotes';
 import {
   getGuestNotes,
   createGuestNote,
@@ -22,6 +25,9 @@ export default function ScratchpadPage() {
   const [activeNoteForEdit, setActiveNoteForEdit] = useState<Note | NoteInput | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+
+  const { isAuthenticated } = useAuth();
+  const { createNote } = useNotes();
 
   useEffect(() => {
     setNotes(getGuestNotes());
@@ -53,66 +59,81 @@ export default function ScratchpadPage() {
     setNotes((prev) => prev.map((n) => (n.id === id ? updated : n)));
   };
 
+  const handleTackToDesk = async (noteToTack: Note) => {
+    try {
+      await createNote({
+        title: noteToTack.title,
+        content: noteToTack.content,
+        color: noteToTack.color,
+        tags: noteToTack.tags?.length ? noteToTack.tags : ['scratch'],
+        isPinned: noteToTack.isPinned,
+      });
+      handleDelete(noteToTack.id);
+    } catch (err) {
+      console.error('Failed to promote scratch note to desk:', err);
+    }
+  };
+
   const pinnedCount = notes.filter((n) => n.isPinned).length;
   const allTags = Array.from(new Set(notes.flatMap((n) => n.tags || [])));
 
-  return (
+  const content = (
     <div className={styles.container}>
-      <div className={styles.guestBanner}>
-        <span className={styles.bannerText}>
-          Working in Guest Scratchpad. Your notes are saved locally in this browser.
-        </span>
-        <div className={styles.bannerActions}>
-          <Link to="/register" className={styles.ctaButton}><Sparkles size={14} /> Create Account to Sync</Link>
-          <Link to="/login" className={styles.loginLink}>Log In</Link>
-        </div>
-      </div>
+      <ScratchpadBanner isAuthenticated={isAuthenticated} />
 
       <div className={styles.headerRow}>
-        <h1 className={styles.brandTitle}>Notes Scratchpad</h1>
+        <h1 className={styles.brandTitle}>
+          {isAuthenticated ? 'Draft Blotter' : 'Notes Scratchpad'}
+        </h1>
         <button type="button" className={styles.newNoteBtn} onClick={handleOpenNewNote}>
           <Plus size={16} /><span>New Note</span>
         </button>
       </div>
 
       <BentoStatsBar
-        totalNotes={notes.length}
-        pinnedCount={pinnedCount}
-        totalTags={allTags.length}
+        totalNotes={notes.length} pinnedCount={pinnedCount} totalTags={allTags.length}
         onOpenCommandPalette={() => setIsPaletteOpen(true)}
       />
 
       {notes.length === 0 ? (
-        <NotesEmptyState searchQuery="" onCreateNote={handleOpenNewNote} />
+        <NotesEmptyState
+          searchQuery=""
+          onCreateNote={handleOpenNewNote}
+          onApplyTemplate={(tpl) => { setActiveNoteForEdit(tpl); setIsEditorOpen(true); }}
+        />
       ) : (
         <div className={dashboardStyles.notesGrid}>
           {notes.map((singleNote) => (
-            <NoteCard
-              key={singleNote.id}
-              note={singleNote}
-              onSelect={handleSelectNote}
-              onTogglePin={handleTogglePin}
-              onDelete={handleDelete}
-            />
+            <div key={singleNote.id} className={styles.scratchpadItem}>
+              <NoteCard
+                note={singleNote}
+                onSelect={handleSelectNote}
+                onTogglePin={handleTogglePin}
+                onDelete={handleDelete}
+              />
+              {isAuthenticated && (
+                <button
+                  type="button"
+                  className={styles.tackBtn}
+                  onClick={() => handleTackToDesk(singleNote)}
+                  title="Promote this draft to your cloud desk board"
+                >
+                  <Pin size={13} />
+                  <span>Tack to Desk</span>
+                </button>
+              )}
+            </div>
           ))}
         </div>
       )}
 
-      <NoteEditor
-        note={activeNoteForEdit}
-        isOpen={isEditorOpen}
-        onClose={handleCloseEditor}
-        onSave={handleSaveNote}
-      />
-
+      <NoteEditor note={activeNoteForEdit} isOpen={isEditorOpen} onClose={handleCloseEditor} onSave={handleSaveNote} />
       <CommandPalette
-        isOpen={isPaletteOpen}
-        onClose={() => setIsPaletteOpen(false)}
-        notes={notes}
-        onSelectNote={handleSelectNote}
-        onCreateNote={handleOpenNewNote}
-        onTogglePinnedFilter={() => {}}
+        isOpen={isPaletteOpen} onClose={() => setIsPaletteOpen(false)} notes={notes}
+        onSelectNote={handleSelectNote} onCreateNote={handleOpenNewNote} onTogglePinnedFilter={() => {}}
       />
     </div>
   );
+
+  return isAuthenticated ? <Layout onNewNoteClick={handleOpenNewNote}>{content}</Layout> : content;
 }

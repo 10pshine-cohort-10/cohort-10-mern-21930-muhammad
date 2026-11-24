@@ -65,4 +65,14 @@ describe('guestStorage', () => {
     clearGuestNotes();
     expect(getGuestNotes()).toHaveLength(0);
   });
+
+  it('handles localStorage throwing an error gracefully', () => {
+    const spy = jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('Access denied in private mode');
+    });
+
+    expect(getGuestNotes()).toEqual([]);
+
+    spy.mockRestore();
+  });
 });

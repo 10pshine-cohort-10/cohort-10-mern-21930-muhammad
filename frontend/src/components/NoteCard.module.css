@@ -244,3 +244,10 @@
   font-size: 12px;
   font-weight: 600;
 }
+
+@media (max-width: 640px) {
+  .card {
+    padding: 14px 16px;
+    min-height: auto;
+  }
+}

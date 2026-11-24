@@ -83,6 +83,13 @@ export default function Layout({ children, onNewNoteClick }: LayoutProps) {
 
       <div className={styles.mainContent}>
         <header className={styles.topbar}>
+          <div className={styles.mobileBrand}>
+            <div className={styles.logoIcon}>
+              <BookOpen size={18} />
+            </div>
+            <span className={styles.mobileAppName}>Notes</span>
+          </div>
+
           <div className={styles.topbarActions}>
             {onNewNoteClick && (
               <button
@@ -94,6 +101,9 @@ export default function Layout({ children, onNewNoteClick }: LayoutProps) {
                 <span>New Note</span>
               </button>
             )}
+            <div className={styles.mobileAvatar} title={user?.name}>
+              {userInitial}
+            </div>
           </div>
         </header>
 

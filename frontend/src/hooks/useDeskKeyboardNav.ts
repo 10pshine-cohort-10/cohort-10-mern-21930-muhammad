@@ -39,7 +39,7 @@ export function useDeskKeyboardNav({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (isModalOpen) return;
+      if (isModalOpen || !event.key) return;
 
       const activeEl = document.activeElement;
       const isInputActive =
@@ -48,6 +48,8 @@ export function useDeskKeyboardNav({
         (activeEl instanceof HTMLElement && activeEl.isContentEditable);
 
       if (isInputActive) return;
+
+      const keyLower = event.key.toLowerCase();
 
       // Handle hotkeys
       if (event.key === 'j' || event.key === 'ArrowDown') {
@@ -61,20 +63,20 @@ export function useDeskKeyboardNav({
       } else if (event.key === 'Enter' && focusedIndex >= 0 && notes[focusedIndex]) {
         event.preventDefault();
         onSelectNote(notes[focusedIndex]);
-      } else if (event.key.toLowerCase() === 'p' && focusedIndex >= 0 && notes[focusedIndex]) {
+      } else if (keyLower === 'p' && focusedIndex >= 0 && notes[focusedIndex]) {
         event.preventDefault();
         const note = notes[focusedIndex];
         onTogglePin(note.id, !note.isPinned);
-      } else if (event.key.toLowerCase() === 'd' && focusedIndex >= 0 && notes[focusedIndex]) {
+      } else if (keyLower === 'd' && focusedIndex >= 0 && notes[focusedIndex]) {
         event.preventDefault();
         onDeleteNote(notes[focusedIndex].id);
-      } else if (event.key.toLowerCase() === 'z' && onUndoDelete) {
+      } else if (keyLower === 'z' && onUndoDelete) {
         event.preventDefault();
         onUndoDelete();
-      } else if (event.key.toLowerCase() === 't') {
+      } else if (keyLower === 't') {
         event.preventDefault();
         onFocusQuickTack();
-      } else if (event.key.toLowerCase() === 'n') {
+      } else if (keyLower === 'n') {
         event.preventDefault();
         onOpenNewNote();
       } else if (event.key === '/') {

@@ -194,6 +194,14 @@
   overflow-y: auto;
 }
 
+.mobileBrand {
+  display: none;
+}
+
+.mobileAvatar {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
@@ -203,6 +211,34 @@
   }
   .topbar {
     padding: 0 16px;
+    justify-content: space-between;
+  }
+  .mobileBrand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mobileAppName {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.01em;
+  }
+  .mobileAvatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background-color: var(--border-dark);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 12px;
+    border: 1.5px solid var(--border-dark);
+  }
+  .newNoteButton {
+    display: none;
   }
   .pageBody {
     padding: 16px;

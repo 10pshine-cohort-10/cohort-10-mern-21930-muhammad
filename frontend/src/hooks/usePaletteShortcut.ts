@@ -3,17 +3,10 @@ import { useEffect } from 'react';
 export function usePaletteShortcut(onOpen: () => void) {
   useEffect(() => {
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (!event.key) return;
       const isCmdK = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k';
-      const isSlash = event.key === '/';
 
-      const target = event.target as HTMLElement | null;
-      const isTyping =
-        target &&
-        (target.tagName === 'INPUT' ||
-          target.tagName === 'TEXTAREA' ||
-          target.isContentEditable);
-
-      if (isCmdK || (isSlash && !isTyping)) {
+      if (isCmdK) {
         event.preventDefault();
         onOpen();
       }
