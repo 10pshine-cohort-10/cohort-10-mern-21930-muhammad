@@ -27,7 +27,7 @@ export default function ScratchpadPage() {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
 
   const { isAuthenticated } = useAuth();
-  const { createNote } = useNotes();
+  const { createNote } = useNotes({ autoSync: false });
 
   useEffect(() => {
     setNotes(getGuestNotes());
@@ -74,9 +74,11 @@ export default function ScratchpadPage() {
     }
   };
 
-  const safeNotes = Array.isArray(notes) ? notes : [];
-  const pinnedCount = safeNotes.filter((n) => n?.isPinned).length;
-  const allTags = Array.from(new Set(safeNotes.flatMap((n) => (Array.isArray(n?.tags) ? n.tags : []))));
+  const safeNotes = Array.isArray(notes)
+    ? notes.filter((n): n is Note => Boolean(n && typeof n === 'object' && n.id))
+    : [];
+  const pinnedCount = safeNotes.filter((n) => Boolean(n.isPinned)).length;
+  const allTags = Array.from(new Set(safeNotes.flatMap((n) => (Array.isArray(n.tags) ? n.tags : []))));
 
   const content = (
     <div className={styles.container}>
@@ -92,11 +94,11 @@ export default function ScratchpadPage() {
       </div>
 
       <BentoStatsBar
-        totalNotes={notes.length} pinnedCount={pinnedCount} totalTags={allTags.length}
+        totalNotes={safeNotes.length} pinnedCount={pinnedCount} totalTags={allTags.length}
         onOpenCommandPalette={() => setIsPaletteOpen(true)}
       />
 
-      {notes.length === 0 ? (
+      {safeNotes.length === 0 ? (
         <NotesEmptyState
           searchQuery=""
           onCreateNote={handleOpenNewNote}
@@ -104,7 +106,7 @@ export default function ScratchpadPage() {
         />
       ) : (
         <div className={dashboardStyles.notesGrid}>
-          {notes.map((singleNote) => (
+          {safeNotes.map((singleNote) => (
             <div key={singleNote.id} className={styles.scratchpadItem}>
               <NoteCard
                 note={singleNote}
@@ -131,7 +133,7 @@ export default function ScratchpadPage() {
       <NoteEditor note={activeNoteForEdit} isOpen={isEditorOpen} onClose={handleCloseEditor} onSave={handleSaveNote} />
       <CommandPalette
         isOpen={isPaletteOpen} onClose={() => setIsPaletteOpen(false)} notes={notes}
-        onSelectNote={handleSelectNote} onCreateNote={handleOpenNewNote} onTogglePinnedFilter={() => {}}
+        onSelectNote={handleSelectNote} onCreateNote={handleOpenNewNote} onTogglePinnedFilter={() => { }}
       />
     </div>
   );

@@ -17,7 +17,12 @@ export interface NoteEditorProps {
   onSave: (notePayload: NoteInput) => Promise<void>;
 }
 
-export default function NoteEditor({ note, isOpen, onClose, onSave }: NoteEditorProps) {
+export default function NoteEditor(props: NoteEditorProps) {
+  if (!props.isOpen) return null;
+  return <NoteEditorDrawer {...props} />;
+}
+
+function NoteEditorDrawer({ note, isOpen, onClose, onSave }: NoteEditorProps) {
   const [title, setTitle] = useState<string>('');
   const [color, setColor] = useState<NoteColor>('slate');
   const [isPinned, setIsPinned] = useState<boolean>(false);
@@ -31,7 +36,10 @@ export default function NoteEditor({ note, isOpen, onClose, onSave }: NoteEditor
     editorProps: { attributes: { class: styles.tiptapEditor } },
   });
 
-  const getEditorContent = useCallback(() => (editor ? editor.getHTML() : ''), [editor]);
+  const getEditorContent = useCallback(
+    () => (editor && !editor.isDestroyed ? editor.getHTML() : ''),
+    [editor]
+  );
 
   const { saveStatus, setSaveStatus, clearTimer } = useDebouncedAutosave({
     noteId: note?.id,
@@ -49,10 +57,10 @@ export default function NoteEditor({ note, isOpen, onClose, onSave }: NoteEditor
     setColor(note?.color || 'slate');
     setIsPinned(Boolean(note?.isPinned));
     setTags(Array.isArray(note?.tags) ? note.tags : []);
-    if (editor) editor.commands.setContent(note?.content || '');
+    if (editor && !editor.isDestroyed) {
+      editor.commands.setContent(note?.content || '');
+    }
   }, [note, editor]);
-
-  if (!isOpen) return null;
 
   const handleManualSave = async () => {
     clearTimer();

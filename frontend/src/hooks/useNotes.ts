@@ -11,7 +11,12 @@ function resolveSocketUrl(): string {
   return apiUrl.replace(/\/api\/?$/, '');
 }
 
-export function useNotes() {
+export interface UseNotesOptions {
+  autoSync?: boolean;
+}
+
+export function useNotes(options: UseNotesOptions = {}) {
+  const { autoSync = true } = options;
   const [notes, setNotes] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -80,11 +85,12 @@ export function useNotes() {
   }, [isAuthenticated, searchQuery, selectedTag]);
 
   useEffect(() => {
+    if (!autoSync) return;
     fetchNotes();
-  }, [fetchNotes]);
+  }, [autoSync, fetchNotes]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!autoSync || !token) return;
 
     const socketUrl = resolveSocketUrl();
     const socket: Socket = io(socketUrl, {
@@ -125,7 +131,7 @@ export function useNotes() {
     return () => {
       socket.disconnect();
     };
-  }, [token, matchesTag, matchesSearch, fetchNotes]);
+  }, [autoSync, token, matchesTag, matchesSearch, fetchNotes]);
 
   const createNote = async (noteData: NoteInput): Promise<Note> => {
     try {

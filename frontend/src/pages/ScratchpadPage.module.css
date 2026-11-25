@@ -15,8 +15,8 @@
   flex-wrap: wrap;
   padding: 12px 18px;
   background-color: #ffffff;
-  border: 1.5px solid var(--border-dark);
-  box-shadow: 2px 2px 0px var(--border-dark);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
   border-radius: var(--radius-sm);
   font-size: 13px;
 }

@@ -1,9 +1,10 @@
 import { useState, useRef, type ChangeEvent } from 'react';
 import Layout from '../components/Layout';
-import DashboardControls from '../components/DashboardControls';
+import SearchBar from '../components/SearchBar';
 import NoteCard from '../components/NoteCard';
 import NoteEditor from '../components/NoteEditor';
 import TagFilterBar from '../components/TagFilterBar';
+import ExportImportActions from '../components/ExportImportActions';
 import NotesEmptyState from '../components/NotesEmptyState';
 import BentoStatsBar from '../components/BentoStatsBar';
 import CommandPalette from '../components/CommandPalette';
@@ -48,15 +49,20 @@ export default function DashboardPage() {
     onPermanentDelete: deleteNote, onRestoreNote: restoreNoteLocally, onRemoveFromState: removeNoteLocally,
   });
 
-  const safeNotes = Array.isArray(notes) ? notes : [];
+  const safeNotes = Array.isArray(notes)
+    ? notes.filter((n): n is Note => Boolean(n && typeof n === 'object' && n.id))
+    : [];
   const safeTags = Array.isArray(allTags) ? allTags : [];
-  const displayedNotes = safeNotes.filter((n: Note) => {
-    if (!n) return false;
-    const tags = Array.isArray(n.tags) ? n.tags : [];
-    if (!selectedTag && tags.includes('archive')) return false;
-    return filterMode === 'pinned' ? Boolean(n.isPinned) : true;
-  });
-  const pinnedCount = safeNotes.filter((n) => n && n.isPinned && !(Array.isArray(n.tags) && n.tags.includes('archive'))).length;
+  const displayedNotes = safeNotes.filter((n: Note) =>
+    !selectedTag && Array.isArray(n.tags) && n.tags.includes('archive')
+      ? false
+      : filterMode === 'pinned'
+        ? n.isPinned
+        : true
+  );
+  const pinnedCount = safeNotes.filter(
+    (n) => n.isPinned && !(Array.isArray(n.tags) && n.tags.includes('archive'))
+  ).length;
 
   const openEditor = (targetNote: Note | NoteInput | null = null) => {
     setActiveNoteForEdit(targetNote);
@@ -68,7 +74,7 @@ export default function DashboardPage() {
     isModalOpen: isEditorOpen || isPaletteOpen || isHelpOpen,
     onSelectNote: openEditor,
     onTogglePin: togglePin,
-    onDeleteNote: (id) => { const n = safeNotes.find((item) => item.id === id); if (n) triggerSoftDelete(n); },
+    onDeleteNote: (id) => { const n = notes.find((item) => item.id === id); if (n) triggerSoftDelete(n); },
     onUndoDelete: undoDelete,
     onOpenNewNote: () => openEditor(null),
     onToggleHelp: () => setIsHelpOpen((prev) => !prev),
@@ -85,20 +91,38 @@ export default function DashboardPage() {
 
   const tagCounts: Record<string, number> = {};
   for (const t of safeTags) {
-    tagCounts[t] = safeNotes.filter((n) => n && Array.isArray(n.tags) && n.tags.includes(t)).length;
+    tagCounts[t] = safeNotes.filter((n) => Array.isArray(n.tags) && n.tags.includes(t)).length;
   }
 
-  return (
-    <Layout onNewNoteClick={() => openEditor(null)}>
-      <div className={styles.container}>
-        <DashboardControls
-          searchInputRef={searchInputRef}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          onSearchClear={() => setSearchQuery('')}
-          onExportNotes={exportNotes}
-          onImportFileChange={handleImportFileChange}
+  const pinnedNotes = filterMode === 'all' ? displayedNotes.filter((n) => n.isPinned) : [];
+  const regularNotes = filterMode === 'all' && pinnedNotes.length > 0
+    ? displayedNotes.filter((n) => !n.isPinned)
+    : displayedNotes;
+
+  const renderNotesList = (list: Note[], offset = 0) => (
+    <div className={viewMode === 'stream' ? styles.notesStream : styles.notesGrid}>
+      {list.map((singleNote: Note, idx: number) => (
+        <NoteCard
+          key={singleNote.id} note={singleNote} isFocused={focusedIndex === offset + idx}
+          onSelect={openEditor} onTogglePin={togglePin} onDelete={() => triggerSoftDelete(singleNote)}
         />
+      ))}
+    </div>
+  );
+
+  return (
+    <Layout
+      onNewNoteClick={() => openEditor(null)}
+      folders={safeTags}
+      selectedFolder={selectedTag}
+      onSelectFolder={(tag) => { setFilterMode('all'); setSelectedTag(tag); }}
+      onAddFolder={(tag) => { setFilterMode('all'); setSelectedTag(tag); }}
+    >
+      <div className={styles.container}>
+        <div className={styles.controlsBar}>
+          <SearchBar ref={searchInputRef} value={searchQuery} onChange={setSearchQuery} onClear={() => setSearchQuery('')} />
+          <ExportImportActions onExport={exportNotes} onImportFile={handleImportFileChange} />
+        </div>
 
         <BentoStatsBar
           totalNotes={safeNotes.length} pinnedCount={pinnedCount} totalTags={safeTags.length}
@@ -107,21 +131,10 @@ export default function DashboardPage() {
           onFilterPinned={() => setFilterMode('pinned')}
         />
 
-        <div className={styles.sectionHeading}>My folders</div>
         <TagFilterBar
-          filterMode={filterMode} selectedTag={selectedTag} allTags={safeTags}
+          filterMode={filterMode} selectedTag={selectedTag} allTags={[]}
           totalCount={safeNotes.length} pinnedCount={pinnedCount} tagCounts={tagCounts}
-          onSelectFilterMode={setFilterMode} onSelectTag={setSelectedTag} onAddNewFolder={setSelectedTag}
-        />
-
-        <div className={styles.headerWithAction}>
-          <div className={styles.sectionHeading} style={{ margin: 0 }}>Recent notes</div>
-          <ViewModeToggle currentMode={viewMode} onChangeMode={(m) => { setViewMode(m); localStorage.setItem('notes_view_mode', m); }} />
-        </div>
-
-        <QuickTackBar
-          activeTag={selectedTag} inputRef={quickTackInputRef}
-          onQuickCreate={async (title, tag) => { await createNote({ title, content: '', tags: tag ? [tag] : [], color: 'slate', isPinned: false }); }}
+          onSelectFilterMode={setFilterMode} onSelectTag={setSelectedTag}
         />
 
         {isLoading ? (
@@ -129,19 +142,27 @@ export default function DashboardPage() {
         ) : displayedNotes.length === 0 ? (
           <NotesEmptyState searchQuery={searchQuery} onCreateNote={() => openEditor(null)} onApplyTemplate={openEditor} />
         ) : (
-          <div className={viewMode === 'stream' ? styles.notesStream : styles.notesGrid}>
-            {displayedNotes.map((singleNote: Note, idx: number) => (
-              <NoteCard
-                key={singleNote.id}
-                note={singleNote}
-                isFocused={focusedIndex === idx}
-                onSelect={openEditor}
-                onTogglePin={togglePin}
-                onDelete={() => triggerSoftDelete(singleNote)}
-              />
-            ))}
-          </div>
+          <>
+            {pinnedNotes.length > 0 && (
+              <>
+                <div className={styles.sectionHeading}>Pinned</div>
+                {renderNotesList(pinnedNotes, 0)}
+              </>
+            )}
+            <div className={styles.headerWithAction}>
+              <div className={styles.sectionHeading} style={{ margin: 0 }}>
+                {filterMode === 'pinned' ? 'Pinned notes' : 'Recent notes'}
+              </div>
+              <ViewModeToggle currentMode={viewMode} onChangeMode={(m) => { setViewMode(m); localStorage.setItem('notes_view_mode', m); }} />
+            </div>
+            {renderNotesList(regularNotes, pinnedNotes.length)}
+          </>
         )}
+
+        <QuickTackBar
+          activeTag={selectedTag} inputRef={quickTackInputRef}
+          onQuickCreate={async (title, tag) => { await createNote({ title, content: '', tags: tag ? [tag] : [], color: 'slate', isPinned: false }); }}
+        />
 
         <NoteEditor
           note={activeNoteForEdit} isOpen={isEditorOpen}
@@ -150,7 +171,7 @@ export default function DashboardPage() {
         />
 
         <CommandPalette
-          isOpen={isPaletteOpen} onClose={() => setIsPaletteOpen(false)} notes={safeNotes}
+          isOpen={isPaletteOpen} onClose={() => setIsPaletteOpen(false)} notes={notes}
           onSelectNote={openEditor} onCreateNote={() => openEditor(null)}
           onTogglePinnedFilter={() => setFilterMode((prev) => (prev === 'pinned' ? 'all' : 'pinned'))}
           onExportNotes={exportNotes} onLogout={logout}

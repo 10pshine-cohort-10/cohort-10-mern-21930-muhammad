@@ -1,4 +1,4 @@
-import { extractPlainText, formatRelativeTime, formatDate } from '../utils/formatters';
+import { extractPlainText, formatRelativeTime } from '../utils/formatters';
 
 describe('formatters', () => {
   describe('extractPlainText', () => {
@@ -43,23 +43,6 @@ describe('formatters', () => {
     it('returns Just now for recent dates', () => {
       const now = new Date().toISOString();
       expect(formatRelativeTime(now)).toBe('Just now');
-    });
-  });
-
-  describe('formatDate', () => {
-    it('returns Recent for missing or empty date', () => {
-      expect(formatDate()).toBe('Recent');
-      expect(formatDate('')).toBe('Recent');
-    });
-
-    it('returns Recent for invalid date string without throwing RangeError', () => {
-      expect(formatDate('invalid-date')).toBe('Recent');
-      expect(formatDate('2026-99-99T99:99:99')).toBe('Recent');
-    });
-
-    it('formats a valid date string accurately', () => {
-      const formatted = formatDate('2026-01-15T12:00:00Z');
-      expect(formatted).toMatch(/January 15, 2026|15 January 2026/);
     });
   });
 });

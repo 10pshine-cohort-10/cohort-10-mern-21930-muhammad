@@ -39,12 +39,12 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
     }
   };
 
-  handleReturnToDesk = () => {
+  handleNavigateHome = () => {
     this.setState({ hasError: false, errorMessage: '' });
     if (this.props.onNavigateHome) {
       this.props.onNavigateHome();
     } else {
-      window.location.href = '/dashboard';
+      window.location.assign('/dashboard');
     }
   };
 
@@ -58,14 +58,10 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
             <p className={styles.subtitle}>
               An unexpected render issue occurred. Your saved notes are completely safe.
             </p>
-
             {this.state.errorMessage && (
-              <div className={styles.errorTrace}>
-                <code>{this.state.errorMessage}</code>
-              </div>
+              <p className={styles.errorDetail}>{this.state.errorMessage}</p>
             )}
-
-            <div className={styles.actionsGroup}>
+            <div className={styles.actions}>
               <button
                 type="button"
                 className={styles.reloadBtn}
@@ -74,11 +70,10 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
                 <RotateCcw size={15} />
                 <span>Reload Workspace</span>
               </button>
-
               <button
                 type="button"
-                className={styles.deskBtn}
-                onClick={this.handleReturnToDesk}
+                className={styles.homeBtn}
+                onClick={this.handleNavigateHome}
               >
                 <Home size={15} />
                 <span>Return to Desk</span>

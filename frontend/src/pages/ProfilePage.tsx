@@ -8,10 +8,10 @@ export default function ProfilePage() {
   const { user, logout } = useAuth();
   const { notes, allTags } = useNotes();
 
-  const safeNotes = Array.isArray(notes) ? notes : [];
+  const safeNotes = Array.isArray(notes) ? notes.filter(Boolean) : [];
   const safeTags = Array.isArray(allTags) ? allTags : [];
   const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'U';
-  const pinnedCount = safeNotes.filter((n) => n?.isPinned).length;
+  const pinnedCount = safeNotes.filter((n) => n.isPinned).length;
   const memberSince = formatDate(user?.createdAt);
 
   return (

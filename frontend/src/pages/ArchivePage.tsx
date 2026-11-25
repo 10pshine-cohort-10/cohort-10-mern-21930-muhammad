@@ -8,9 +8,8 @@ import styles from './ArchivePage.module.css';
 export default function ArchivePage() {
   const { notes, isLoading, updateNote, deleteNote } = useNotes();
 
-  const safeNotes = Array.isArray(notes) ? notes : [];
-  const archivedNotes = safeNotes.filter(
-    (singleNote: Note) => Boolean(singleNote) && Array.isArray(singleNote.tags) && singleNote.tags.includes('archive')
+  const archivedNotes = notes.filter(
+    (singleNote: Note) => Array.isArray(singleNote.tags) && singleNote.tags.includes('archive')
   );
 
   const handleRestoreNote = async (noteToRestore: Note) => {

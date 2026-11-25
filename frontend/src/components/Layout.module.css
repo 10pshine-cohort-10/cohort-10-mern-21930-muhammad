@@ -7,7 +7,7 @@
 .sidebar {
   width: 260px;
   background-color: var(--bg-surface);
-  border-right: 1.5px solid var(--border-dark);
+  border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -21,7 +21,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 1.5px solid var(--border-dark);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .logoIcon {
@@ -75,9 +75,93 @@
   font-weight: 600;
 }
 
+.folderTree {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 10px;
+  margin-bottom: 6px;
+}
+
+.folderToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-subtle);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.folderToggle:hover {
+  color: var(--text-main);
+  background-color: var(--bg-subtle);
+}
+
+.folderCount {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-subtle);
+}
+
+.folderList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 10px;
+  border-left: 1px solid var(--border-subtle);
+  margin-left: 14px;
+}
+
+.folderItem,
+.folderAddBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.folderItem:hover,
+.folderAddBtn:hover {
+  background-color: var(--bg-subtle);
+  color: var(--text-main);
+}
+
+.folderItemActive {
+  background-color: var(--teal-tint);
+  color: var(--teal-primary);
+  font-weight: 600;
+}
+
+.folderName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.folderAddBtn {
+  color: var(--text-subtle);
+  font-size: 12px;
+}
+
 .sidebarFooter {
   padding: 16px;
-  border-top: 1.5px solid var(--border-dark);
+  border-top: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -152,7 +236,7 @@
 .topbar {
   height: 64px;
   background-color: var(--bg-surface);
-  border-bottom: 1.5px solid var(--border-dark);
+  border-bottom: 1.5px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -206,24 +290,29 @@
   .layout {
     flex-direction: column;
   }
+
   .sidebar {
     display: none;
   }
+
   .topbar {
     padding: 0 16px;
     justify-content: space-between;
   }
+
   .mobileBrand {
     display: flex;
     align-items: center;
     gap: 10px;
   }
+
   .mobileAppName {
     font-size: 16px;
     font-weight: 700;
     color: var(--text-main);
     letter-spacing: -0.01em;
   }
+
   .mobileAvatar {
     display: flex;
     align-items: center;
@@ -237,9 +326,11 @@
     font-size: 12px;
     border: 1.5px solid var(--border-dark);
   }
+
   .newNoteButton {
     display: none;
   }
+
   .pageBody {
     padding: 16px;
     padding-bottom: 90px;

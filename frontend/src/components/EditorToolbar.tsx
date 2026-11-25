@@ -19,7 +19,7 @@ export interface EditorToolbarProps {
 }
 
 export default function EditorToolbar({ editor }: EditorToolbarProps) {
-  if (!editor) return null;
+  if (!editor || editor.isDestroyed) return null;
 
   return (
     <div className={styles.editorToolbar}>

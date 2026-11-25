@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 22px;
+  padding-bottom: 96px;
 }
 
 .controlsBar {
@@ -35,9 +36,9 @@
   gap: 8px;
   padding: 8px 14px;
   background-color: var(--bg-surface);
-  border: 1.5px solid var(--border-dark);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  box-shadow: 2px 2px 0px var(--border-dark);
+  box-shadow: var(--shadow-sm);
   font-size: 13px;
 }
 
@@ -58,9 +59,9 @@
   gap: 8px;
   padding: 7px 14px;
   background-color: var(--bg-surface);
-  border: 1.5px solid var(--border-dark);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  box-shadow: 2px 2px 0px var(--border-dark);
+  box-shadow: var(--shadow-sm);
   color: var(--text-main);
   font-size: 13px;
   font-weight: 600;
@@ -77,7 +78,7 @@
   font-size: 11px;
   padding: 2px 6px;
   background-color: var(--bg-subtle);
-  border: 1px solid var(--border-dark);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   color: var(--text-main);
 }
@@ -154,9 +155,9 @@
   padding: 64px 24px;
   text-align: center;
   background-color: var(--bg-surface);
-  border: 2px dashed var(--border-dark);
+  border: 1.5px dashed var(--border-subtle);
   border-radius: var(--radius-md);
-  box-shadow: 3px 3px 0px var(--border-dark);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -230,7 +231,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background-color: var(--bg-subtle);
+  background-color: #ffffff;
   border: 1.5px solid var(--border-dark);
   box-shadow: 2px 2px 0px var(--border-dark);
   border-radius: var(--radius-sm);
@@ -252,11 +253,13 @@
     align-items: stretch;
     gap: 10px;
   }
+
   .bentoStatsBar {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
   }
+
   .statCard {
     padding: 8px 6px;
     justify-content: center;
@@ -265,27 +268,33 @@
     text-align: center;
     font-size: 11px;
   }
+
   .cmdButton {
     grid-column: span 3;
     justify-content: center;
     margin-left: 0;
     width: 100%;
   }
+
   .notesGrid {
     grid-template-columns: 1fr;
     gap: 14px;
   }
+
   .tagFilterBar {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     padding-bottom: 4px;
   }
+
   .tagFilterBar::-webkit-scrollbar {
     display: none;
   }
+
   .starterTemplatesGrid {
     flex-direction: column;
   }
+
   .templateBtn {
     justify-content: center;
     width: 100%;

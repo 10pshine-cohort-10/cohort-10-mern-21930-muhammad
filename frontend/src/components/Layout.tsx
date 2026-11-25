@@ -2,15 +2,27 @@ import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BookOpen, FileText, Edit3, Archive, User as UserIcon, LogOut, Plus } from 'lucide-react';
 import MobileNavDock from './MobileNavDock';
+import SidebarFolders from './SidebarFolders';
 import { useAuth } from '../context/AuthContext';
 import styles from './Layout.module.css';
 
 export interface LayoutProps {
   children: ReactNode;
   onNewNoteClick?: () => void;
+  folders?: string[];
+  selectedFolder?: string;
+  onSelectFolder?: (tag: string) => void;
+  onAddFolder?: (tag: string) => void;
 }
 
-export default function Layout({ children, onNewNoteClick }: LayoutProps) {
+export default function Layout({
+  children,
+  onNewNoteClick,
+  folders = [],
+  selectedFolder = '',
+  onSelectFolder,
+  onAddFolder,
+}: LayoutProps) {
   const { user, logout } = useAuth();
   const location = useLocation();
 
@@ -34,6 +46,15 @@ export default function Layout({ children, onNewNoteClick }: LayoutProps) {
             <FileText size={18} />
             <span>All Notes</span>
           </Link>
+
+          {onSelectFolder && (
+            <SidebarFolders
+              folders={folders}
+              selectedFolder={selectedFolder}
+              onSelectFolder={onSelectFolder}
+              onAddFolder={onAddFolder}
+            />
+          )}
 
           <Link
             to="/scratchpad"
