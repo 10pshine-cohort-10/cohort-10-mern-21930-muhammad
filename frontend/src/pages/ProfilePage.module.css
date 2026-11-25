@@ -27,7 +27,7 @@
   width: 64px;
   height: 64px;
   border-radius: var(--radius-full);
-  background-color: var(--teal-primary);
+  background-color: var(--border-dark);
   color: #ffffff;
   font-size: 24px;
   font-weight: 700;
@@ -74,7 +74,7 @@
 .statValue {
   font-size: 24px;
   font-weight: 700;
-  color: var(--teal-primary);
+  color: var(--text-main);
 }
 
 .statLabel {

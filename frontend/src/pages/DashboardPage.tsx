@@ -3,7 +3,6 @@ import Layout from '../components/Layout';
 import SearchBar from '../components/SearchBar';
 import NoteCard from '../components/NoteCard';
 import NoteEditor from '../components/NoteEditor';
-import TagFilterBar from '../components/TagFilterBar';
 import ExportImportActions from '../components/ExportImportActions';
 import NotesEmptyState from '../components/NotesEmptyState';
 import BentoStatsBar from '../components/BentoStatsBar';
@@ -22,7 +21,7 @@ import styles from './DashboardPage.module.css';
 
 export default function DashboardPage() {
   const {
-    notes, isLoading, searchQuery, setSearchQuery, selectedTag, setSelectedTag, allTags,
+    notes, isLoading, searchQuery, setSearchQuery, selectedTag, setSelectedTag, allTags, addCustomFolder,
     createNote, updateNote, deleteNote, togglePin, exportNotes, importNotes,
     removeNoteLocally, restoreNoteLocally,
   } = useNotes();
@@ -116,7 +115,10 @@ export default function DashboardPage() {
       folders={safeTags}
       selectedFolder={selectedTag}
       onSelectFolder={(tag) => { setFilterMode('all'); setSelectedTag(tag); }}
-      onAddFolder={(tag) => { setFilterMode('all'); setSelectedTag(tag); }}
+      onAddFolder={(tag) => {
+        const created = addCustomFolder(tag);
+        if (created) { setFilterMode('all'); setSelectedTag(created); }
+      }}
     >
       <div className={styles.container}>
         <div className={styles.controlsBar}>
@@ -129,12 +131,6 @@ export default function DashboardPage() {
           onOpenCommandPalette={() => setIsPaletteOpen(true)}
           onFilterAll={() => { setFilterMode('all'); setSelectedTag(''); }}
           onFilterPinned={() => setFilterMode('pinned')}
-        />
-
-        <TagFilterBar
-          filterMode={filterMode} selectedTag={selectedTag} allTags={[]}
-          totalCount={safeNotes.length} pinnedCount={pinnedCount} tagCounts={tagCounts}
-          onSelectFilterMode={setFilterMode} onSelectTag={setSelectedTag}
         />
 
         {isLoading ? (
@@ -150,7 +146,7 @@ export default function DashboardPage() {
               </>
             )}
             <div className={styles.headerWithAction}>
-              <div className={styles.sectionHeading} style={{ margin: 0 }}>
+              <div className={`${styles.sectionHeading} ${styles.sectionHeadingCompact}`}>
                 {filterMode === 'pinned' ? 'Pinned notes' : 'Recent notes'}
               </div>
               <ViewModeToggle currentMode={viewMode} onChangeMode={(m) => { setViewMode(m); localStorage.setItem('notes_view_mode', m); }} />

@@ -1,11 +1,16 @@
 .layout {
+  --sidebar-width: 260px;
   display: flex;
   min-height: 100vh;
   background-color: var(--bg-app);
 }
 
+.layoutCollapsed {
+  --sidebar-width: 68px;
+}
+
 .sidebar {
-  width: 260px;
+  width: var(--sidebar-width);
   background-color: var(--bg-surface);
   border-right: 1px solid var(--border-subtle);
   display: flex;
@@ -14,6 +19,24 @@
   position: sticky;
   top: 0;
   height: 100vh;
+  z-index: var(--z-sidebar, 20);
+  transition: width 180ms ease;
+  overflow: hidden;
+}
+
+.sidebarCollapsed .sidebarHeader {
+  justify-content: center;
+  padding: 20px 12px;
+}
+
+.sidebarCollapsed .navItem {
+  justify-content: center;
+  padding: 10px;
+}
+
+.sidebarCollapsed .sidebarFooter {
+  justify-content: center;
+  padding: 16px 10px;
 }
 
 .sidebarHeader {
@@ -143,8 +166,8 @@
 }
 
 .folderItemActive {
-  background-color: var(--teal-tint);
-  color: var(--teal-primary);
+  background-color: var(--border-dark);
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -236,17 +259,48 @@
 .topbar {
   height: 64px;
   background-color: var(--bg-surface);
-  border-bottom: 1.5px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 28px;
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: var(--z-topbar, 10);
+}
+
+.topbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.collapseBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.collapseBtn:hover {
+  background-color: var(--bg-subtle);
+  color: var(--text-main);
+}
+
+.topbarTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
 }
 
 .topbarActions {
+  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -288,7 +342,12 @@
 
 @media (max-width: 768px) {
   .layout {
+    --sidebar-width: 0px;
     flex-direction: column;
+  }
+
+  .topbarLeft {
+    display: none;
   }
 
   .sidebar {

@@ -52,9 +52,7 @@ export default function ProfilePage() {
             </div>
             <div className={styles.metaRow}>
               <span className={styles.metaKey}>Account Status</span>
-              <span className={styles.metaValue} style={{ color: 'var(--teal-primary)' }}>
-                Active
-              </span>
+              <span className={styles.metaValue}>Active</span>
             </div>
           </div>
 

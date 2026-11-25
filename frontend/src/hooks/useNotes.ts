@@ -11,6 +11,19 @@ function resolveSocketUrl(): string {
   return apiUrl.replace(/\/api\/?$/, '');
 }
 
+const CUSTOM_FOLDERS_KEY = 'notes_custom_folders';
+
+function loadCustomFolders(): string[] {
+  try {
+    const raw = localStorage.getItem(CUSTOM_FOLDERS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((t): t is string => typeof t === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
 export interface UseNotesOptions {
   autoSync?: boolean;
 }
@@ -18,6 +31,8 @@ export interface UseNotesOptions {
 export function useNotes(options: UseNotesOptions = {}) {
   const { autoSync = true } = options;
   const [notes, setNotes] = useState<Note[]>([]);
+  const [knownServerTags, setKnownServerTags] = useState<string[]>([]);
+  const [customFolders, setCustomFolders] = useState<string[]>(loadCustomFolders);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedTag, setSelectedTag] = useState<string>('');
@@ -70,7 +85,13 @@ export function useNotes(options: UseNotesOptions = {}) {
 
       const response = await client.get<ApiResponse<Note[]>>(endpoint, { params });
       if (currentRequestId === requestIdRef.current) {
-        setNotes(response.data.data || []);
+        const fetched = response.data.data || [];
+        setNotes(fetched);
+        if (!searchQuery.trim() && !selectedTag) {
+          setKnownServerTags(
+            Array.from(new Set(fetched.flatMap((n) => (Array.isArray(n.tags) ? n.tags : []))))
+          );
+        }
       }
     } catch (err: unknown) {
       if (currentRequestId === requestIdRef.current) {
@@ -224,8 +245,28 @@ export function useNotes(options: UseNotesOptions = {}) {
     });
   };
 
+  const addCustomFolder = useCallback((folderName: string): string => {
+    const normalized = folderName.trim().toLowerCase().replace(/^#+/, '').replace(/\s+/g, '-');
+    if (!normalized) return '';
+    setCustomFolders((prev) => {
+      if (prev.includes(normalized)) return prev;
+      const next = [...prev, normalized];
+      try {
+        localStorage.setItem(CUSTOM_FOLDERS_KEY, JSON.stringify(next));
+      } catch {
+        // Ignore storage errors in restricted environments
+      }
+      return next;
+    });
+    return normalized;
+  }, []);
+
   const allTags = Array.from(
-    new Set(notes.flatMap((n) => (Array.isArray(n.tags) ? n.tags : [])))
+    new Set([
+      ...knownServerTags,
+      ...customFolders,
+      ...notes.flatMap((n) => (Array.isArray(n.tags) ? n.tags : [])),
+    ])
   ).sort();
 
   const removeNoteLocally = useCallback((id: string) => {
@@ -245,6 +286,7 @@ export function useNotes(options: UseNotesOptions = {}) {
     setSelectedTag,
     errorMessage,
     allTags,
+    addCustomFolder,
     fetchNotes,
     createNote,
     updateNote,

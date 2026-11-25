@@ -18,8 +18,8 @@
   padding: 8px 36px 8px 36px;
   border-radius: var(--radius-sm);
   background-color: var(--bg-surface);
-  border: 1.5px solid var(--border-dark);
-  box-shadow: 2px 2px 0px var(--border-dark);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
   font-size: 13px;
   color: var(--text-main);
   transition: all 120ms ease;
@@ -27,7 +27,7 @@
 
 .searchInput:focus {
   background-color: var(--bg-surface);
-  border-color: var(--border-dark);
+  border-color: var(--border-focus);
 }
 
 .clearButton {

@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import AddFolderModal from './AddFolderModal';
 import styles from '../pages/DashboardPage.module.css';
 
 export interface TagFilterBarProps {
@@ -23,12 +25,7 @@ export default function TagFilterBar({
   onSelectTag,
   onAddNewFolder,
 }: TagFilterBarProps) {
-  const handleCreateFolder = () => {
-    const input = window.prompt('Enter new folder name:');
-    if (input && input.trim()) {
-      onAddNewFolder?.(input.trim().toLowerCase().replace(/^#/, ''));
-    }
-  };
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   return (
     <div className={styles.tagFilterBar}>
@@ -72,14 +69,22 @@ export default function TagFilterBar({
       })}
 
       {onAddNewFolder && (
-        <button
-          type="button"
-          className={styles.tagChip}
-          onClick={handleCreateFolder}
-          title="Create a new folder"
-        >
-          + Folder
-        </button>
+        <>
+          <button
+            type="button"
+            className={styles.tagChip}
+            onClick={() => setIsAddModalOpen(true)}
+            title="Create a new folder"
+          >
+            + Folder
+          </button>
+          <AddFolderModal
+            isOpen={isAddModalOpen}
+            existingFolders={allTags}
+            onClose={() => setIsAddModalOpen(false)}
+            onCreateFolder={onAddNewFolder}
+          />
+        </>
       )}
     </div>
   );

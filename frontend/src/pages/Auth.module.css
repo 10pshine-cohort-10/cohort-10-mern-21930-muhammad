@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background-color: var(--bg-app);
 }
 
 .card {
@@ -28,8 +28,8 @@
   width: 34px;
   height: 34px;
   border-radius: var(--radius-md);
-  background-color: var(--teal-tint);
-  color: var(--teal-primary);
+  background-color: var(--border-dark);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,7 +97,7 @@
   margin-top: 6px;
   padding: 11px;
   border-radius: var(--radius-sm);
-  background-color: var(--teal-primary);
+  background-color: var(--border-dark);
   color: #ffffff;
   font-weight: 600;
   font-size: 14px;
@@ -105,7 +105,7 @@
 }
 
 .submitButton:hover:not(:disabled) {
-  background-color: var(--teal-hover);
+  background-color: #27272a;
 }
 
 .submitButton:disabled {

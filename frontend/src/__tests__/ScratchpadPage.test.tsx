@@ -27,6 +27,7 @@ describe('ScratchpadPage', () => {
       setSelectedTag: jest.fn(),
       errorMessage: '',
       allTags: [],
+      addCustomFolder: jest.fn(),
       fetchNotes: jest.fn(),
       createNote: mockCreateNote,
       updateNote: jest.fn(),

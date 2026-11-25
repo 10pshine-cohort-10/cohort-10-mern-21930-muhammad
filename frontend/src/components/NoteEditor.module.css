@@ -1,11 +1,11 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.35);
+  background-color: rgba(24, 24, 27, 0.35);
   backdrop-filter: blur(2px);
   display: flex;
   justify-content: flex-end;
-  z-index: 100;
+  z-index: var(--z-modal, 100);
   animation: fadeIn 150ms ease-out;
 }
 
@@ -317,15 +317,16 @@
 }
 
 .editorContent :global(.tiptap blockquote) {
-  border-left: 3px solid var(--teal-primary);
-  padding-left: 12px;
+  background-color: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
   color: var(--text-muted);
   margin: 12px 0;
 }
 
 .editorContent :global(.tiptap pre) {
-  background-color: #1e293b;
-  color: #f8fafc;
+  background-color: var(--border-dark);
+  color: var(--bg-app);
   padding: 12px;
   border-radius: var(--radius-sm);
   font-family: var(--font-family-mono);

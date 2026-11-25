@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, Folder, FolderPlus } from 'lucide-react';
+import AddFolderModal from './AddFolderModal';
 import styles from './Layout.module.css';
 
 export interface SidebarFoldersProps {
@@ -16,13 +17,7 @@ export default function SidebarFolders({
   onAddFolder,
 }: SidebarFoldersProps) {
   const [isExpanded, setIsExpanded] = useState(true);
-
-  const handleCreateFolder = () => {
-    const input = window.prompt('Enter new folder name:');
-    if (input && input.trim()) {
-      onAddFolder?.(input.trim().toLowerCase().replace(/^#/, ''));
-    }
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className={styles.folderTree}>
@@ -58,13 +53,22 @@ export default function SidebarFolders({
             <button
               type="button"
               className={styles.folderAddBtn}
-              onClick={handleCreateFolder}
+              onClick={() => setIsModalOpen(true)}
             >
               <FolderPlus size={14} />
               <span>New Folder</span>
             </button>
           )}
         </div>
+      )}
+
+      {onAddFolder && (
+        <AddFolderModal
+          isOpen={isModalOpen}
+          existingFolders={folders}
+          onClose={() => setIsModalOpen(false)}
+          onCreateFolder={onAddFolder}
+        />
       )}
     </div>
   );

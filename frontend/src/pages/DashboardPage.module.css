@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 22px;
-  padding-bottom: 96px;
+  padding-bottom: 112px;
 }
 
 .controlsBar {
@@ -21,6 +21,10 @@
   align-items: center;
   gap: 8px;
   margin-top: 4px;
+}
+
+.sectionHeadingCompact {
+  margin-top: 0;
 }
 
 .bentoStatsBar {
@@ -95,9 +99,9 @@
   gap: 6px;
   padding: 8px 14px;
   background-color: var(--bg-surface);
-  border: 1.5px solid var(--border-dark);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  box-shadow: 2px 2px 0px var(--border-dark);
+  box-shadow: var(--shadow-sm);
   color: var(--text-main);
   font-size: 13px;
   font-weight: 600;
@@ -124,12 +128,12 @@
   padding: 6px 16px;
   border-radius: var(--radius-full);
   background-color: #ffffff;
-  border: 1.5px solid var(--border-dark);
+  border: 1px solid var(--border-subtle);
   color: var(--text-main);
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
-  box-shadow: 2px 2px 0px var(--border-dark);
+  box-shadow: var(--shadow-sm);
   transition: all 120ms ease;
 }
 
@@ -142,7 +146,7 @@
   background-color: var(--border-dark);
   color: #ffffff;
   border-color: var(--border-dark);
-  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-sm);
 }
 
 .notesGrid {
