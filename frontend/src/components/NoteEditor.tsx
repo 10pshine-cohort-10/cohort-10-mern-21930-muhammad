@@ -62,6 +62,19 @@ function NoteEditorDrawer({ note, isOpen, onClose, onSave }: NoteEditorProps) {
     }
   }, [note, editor]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && saveStatus !== 'saving') {
+        event.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, saveStatus]);
+
+  const hasCustomMetadata = tags.length > 0 || color !== 'slate' || isPinned;
+
   const handleManualSave = async () => {
     clearTimer();
     setSaveStatus('saving');
@@ -83,8 +96,19 @@ function NoteEditorDrawer({ note, isOpen, onClose, onSave }: NoteEditorProps) {
   };
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={`${styles.drawer} ${isFocusMode ? styles.drawerFocus : ''}`} onClick={(e) => e.stopPropagation()}>
+    <div
+      className={styles.overlay}
+      onClick={() => {
+        if (saveStatus !== 'saving') onClose();
+      }}
+    >
+      <div
+        className={`${styles.drawer} ${isFocusMode ? styles.drawerFocus : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={note?.id ? 'Edit Note' : 'Create Note'}
+        onClick={(e) => e.stopPropagation()}
+      >
         <NoteEditorHeader
           isEditing={Boolean(note?.id)}
           isFocusMode={isFocusMode}
@@ -111,6 +135,9 @@ function NoteEditorDrawer({ note, isOpen, onClose, onSave }: NoteEditorProps) {
             >
               {showMetadata ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
               <span>{showMetadata ? 'Hide Details' : 'Details & Tags'}</span>
+              {!showMetadata && hasCustomMetadata && (
+                <span aria-label="Has tags or color">· {tags.length || '•'}</span>
+              )}
             </button>
           </div>
 

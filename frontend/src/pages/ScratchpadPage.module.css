@@ -93,10 +93,16 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease;
 }
 
 .bulkBtn:hover:not(:disabled) {
   background-color: var(--bg-subtle);
+  transform: translateY(-1px);
+}
+
+.bulkBtn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
 }
 
 .bulkBtn:disabled {
@@ -167,10 +173,16 @@
   border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 600;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease;
 }
 
 .newNoteBtn:hover {
   background-color: #27272a;
+  transform: translateY(-1px);
+}
+
+.newNoteBtn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .tackBtn {
@@ -187,12 +199,16 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.1s ease;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease;
   width: fit-content;
 }
 
-.tackBtn:hover {
-  transform: translate(-1px, -1px);
+.tackBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.tackBtn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
 }
 
 .scratchpadItem {

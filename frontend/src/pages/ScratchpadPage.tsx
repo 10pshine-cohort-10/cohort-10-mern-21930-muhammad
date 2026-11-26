@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Pin, Trash2 } from 'lucide-react';
 import Layout from '../components/Layout';
 import NoteCard from '../components/NoteCard';
@@ -33,13 +33,20 @@ export default function ScratchpadPage() {
 
   const { isAuthenticated } = useAuth();
   const { createNote } = useNotes({ autoSync: false });
+  const noticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => { setNotes(getGuestNotes()); }, []);
+  useEffect(() => {
+    setNotes(getGuestNotes());
+    return () => {
+      if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
+    };
+  }, []);
   usePaletteShortcut(() => setIsPaletteOpen(true));
 
   const showNotice = (text: string, isError = false) => {
+    if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
     setStatusNotice({ text, isError });
-    setTimeout(() => setStatusNotice(null), 3000);
+    noticeTimerRef.current = setTimeout(() => setStatusNotice(null), 3000);
   };
 
   const handleOpenNewNote = () => { setActiveNoteForEdit(null); setIsEditorOpen(true); };
@@ -149,6 +156,7 @@ export default function ScratchpadPage() {
       <BentoStatsBar
         totalNotes={safeNotes.length} pinnedCount={pinnedCount} totalTags={0}
         thirdStatLabel="Storage" thirdStatValue="Local"
+        activeFilter={filterMode}
         onOpenCommandPalette={() => setIsPaletteOpen(true)}
         onFilterAll={() => setFilterMode('all')}
         onFilterPinned={() => setFilterMode((prev) => (prev === 'pinned' ? 'all' : 'pinned'))}

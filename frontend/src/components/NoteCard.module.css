@@ -133,12 +133,17 @@
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
+  transition: transform 120ms var(--ease-tactile), background-color 120ms ease, border-color 120ms ease;
 }
 
 .iconButton:hover {
   background-color: rgba(24, 24, 27, 0.08);
   color: var(--text-main);
   border-color: rgba(24, 24, 27, 0.15);
+}
+
+.iconButton:active {
+  transform: scale(0.92);
 }
 
 .pinActive {
