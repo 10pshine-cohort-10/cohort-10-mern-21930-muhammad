@@ -19,9 +19,9 @@
 }
 
 .cardFocused {
-  outline: 3px solid var(--border-dark);
+  outline: 2px solid var(--border-dark);
   outline-offset: 3px;
-  box-shadow: 5px 5px 0px var(--shadow-dark) !important;
+  box-shadow: 4px 4px 0px var(--border-dark);
   transform: translateY(-2px);
 }
 

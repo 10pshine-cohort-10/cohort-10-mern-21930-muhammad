@@ -44,6 +44,25 @@
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
   font-size: 13px;
+  transition: transform 140ms var(--ease-tactile), border-color 140ms ease, background-color 140ms ease;
+}
+
+.statCardBtn {
+  cursor: pointer;
+}
+
+.statCardBtn:hover {
+  transform: translateY(-1px);
+  background-color: var(--bg-subtle);
+}
+
+.statCardBtn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.statCardActive {
+  border-color: var(--border-dark);
+  background-color: var(--bg-subtle);
 }
 
 .statValue {
@@ -105,11 +124,41 @@
   color: var(--text-main);
   font-size: 13px;
   font-weight: 600;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease;
 }
 
 .secondaryBtn:hover {
   background-color: var(--bg-subtle);
   transform: translateY(-1px);
+}
+
+.secondaryBtn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background-color: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-sm);
+  color: var(--danger-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.retryBtn {
+  padding: 5px 12px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-sm);
+  color: var(--danger-text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .hiddenInput {
@@ -204,9 +253,14 @@
 .skeletonCard {
   height: 170px;
   background-color: var(--bg-subtle);
-  border: 2px solid var(--border-subtle);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  box-shadow: 2px 2px 0px var(--border-subtle);
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 .notesStream {

@@ -102,10 +102,16 @@
   font-weight: 600;
   font-size: 14px;
   box-shadow: var(--shadow-sm);
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease;
 }
 
 .submitButton:hover:not(:disabled) {
   background-color: #27272a;
+  transform: translateY(-1px);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
 }
 
 .submitButton:disabled {

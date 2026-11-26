@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import PropTypes from 'prop-types';
-import { Download, Upload } from 'lucide-react';
+import { Download, Upload, Check } from 'lucide-react';
 import styles from '../pages/DashboardPage.module.css';
 
 export interface ExportImportActionsProps {
@@ -11,11 +11,14 @@ export interface ExportImportActionsProps {
 export default function ExportImportActions({ onExport, onImportFile }: ExportImportActionsProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [exportError, setExportError] = useState<string>('');
+  const [recentExport, setRecentExport] = useState<'json' | 'markdown' | null>(null);
 
   const handleExportClick = async (format: 'json' | 'markdown') => {
     setExportError('');
     try {
       await onExport(format);
+      setRecentExport(format);
+      setTimeout(() => setRecentExport((prev) => (prev === format ? null : prev)), 1500);
     } catch (err) {
       console.error('Failed to export notes:', err);
       setExportError('Export failed. Please try again.');
@@ -24,15 +27,19 @@ export default function ExportImportActions({ onExport, onImportFile }: ExportIm
 
   return (
     <div className={styles.actionsGroup}>
-      {exportError && <span role="alert" style={{ color: 'var(--danger-text)', fontSize: '0.8rem' }}>{exportError}</span>}
+      {exportError && (
+        <span role="alert" style={{ color: 'var(--danger-text)', fontSize: '0.8rem' }}>
+          {exportError}
+        </span>
+      )}
       <button
         type="button"
         className={styles.secondaryBtn}
         onClick={() => handleExportClick('json')}
         title="Export all notes to JSON backup"
       >
-        <Download size={14} />
-        <span>Export JSON</span>
+        {recentExport === 'json' ? <Check size={14} /> : <Download size={14} />}
+        <span>{recentExport === 'json' ? 'Exported' : 'Export JSON'}</span>
       </button>
 
       <button
@@ -41,8 +48,8 @@ export default function ExportImportActions({ onExport, onImportFile }: ExportIm
         onClick={() => handleExportClick('markdown')}
         title="Export notes to Markdown document"
       >
-        <Download size={14} />
-        <span>Export MD</span>
+        {recentExport === 'markdown' ? <Check size={14} /> : <Download size={14} />}
+        <span>{recentExport === 'markdown' ? 'Exported' : 'Export MD'}</span>
       </button>
 
       <button

@@ -10,14 +10,35 @@ export interface SidebarFoldersProps {
   onAddFolder?: (tag: string) => void;
 }
 
+const FOLDERS_EXPANDED_KEY = 'notes_folders_expanded';
+
 export default function SidebarFolders({
   folders,
   selectedFolder = '',
   onSelectFolder,
   onAddFolder,
 }: SidebarFoldersProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem(FOLDERS_EXPANDED_KEY);
+      return saved === null ? true : saved === 'true';
+    } catch {
+      return true;
+    }
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const toggleExpanded = () => {
+    setIsExpanded((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(FOLDERS_EXPANDED_KEY, String(next));
+      } catch {
+        // Ignore storage errors in restricted environments
+      }
+      return next;
+    });
+  };
 
   return (
     <div className={styles.folderTree}>
@@ -25,7 +46,7 @@ export default function SidebarFolders({
         <button
           type="button"
           className={styles.folderToggle}
-          onClick={() => setIsExpanded((prev) => !prev)}
+          onClick={toggleExpanded}
           aria-expanded={isExpanded}
         >
           {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}

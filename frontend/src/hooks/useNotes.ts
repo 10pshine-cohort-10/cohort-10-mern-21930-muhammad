@@ -12,10 +12,11 @@ function resolveSocketUrl(): string {
 }
 
 const CUSTOM_FOLDERS_KEY = 'notes_custom_folders';
+const KNOWN_TAGS_KEY = 'notes_known_tags';
 
-function loadCustomFolders(): string[] {
+function loadTagList(key: string): string[] {
   try {
-    const raw = localStorage.getItem(CUSTOM_FOLDERS_KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed.filter((t): t is string => typeof t === 'string') : [];
@@ -24,18 +25,23 @@ function loadCustomFolders(): string[] {
   }
 }
 
+export function getCachedFolders(): string[] {
+  return Array.from(new Set([...loadTagList(KNOWN_TAGS_KEY), ...loadTagList(CUSTOM_FOLDERS_KEY)])).sort();
+}
+
 export interface UseNotesOptions {
   autoSync?: boolean;
+  initialTag?: string;
 }
 
 export function useNotes(options: UseNotesOptions = {}) {
-  const { autoSync = true } = options;
+  const { autoSync = true, initialTag = '' } = options;
   const [notes, setNotes] = useState<Note[]>([]);
-  const [knownServerTags, setKnownServerTags] = useState<string[]>([]);
-  const [customFolders, setCustomFolders] = useState<string[]>(loadCustomFolders);
+  const [knownServerTags, setKnownServerTags] = useState<string[]>(() => loadTagList(KNOWN_TAGS_KEY));
+  const [customFolders, setCustomFolders] = useState<string[]>(() => loadTagList(CUSTOM_FOLDERS_KEY));
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedTag, setSelectedTag] = useState<string>('');
+  const [selectedTag, setSelectedTag] = useState<string>(initialTag);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   const requestIdRef = useRef<number>(0);
@@ -88,9 +94,15 @@ export function useNotes(options: UseNotesOptions = {}) {
         const fetched = response.data.data || [];
         setNotes(fetched);
         if (!searchQuery.trim() && !selectedTag) {
-          setKnownServerTags(
-            Array.from(new Set(fetched.flatMap((n) => (Array.isArray(n.tags) ? n.tags : []))))
+          const nextTags = Array.from(
+            new Set(fetched.flatMap((n) => (Array.isArray(n.tags) ? n.tags : [])))
           );
+          setKnownServerTags(nextTags);
+          try {
+            localStorage.setItem(KNOWN_TAGS_KEY, JSON.stringify(nextTags));
+          } catch {
+            // Ignore storage errors in restricted environments
+          }
         }
       }
     } catch (err: unknown) {

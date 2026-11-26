@@ -127,10 +127,16 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease;
 }
 
 .cancelBtn:hover {
   background-color: var(--bg-subtle);
+  transform: translateY(-1px);
+}
+
+.cancelBtn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .submitBtn {
@@ -142,8 +148,14 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease;
 }
 
 .submitBtn:hover {
   background-color: #27272a;
+  transform: translateY(-1px);
+}
+
+.submitBtn:active {
+  transform: translateY(0) scale(0.98);
 }

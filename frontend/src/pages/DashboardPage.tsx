@@ -1,4 +1,5 @@
-import { useState, useRef, type ChangeEvent } from 'react';
+import { useState, useRef, useEffect, type ChangeEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Layout from '../components/Layout';
 import SearchBar from '../components/SearchBar';
 import NoteCard from '../components/NoteCard';
@@ -20,12 +21,25 @@ import type { Note, NoteInput } from '../types';
 import styles from './DashboardPage.module.css';
 
 export default function DashboardPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialUrlTag = searchParams.get('tag') || '';
+
   const {
-    notes, isLoading, searchQuery, setSearchQuery, selectedTag, setSelectedTag, allTags, addCustomFolder,
-    createNote, updateNote, deleteNote, togglePin, exportNotes, importNotes,
+    notes, isLoading, errorMessage, fetchNotes, searchQuery, setSearchQuery, selectedTag, setSelectedTag,
+    allTags, addCustomFolder, createNote, updateNote, deleteNote, togglePin, exportNotes, importNotes,
     removeNoteLocally, restoreNoteLocally,
-  } = useNotes();
+  } = useNotes({ initialTag: initialUrlTag });
   const { logout } = useAuth();
+
+  useEffect(() => {
+    const urlTag = searchParams.get('tag') || '';
+    setSelectedTag(urlTag);
+  }, [searchParams, setSelectedTag]);
+
+  const handleSelectFolder = (tag: string) => {
+    setFilterMode('all');
+    setSearchParams(tag ? { tag } : {});
+  };
 
   const [activeNoteForEdit, setActiveNoteForEdit] = useState<Note | NoteInput | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -88,11 +102,6 @@ export default function DashboardPage() {
     }
   };
 
-  const tagCounts: Record<string, number> = {};
-  for (const t of safeTags) {
-    tagCounts[t] = safeNotes.filter((n) => Array.isArray(n.tags) && n.tags.includes(t)).length;
-  }
-
   const pinnedNotes = filterMode === 'all' ? displayedNotes.filter((n) => n.isPinned) : [];
   const regularNotes = filterMode === 'all' && pinnedNotes.length > 0
     ? displayedNotes.filter((n) => !n.isPinned)
@@ -114,10 +123,10 @@ export default function DashboardPage() {
       onNewNoteClick={() => openEditor(null)}
       folders={safeTags}
       selectedFolder={selectedTag}
-      onSelectFolder={(tag) => { setFilterMode('all'); setSelectedTag(tag); }}
+      onSelectFolder={handleSelectFolder}
       onAddFolder={(tag) => {
         const created = addCustomFolder(tag);
-        if (created) { setFilterMode('all'); setSelectedTag(created); }
+        if (created) handleSelectFolder(created);
       }}
     >
       <div className={styles.container}>
@@ -128,13 +137,25 @@ export default function DashboardPage() {
 
         <BentoStatsBar
           totalNotes={safeNotes.length} pinnedCount={pinnedCount} totalTags={safeTags.length}
+          activeFilter={filterMode === 'pinned' ? 'pinned' : 'all'}
           onOpenCommandPalette={() => setIsPaletteOpen(true)}
-          onFilterAll={() => { setFilterMode('all'); setSelectedTag(''); }}
-          onFilterPinned={() => setFilterMode('pinned')}
+          onFilterAll={() => handleSelectFolder('')}
+          onFilterPinned={() => setFilterMode((prev) => (prev === 'pinned' ? 'all' : 'pinned'))}
         />
 
+        {errorMessage && (
+          <div className={styles.errorBanner} role="alert">
+            <span>{errorMessage}</span>
+            <button type="button" className={styles.retryBtn} onClick={() => fetchNotes()}>
+              Retry
+            </button>
+          </div>
+        )}
+
         {isLoading ? (
-          <div className={styles.skeletonGrid}><div className={styles.skeletonCard} /><div className={styles.skeletonCard} /></div>
+          <div className={styles.skeletonGrid} aria-busy="true" aria-label="Loading notes">
+            <div className={styles.skeletonCard} /><div className={styles.skeletonCard} />
+          </div>
         ) : displayedNotes.length === 0 ? (
           <NotesEmptyState searchQuery={searchQuery} onCreateNote={() => openEditor(null)} onApplyTemplate={openEditor} />
         ) : (

@@ -59,10 +59,20 @@
 }
 
 .sidebarHeader {
-  padding: 20px 18px 14px;
+  padding: 18px 14px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.brandGroup {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
+  flex: 1;
 }
 
 .logoIcon {
@@ -74,13 +84,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .appName {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-main);
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .navigation {
@@ -89,7 +104,9 @@
   flex-direction: column;
   gap: 6px;
   flex: 1;
+  min-width: 0;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .navItem {
@@ -102,7 +119,25 @@
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
-  transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+
+.navItem:active {
+  transform: scale(0.98);
+}
+
+.navItem svg {
+  flex-shrink: 0;
+}
+
+.navItem > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .navItem:hover {
@@ -140,14 +175,18 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding-left: 10px;
+  padding-left: 6px;
   margin-bottom: 6px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .folderTreeHeader {
   display: flex;
   align-items: center;
   gap: 4px;
+  min-width: 0;
 }
 
 .folderToggle {
@@ -165,6 +204,11 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   cursor: pointer;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease, color 140ms ease;
+}
+
+.folderToggle:active {
+  transform: scale(0.98);
 }
 
 .folderInlineAdd {
@@ -178,6 +222,11 @@
   background: transparent;
   color: var(--text-subtle);
   cursor: pointer;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease, color 140ms ease;
+}
+
+.folderInlineAdd:active {
+  transform: scale(0.94);
 }
 
 .folderInlineAdd:hover {
@@ -203,6 +252,9 @@
   padding-left: 10px;
   border-left: 1px solid var(--border-subtle);
   margin-left: 14px;
+  min-width: 0;
+  max-width: calc(100% - 14px);
+  box-sizing: border-box;
 }
 
 .folderItem,
@@ -219,7 +271,19 @@
   font-weight: 500;
   cursor: pointer;
   text-align: left;
-  transition: background-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+
+.folderItem:active,
+.folderAddBtn:active {
+  transform: scale(0.98);
+}
+
+.folderItem svg {
+  flex-shrink: 0;
 }
 
 .folderItem:hover,
@@ -247,11 +311,13 @@
 }
 
 .sidebarFooter {
-  padding: 14px 16px 18px;
+  padding: 12px 14px 16px;
   border-top: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
   background-color: transparent;
 }
 
@@ -259,9 +325,27 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 6px;
+  border-radius: var(--radius-full);
   overflow: hidden;
   text-decoration: none;
   color: inherit;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.userInfo:active {
+  transform: scale(0.98);
+}
+
+.userInfo:hover {
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
+.userInfoActive {
+  background-color: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .avatar {
@@ -308,11 +392,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease, color 140ms ease;
 }
 
 .logoutButton:hover {
   background-color: var(--danger-bg);
   color: var(--danger-text);
+}
+
+.logoutButton:active {
+  transform: scale(0.94);
 }
 
 .mainContent {
@@ -352,12 +441,16 @@
   background-color: var(--bg-surface);
   color: var(--text-muted);
   cursor: pointer;
-  transition: background-color 120ms ease, color 120ms ease;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease, color 140ms ease;
 }
 
 .collapseBtn:hover {
   background-color: var(--bg-subtle);
   color: var(--text-main);
+}
+
+.collapseBtn:active {
+  transform: scale(0.94);
 }
 
 .topbarTitle {
@@ -385,12 +478,16 @@
   border-radius: var(--radius-full);
   font-weight: 600;
   font-size: 13px;
-  transition: all 120ms ease;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease, box-shadow 140ms ease;
 }
 
 .newNoteButton:hover {
   background-color: #27272a;
   transform: translateY(-1px);
+}
+
+.newNoteButton:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .pageBody {

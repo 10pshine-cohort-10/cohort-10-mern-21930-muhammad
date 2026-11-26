@@ -61,6 +61,7 @@
   background-color: var(--bg-subtle);
   color: var(--text-muted);
   box-shadow: 1px 1px 0px var(--border-dark);
+  animation: fadeInScale 160ms var(--ease-tactile);
 }
 
 .saveStampActive {
@@ -86,11 +87,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 120ms var(--ease-tactile), background-color 120ms ease, color 120ms ease;
 }
 
 .iconButton:hover {
   background-color: var(--bg-subtle);
   color: var(--text-main);
+}
+
+.iconButton:active {
+  transform: scale(0.94);
 }
 
 .collapsibleToggle {
@@ -104,11 +110,16 @@
   border-radius: var(--radius-sm);
   background-color: var(--bg-subtle);
   border: 1px solid var(--border-subtle);
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease, color 140ms ease;
 }
 
 .collapsibleToggle:hover {
   color: var(--text-main);
   background-color: var(--bg-muted);
+}
+
+.collapsibleToggle:active {
+  transform: scale(0.98);
 }
 
 .closeButton {
@@ -118,6 +129,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 120ms var(--ease-tactile), background-color 120ms ease, color 120ms ease;
+}
+
+.closeButton:active {
+  transform: scale(0.94);
 }
 
 .closeButton:hover {
@@ -171,6 +187,11 @@
   border-radius: var(--radius-full);
   border: 2px solid transparent;
   cursor: pointer;
+  transition: transform 140ms var(--ease-tactile), border-color 140ms ease;
+}
+
+.colorDot:active {
+  transform: scale(0.92);
 }
 
 .colorDotActive {
@@ -179,12 +200,12 @@
   transform: scale(1.15);
 }
 
-.colorSlate { background-color: #cbd5e1; }
-.colorSage { background-color: #bef264; }
-.colorTeal { background-color: #5eead4; }
-.colorSand { background-color: #fde047; }
-.colorLavender { background-color: #c4b5fd; }
-.colorRose { background-color: #fda4af; }
+.colorSlate { background-color: var(--color-slate-bg); border-color: var(--border-subtle); }
+.colorSage { background-color: var(--color-sage-bg); }
+.colorTeal { background-color: var(--color-teal-bg); }
+.colorSand { background-color: var(--color-sand-bg); }
+.colorLavender { background-color: var(--color-lavender-bg); }
+.colorRose { background-color: var(--color-rose-bg); }
 
 .pinToggle {
   display: flex;
@@ -196,10 +217,15 @@
   padding: 4px 8px;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease, border-color 140ms ease;
 }
 
 .pinToggle:hover {
   background-color: var(--bg-subtle);
+}
+
+.pinToggle:active {
+  transform: scale(0.97);
 }
 
 .pinActive {
@@ -269,11 +295,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 120ms var(--ease-tactile), background-color 120ms ease, color 120ms ease;
 }
 
 .toolButton:hover {
   background-color: var(--bg-surface);
   color: var(--text-main);
+}
+
+.toolButton:active {
+  transform: scale(0.94);
 }
 
 .toolActive {
@@ -287,6 +318,14 @@
   font-size: 15px;
   line-height: 1.6;
   color: var(--text-main);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  transition: border-color 140ms ease;
+}
+
+.editorContent:focus-within {
+  border-color: var(--border-subtle);
 }
 
 .editorContent :global(.tiptap) {
@@ -352,11 +391,16 @@
   box-shadow: 2px 2px 0px var(--border-dark);
   color: var(--text-main);
   font-weight: 600;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease, box-shadow 140ms ease;
 }
 
 .cancelBtn:hover {
   background-color: var(--bg-subtle);
   transform: translateY(-1px);
+}
+
+.cancelBtn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .saveBtn {
@@ -367,11 +411,16 @@
   box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
   color: #ffffff;
   font-weight: 600;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease, box-shadow 140ms ease;
 }
 
 .saveBtn:hover {
   background-color: #27272a;
   transform: translateY(-1px);
+}
+
+.saveBtn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 @media (max-width: 640px) {

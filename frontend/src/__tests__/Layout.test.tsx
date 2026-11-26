@@ -22,8 +22,8 @@ describe('Layout collapsible sidebar', () => {
     });
   });
 
-  it('toggles sidebar collapsed state and persists preference', () => {
-    render(
+  it('keeps collapse toggle inside sidebar, consolidates profile in footer, and persists folder tree', () => {
+    const { unmount } = render(
       <MemoryRouter initialEntries={['/dashboard']}>
         <Layout folders={['work']} selectedFolder="" onSelectFolder={jest.fn()}>
           <div>Workspace body</div>
@@ -31,18 +31,35 @@ describe('Layout collapsible sidebar', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Notes Workspace')).toBeInTheDocument();
+    const aside = document.querySelector('aside');
     const collapseBtn = screen.getByRole('button', { name: /collapse sidebar/i });
-    fireEvent.click(collapseBtn);
+    expect(aside).toContainElement(collapseBtn);
 
+    expect(screen.getAllByRole('link', { name: /test user/i })).toHaveLength(1);
+    expect(screen.getByText('#work')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /folders/i }));
+    expect(screen.queryByText('#work')).not.toBeInTheDocument();
+    expect(localStorage.getItem('notes_folders_expanded')).toBe('false');
+
+    fireEvent.click(collapseBtn);
     expect(screen.queryByText('Notes Workspace')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /log out/i })).toBeInTheDocument();
     expect(localStorage.getItem('notes_sidebar_collapsed')).toBe('true');
 
+    unmount();
+
+    render(
+      <MemoryRouter initialEntries={['/scratchpad']}>
+        <Layout>
+          <div>Scratchpad body</div>
+        </Layout>
+      </MemoryRouter>
+    );
+
     const expandBtn = screen.getByRole('button', { name: /expand sidebar$/i });
     fireEvent.click(expandBtn);
-
     expect(screen.getByText('Notes Workspace')).toBeInTheDocument();
-    expect(localStorage.getItem('notes_sidebar_collapsed')).toBe('false');
+    expect(localStorage.getItem('notes_folders_expanded')).toBe('false');
   });
 });

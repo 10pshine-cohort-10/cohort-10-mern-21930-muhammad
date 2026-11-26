@@ -7,6 +7,7 @@ export interface BentoStatsBarProps {
   totalTags: number;
   thirdStatLabel?: string;
   thirdStatValue?: string | number;
+  activeFilter?: 'all' | 'pinned';
   onOpenCommandPalette: () => void;
   onFilterAll?: () => void;
   onFilterPinned?: () => void;
@@ -18,35 +19,48 @@ export default function BentoStatsBar({
   totalTags,
   thirdStatLabel = 'Folders',
   thirdStatValue,
+  activeFilter,
   onOpenCommandPalette,
   onFilterAll,
   onFilterPinned,
 }: BentoStatsBarProps) {
   return (
     <div className={styles.bentoStatsBar}>
-      <div
-        className={styles.statCard}
-        onClick={onFilterAll}
-        role={onFilterAll ? 'button' : undefined}
-        tabIndex={onFilterAll ? 0 : undefined}
-        style={{ cursor: onFilterAll ? 'pointer' : 'default' }}
-        title={onFilterAll ? 'Show all notes' : undefined}
-      >
-        <span className={styles.statValue}>{totalNotes}</span>
-        <span className={styles.statLabel}>Total Notes</span>
-      </div>
+      {onFilterAll ? (
+        <button
+          type="button"
+          className={`${styles.statCard} ${styles.statCardBtn} ${activeFilter === 'all' ? styles.statCardActive : ''}`}
+          onClick={onFilterAll}
+          aria-pressed={activeFilter === 'all'}
+          title="Show all notes"
+        >
+          <span className={styles.statValue}>{totalNotes}</span>
+          <span className={styles.statLabel}>Total Notes</span>
+        </button>
+      ) : (
+        <div className={styles.statCard}>
+          <span className={styles.statValue}>{totalNotes}</span>
+          <span className={styles.statLabel}>Total Notes</span>
+        </div>
+      )}
 
-      <div
-        className={styles.statCard}
-        onClick={onFilterPinned}
-        role={onFilterPinned ? 'button' : undefined}
-        tabIndex={onFilterPinned ? 0 : undefined}
-        style={{ cursor: onFilterPinned ? 'pointer' : 'default' }}
-        title={onFilterPinned ? 'Filter pinned notes' : undefined}
-      >
-        <span className={styles.statValue}>{pinnedCount}</span>
-        <span className={styles.statLabel}>Pinned</span>
-      </div>
+      {onFilterPinned ? (
+        <button
+          type="button"
+          className={`${styles.statCard} ${styles.statCardBtn} ${activeFilter === 'pinned' ? styles.statCardActive : ''}`}
+          onClick={onFilterPinned}
+          aria-pressed={activeFilter === 'pinned'}
+          title="Filter pinned notes"
+        >
+          <span className={styles.statValue}>{pinnedCount}</span>
+          <span className={styles.statLabel}>Pinned</span>
+        </button>
+      ) : (
+        <div className={styles.statCard}>
+          <span className={styles.statValue}>{pinnedCount}</span>
+          <span className={styles.statLabel}>Pinned</span>
+        </div>
+      )}
 
       <div className={styles.statCard}>
         <span className={styles.statValue}>{thirdStatValue ?? totalTags}</span>

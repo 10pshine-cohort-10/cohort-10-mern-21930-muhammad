@@ -35,4 +35,21 @@ describe('QuickTackBar Component', () => {
 
     expect(handleCreateMock).not.toHaveBeenCalled();
   });
+
+  it('preserves input and shows alert when quick create fails', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const handleCreateMock = jest.fn().mockRejectedValue(new Error('Network error'));
+    render(<QuickTackBar activeTag="" onQuickCreate={handleCreateMock} />);
+
+    const input = screen.getByLabelText('Quick note input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'Unsaved idea' } });
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Failed to save note. Try again.');
+      expect(input.value).toBe('Unsaved idea');
+    });
+
+    consoleSpy.mockRestore();
+  });
 });

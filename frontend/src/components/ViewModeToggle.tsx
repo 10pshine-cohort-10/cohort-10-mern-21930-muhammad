@@ -11,6 +11,10 @@ export interface ViewModeToggleProps {
 export default function ViewModeToggle({ currentMode, onChangeMode }: ViewModeToggleProps) {
   return (
     <div className={styles.toggleContainer} role="radiogroup" aria-label="Layout view mode">
+      <span
+        aria-hidden="true"
+        className={`${styles.slidingPill} ${currentMode === 'stream' ? styles.slidingPillStream : ''}`}
+      />
       <button
         type="button"
         role="radio"

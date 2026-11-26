@@ -1,16 +1,16 @@
 import { useState, type ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  BookOpen, FileText, Edit3, Archive, User as UserIcon,
+  BookOpen, FileText, Edit3, Archive,
   LogOut, Plus, PanelLeftClose, PanelLeftOpen, Folder,
 } from 'lucide-react';
 import MobileNavDock from './MobileNavDock';
 import SidebarFolders from './SidebarFolders';
 import { useAuth } from '../context/AuthContext';
+import { getCachedFolders } from '../hooks/useNotes';
 import styles from './Layout.module.css';
 
 const SIDEBAR_STORAGE_KEY = 'notes_sidebar_collapsed';
-
 const ROUTE_TITLES: Record<string, string> = {
   '/dashboard': 'All Notes',
   '/scratchpad': 'Scratchpad',
@@ -28,76 +28,71 @@ export interface LayoutProps {
 }
 
 export default function Layout({
-  children,
-  onNewNoteClick,
-  folders = [],
-  selectedFolder = '',
-  onSelectFolder,
-  onAddFolder,
+  children, onNewNoteClick, folders, selectedFolder = '', onSelectFolder, onAddFolder,
 }: LayoutProps) {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true';
-    } catch {
-      return false;
-    }
+    try { return localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true'; } catch { return false; }
   });
 
   const toggleSidebar = () => {
     setIsCollapsed((prev) => {
       const next = !prev;
-      try {
-        localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next));
-      } catch {
-        // Ignore storage errors in restricted environments
-      }
+      try { localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next)); } catch { /* ignore */ }
       return next;
     });
   };
 
+  const resolvedFolders = Array.isArray(folders) ? folders : getCachedFolders?.() || [];
+  const handleFolderClick = (tag: string) => {
+    if (onSelectFolder) {
+      onSelectFolder(tag);
+    } else {
+      navigate(tag ? `/dashboard?tag=${encodeURIComponent(tag)}` : '/dashboard');
+    }
+  };
+
   const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'U';
-  const headerTitle = selectedFolder
-    ? `#${selectedFolder}`
-    : ROUTE_TITLES[location.pathname] || 'Notes Workspace';
+  const headerTitle = selectedFolder ? `#${selectedFolder}` : ROUTE_TITLES[location.pathname] || 'Notes Workspace';
 
   return (
     <div className={`${styles.layout} ${isCollapsed ? styles.layoutCollapsed : ''}`}>
       <aside className={`${styles.sidebar} ${isCollapsed ? styles.sidebarCollapsed : ''}`}>
         <div className={styles.sidebarHeader}>
-          <div className={styles.logoIcon}>
-            <BookOpen size={18} />
-          </div>
-          {!isCollapsed && <span className={styles.appName}>Notes Workspace</span>}
+          {!isCollapsed && (
+            <div className={styles.brandGroup}>
+              <div className={styles.logoIcon}><BookOpen size={18} /></div>
+              <span className={styles.appName}>Notes Workspace</span>
+            </div>
+          )}
+          <button
+            type="button" className={styles.collapseBtn} onClick={toggleSidebar}
+            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {isCollapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+          </button>
         </div>
 
         <nav className={styles.navigation}>
           <Link
-            to="/dashboard"
-            onClick={() => onSelectFolder?.('')}
-            title="All Notes"
+            to="/dashboard" onClick={() => onSelectFolder?.('')} title="All Notes"
             className={`${styles.navItem} ${location.pathname === '/dashboard' && !selectedFolder ? styles.navItemActive : ''}`}
           >
-            <FileText size={18} />
-            {!isCollapsed && <span>All Notes</span>}
+            <FileText size={18} />{!isCollapsed && <span>All Notes</span>}
           </Link>
 
-          {onSelectFolder && !isCollapsed && (
+          {!isCollapsed ? (
             <SidebarFolders
-              folders={folders}
-              selectedFolder={selectedFolder}
-              onSelectFolder={onSelectFolder}
-              onAddFolder={onAddFolder}
+              folders={resolvedFolders} selectedFolder={selectedFolder}
+              onSelectFolder={handleFolderClick} onAddFolder={onAddFolder}
             />
-          )}
-
-          {onSelectFolder && isCollapsed && (
+          ) : (
             <button
-              type="button"
-              className={`${styles.navItem} ${selectedFolder ? styles.navItemActive : ''}`}
-              onClick={toggleSidebar}
-              title={`Folders (${folders.length})`}
+              type="button" className={`${styles.navItem} ${selectedFolder ? styles.navItemActive : ''}`}
+              onClick={toggleSidebar} title={`Folders (${resolvedFolders.length})`}
               aria-label="Expand sidebar to view folders"
             >
               <Folder size={18} />
@@ -105,37 +100,25 @@ export default function Layout({
           )}
 
           <Link
-            to="/scratchpad"
-            title="Scratchpad"
+            to="/scratchpad" title="Scratchpad"
             className={`${styles.navItem} ${location.pathname === '/scratchpad' ? styles.navItemActive : ''}`}
           >
-            <Edit3 size={18} />
-            {!isCollapsed && <span>Scratchpad</span>}
+            <Edit3 size={18} />{!isCollapsed && <span>Scratchpad</span>}
           </Link>
 
           <Link
-            to="/archive"
-            title="Archive"
+            to="/archive" title="Archive"
             className={`${styles.navItem} ${location.pathname === '/archive' ? styles.navItemActive : ''}`}
           >
-            <Archive size={18} />
-            {!isCollapsed && <span>Archive</span>}
-          </Link>
-
-          {isCollapsed && <div className={styles.railDivider} aria-hidden="true" />}
-
-          <Link
-            to="/profile"
-            title="My Profile"
-            className={`${styles.navItem} ${location.pathname === '/profile' ? styles.navItemActive : ''}`}
-          >
-            <UserIcon size={18} />
-            {!isCollapsed && <span>My Profile</span>}
+            <Archive size={18} />{!isCollapsed && <span>Archive</span>}
           </Link>
         </nav>
 
         <div className={styles.sidebarFooter}>
-          <Link to="/profile" className={styles.userInfo} title="View My Profile">
+          <Link
+            to="/profile" title="My Profile"
+            className={`${styles.userInfo} ${location.pathname === '/profile' ? styles.userInfoActive : ''}`}
+          >
             <div className={styles.avatar}>{userInitial}</div>
             {!isCollapsed && (
               <div className={styles.userDetails}>
@@ -144,14 +127,7 @@ export default function Layout({
               </div>
             )}
           </Link>
-
-          <button
-            type="button"
-            className={styles.logoutButton}
-            onClick={logout}
-            title="Log out"
-            aria-label="Log out"
-          >
+          <button type="button" className={styles.logoutButton} onClick={logout} title="Log out" aria-label="Log out">
             <LogOut size={16} />
           </button>
         </div>
@@ -160,34 +136,12 @@ export default function Layout({
       <div className={styles.mainContent}>
         <header className={styles.topbar}>
           <div className={styles.topbarLeft}>
-            <button
-              type="button"
-              className={styles.collapseBtn}
-              onClick={toggleSidebar}
-              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            >
-              {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
-            </button>
             <span className={styles.topbarTitle}>{headerTitle}</span>
           </div>
-
-          <div className={styles.mobileBrand}>
-            <div className={styles.logoIcon}>
-              <BookOpen size={18} />
-            </div>
-            <span className={styles.mobileAppName}>Notes</span>
-          </div>
-
           <div className={styles.topbarActions}>
             {onNewNoteClick && (
-              <button
-                type="button"
-                className={styles.newNoteButton}
-                onClick={onNewNoteClick}
-              >
-                <Plus size={16} />
-                <span>New Note</span>
+              <button type="button" className={styles.newNoteButton} onClick={onNewNoteClick}>
+                <Plus size={16} /><span>New Note</span>
               </button>
             )}
             <Link to="/profile" className={styles.mobileAvatar} title={user?.name} aria-label="My Profile">
@@ -195,7 +149,6 @@ export default function Layout({
             </Link>
           </div>
         </header>
-
         <main className={styles.pageBody}>{children}</main>
       </div>
 

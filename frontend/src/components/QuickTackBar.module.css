@@ -1,10 +1,28 @@
-.container {
+.wrapper {
   position: fixed;
   bottom: 20px;
   left: calc(50% + var(--sidebar-width, 0px) / 2);
   transform: translateX(-50%);
   z-index: var(--z-floating, 40);
   width: min(640px, calc(100vw - var(--sidebar-width, 0px) - 48px));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: left 180ms ease, width 180ms ease;
+}
+
+.errorBanner {
+  align-self: center;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background-color: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.container {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -14,7 +32,7 @@
   box-shadow: var(--shadow-lg);
   border-radius: 12px;
   padding: 10px 16px;
-  transition: left 180ms ease, width 180ms ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .container:focus-within {
@@ -56,10 +74,12 @@
 }
 
 @media (max-width: 768px) {
-  .container {
+  .wrapper {
     left: 50%;
     width: min(640px, calc(100vw - 32px));
     bottom: 76px;
+  }
+  .container {
     padding: 8px 12px;
   }
   .hintKey {
