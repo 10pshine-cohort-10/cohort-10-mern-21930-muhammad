@@ -1,11 +1,12 @@
-import { useRef, useState, useEffect, type ChangeEvent, type KeyboardEvent } from 'react';
-import { Download, Upload, ChevronDown, Check, CheckSquare, FileJson, FileText } from 'lucide-react';
+import { useRef, useState, useEffect, useMemo, type ChangeEvent, type KeyboardEvent } from 'react';
+import { MoreHorizontal, Upload, Check, CheckSquare, FileJson, FileText, Terminal } from 'lucide-react';
 import type { ExportFormat, ExportScope } from '../utils/noteExport';
 import styles from '../pages/DashboardPage.module.css';
 
 export interface ExportImportActionsProps {
   onExport: (format: ExportFormat, scope: ExportScope) => Promise<void> | void;
   onImportFile: (event: ChangeEvent<HTMLInputElement>) => void;
+  onOpenCommandPalette?: () => void;
   selectedCount?: number;
   activeFolder?: string;
   folderCount?: number;
@@ -20,6 +21,7 @@ export interface ExportImportActionsProps {
 export default function ExportImportActions({
   onExport,
   onImportFile,
+  onOpenCommandPalette,
   selectedCount = 0,
   activeFolder = '',
   folderCount = 0,
@@ -41,15 +43,27 @@ export default function ExportImportActions({
     onMenuOpenChange?.(next);
   };
 
-  const [exportScope, setExportScope] = useState<ExportScope>('all');
   const [exportError, setExportError] = useState('');
   const [didExport, setDidExport] = useState(false);
 
-  const defaultScope: ExportScope = selectedCount > 0 ? 'selected' : activeFolder ? 'folder' : 'all';
+  const shortcutLabel = useMemo(() => {
+    if (typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent)) {
+      return '⌘K';
+    }
+    return 'Ctrl K';
+  }, []);
 
-  useEffect(() => {
-    setExportScope(defaultScope);
-  }, [defaultScope]);
+  const activeScope: ExportScope = !isBoardView && selectedCount > 0
+    ? 'selected'
+    : activeFolder
+      ? 'folder'
+      : 'all';
+
+  const scopeLabel = activeScope === 'selected'
+    ? `Selected (${selectedCount})`
+    : activeScope === 'folder'
+      ? `#${activeFolder} (${folderCount})`
+      : `All notes (${totalCount})`;
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -66,7 +80,7 @@ export default function ExportImportActions({
     setExportError('');
     setMenuOpen(false);
     try {
-      await onExport(format, exportScope);
+      await onExport(format, activeScope);
       setDidExport(true);
       setTimeout(() => setDidExport(false), 1500);
     } catch (err) {
@@ -84,7 +98,7 @@ export default function ExportImportActions({
     }
 
     const items = Array.from(
-      menuRef.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"], [role="menuitemradio"]') || []
+      menuRef.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') || []
     );
     if (items.length === 0) return;
 
@@ -104,19 +118,16 @@ export default function ExportImportActions({
     }
   };
 
-  const showScopeStrip = selectedCount > 0 || Boolean(activeFolder);
-
   return (
     <div className={styles.actionsWrapper}>
       <div className={styles.actionsGroup}>
-        {onToggleSelectionMode && (
+        {onToggleSelectionMode && !isBoardView && (
           <button
             type="button"
             className={`${styles.secondaryBtn} ${isSelectionMode ? styles.secondaryBtnActive : ''}`}
             onClick={onToggleSelectionMode}
-            disabled={isBoardView}
             aria-pressed={isSelectionMode}
-            title={isBoardView ? 'Switch to Grid or Stream view to multi-select' : 'Select multiple notes'}
+            title="Select multiple notes"
           >
             <CheckSquare size={14} />
             <span>{isSelectionMode ? 'Done' : 'Select'}</span>
@@ -127,56 +138,35 @@ export default function ExportImportActions({
           <button
             ref={triggerRef}
             type="button"
-            className={styles.secondaryBtn}
+            className={styles.moreMenuBtn}
             onClick={() => setMenuOpen(!isMenuOpen)}
             aria-haspopup="menu"
             aria-expanded={isMenuOpen}
-            title="Export notes"
+            aria-label="More actions"
+            title="Commands, Export, Import"
           >
-            {didExport ? <Check size={14} /> : <Download size={14} />}
-            <span>{didExport ? 'Exported' : 'Export'}</span>
-            <ChevronDown size={13} />
+            {didExport ? <Check size={16} /> : <MoreHorizontal size={16} />}
           </button>
 
           {isMenuOpen && (
-            <div className={styles.exportPopover} role="menu" aria-label="Export options">
-              {showScopeStrip ? (
-                <div className={styles.scopeStrip}>
-                  {selectedCount > 0 && (
-                    <button
-                      type="button"
-                      role="menuitemradio"
-                      aria-checked={exportScope === 'selected'}
-                      className={`${styles.scopeBtn} ${exportScope === 'selected' ? styles.scopeBtnActive : ''}`}
-                      onClick={() => setExportScope('selected')}
-                    >
-                      Selected ({selectedCount})
-                    </button>
-                  )}
-                  {activeFolder && (
-                    <button
-                      type="button"
-                      role="menuitemradio"
-                      aria-checked={exportScope === 'folder'}
-                      className={`${styles.scopeBtn} ${exportScope === 'folder' ? styles.scopeBtnActive : ''}`}
-                      onClick={() => setExportScope('folder')}
-                    >
-                      #{activeFolder} ({folderCount})
-                    </button>
-                  )}
+            <div className={styles.exportPopover} role="menu" aria-label="Workspace actions">
+              {onOpenCommandPalette && (
+                <>
                   <button
                     type="button"
-                    role="menuitemradio"
-                    aria-checked={exportScope === 'all'}
-                    className={`${styles.scopeBtn} ${exportScope === 'all' ? styles.scopeBtnActive : ''}`}
-                    onClick={() => setExportScope('all')}
+                    role="menuitem"
+                    className={styles.exportMenuItem}
+                    onClick={() => { setMenuOpen(false); onOpenCommandPalette(); }}
                   >
-                    All notes ({totalCount})
+                    <Terminal size={14} />
+                    <span>Commands</span>
+                    <kbd className={styles.menuKbd}>{shortcutLabel}</kbd>
                   </button>
-                </div>
-              ) : (
-                <div className={styles.exportScopeHeader}>All notes ({totalCount})</div>
+                  <div className={styles.menuDivider} />
+                </>
               )}
+
+              <div className={styles.exportScopeHeader}>Export: {scopeLabel}</div>
 
               <button
                 type="button"
@@ -196,19 +186,21 @@ export default function ExportImportActions({
                 <FileText size={14} />
                 <span>Export as Markdown (.md)</span>
               </button>
+
+              <div className={styles.menuDivider} />
+
+              <button
+                type="button"
+                role="menuitem"
+                className={styles.exportMenuItem}
+                onClick={() => { setMenuOpen(false); fileInputRef.current?.click(); }}
+              >
+                <Upload size={14} />
+                <span>Import JSON…</span>
+              </button>
             </div>
           )}
         </div>
-
-        <button
-          type="button"
-          className={styles.secondaryBtn}
-          onClick={() => fileInputRef.current?.click()}
-          title="Import notes from JSON backup"
-        >
-          <Upload size={14} />
-          <span>Import</span>
-        </button>
 
         <input
           ref={fileInputRef}

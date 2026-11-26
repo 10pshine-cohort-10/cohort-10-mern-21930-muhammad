@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, type DragEvent } from 'react';
 import { Plus, Columns3 } from 'lucide-react';
 import KanbanCard from './KanbanCard';
+import KanbanColumnAddMenu from './KanbanColumnAddMenu';
 import type { Note, NoteStatus } from '../types';
 import styles from './KanbanBoard.module.css';
 
@@ -32,7 +33,7 @@ export default function KanbanBoard({
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<NoteStatus | null>(null);
   const [recentlyMovedId, setRecentlyMovedId] = useState<string | null>(null);
-  const [selectedNoteToAdd, setSelectedNoteToAdd] = useState<string>('');
+  const [openAddMenu, setOpenAddMenu] = useState<{ status: NoteStatus; anchorEl: HTMLButtonElement } | null>(null);
   const swingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -72,12 +73,6 @@ export default function KanbanBoard({
     await triggerColumnMove(noteId, status);
   };
 
-  const handleAddExisting = async () => {
-    if (!selectedNoteToAdd) return;
-    await onMoveStatus(selectedNoteToAdd, 'todo');
-    setSelectedNoteToAdd('');
-  };
-
   if (boardNotes.length === 0) {
     return (
       <div className={styles.emptyBoard}>
@@ -91,24 +86,6 @@ export default function KanbanBoard({
             <Plus size={15} />
             <span>New Plan Note</span>
           </button>
-          {untrackedNotes.length > 0 && (
-            <div className={styles.promoteRow}>
-              <select
-                aria-label="Select an existing note to add to board"
-                className={styles.promoteSelect}
-                value={selectedNoteToAdd}
-                onChange={(e) => setSelectedNoteToAdd(e.target.value)}
-              >
-                <option value="">Add an existing note…</option>
-                {untrackedNotes.map((n) => (
-                  <option key={n.id} value={n.id}>{n.title || 'Untitled'}</option>
-                ))}
-              </select>
-              <button type="button" className={styles.secondaryBtn} onClick={handleAddExisting} disabled={!selectedNoteToAdd}>
-                Add to To Do
-              </button>
-            </div>
-          )}
         </div>
       </div>
     );
@@ -116,29 +93,11 @@ export default function KanbanBoard({
 
   return (
     <div className={styles.boardWrapper}>
-      {untrackedNotes.length > 0 && (
-        <div className={styles.boardToolbar}>
-          <select
-            aria-label="Add existing note to board"
-            className={styles.promoteSelect}
-            value={selectedNoteToAdd}
-            onChange={(e) => setSelectedNoteToAdd(e.target.value)}
-          >
-            <option value="">Track an existing note on board…</option>
-            {untrackedNotes.map((n) => (
-              <option key={n.id} value={n.id}>{n.title || 'Untitled'}</option>
-            ))}
-          </select>
-          <button type="button" className={styles.secondaryBtn} onClick={handleAddExisting} disabled={!selectedNoteToAdd}>
-            Add to To Do
-          </button>
-        </div>
-      )}
-
       <div className={styles.columnsGrid}>
         {COLUMNS.map((col) => {
           const columnNotes = boardNotes.filter((n) => n.status === col.status);
           const isOver = dropTarget === col.status;
+          const isMenuForCol = openAddMenu?.status === col.status;
 
           return (
             <div
@@ -157,7 +116,12 @@ export default function KanbanBoard({
                 <button
                   type="button"
                   className={styles.columnAddBtn}
-                  onClick={() => onCreateInColumn(col.status)}
+                  onClick={(e) => {
+                    const btn = e.currentTarget;
+                    setOpenAddMenu((prev) => (prev?.status === col.status ? null : { status: col.status, anchorEl: btn }));
+                  }}
+                  aria-haspopup="dialog"
+                  aria-expanded={isMenuForCol}
                   aria-label={`Add note to ${col.label}`}
                   title={`Add to ${col.label}`}
                 >
@@ -185,6 +149,18 @@ export default function KanbanBoard({
           );
         })}
       </div>
+
+      {openAddMenu && (
+        <KanbanColumnAddMenu
+          status={openAddMenu.status}
+          columnLabel={COLUMNS.find((c) => c.status === openAddMenu.status)?.label || ''}
+          anchorEl={openAddMenu.anchorEl}
+          untrackedNotes={untrackedNotes}
+          onCreateNew={onCreateInColumn}
+          onAddExisting={triggerColumnMove}
+          onClose={() => setOpenAddMenu(null)}
+        />
+      )}
     </div>
   );
 }

@@ -28,11 +28,79 @@
   margin-top: 0;
 }
 
-.bentoStatsBar {
+.quietStatsLine {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.statLink {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.statLink:hover {
+  color: var(--text-main);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.statLinkActive {
+  color: var(--text-main);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.moreMenuBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 6px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-main);
+}
+
+.moreMenuBtn:hover {
+  background-color: var(--bg-subtle);
+}
+
+.menuDivider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 3px 0;
+}
+
+.menuKbd {
+  margin-left: auto;
+  font-size: 11px;
+  font-family: var(--font-family-mono);
+  color: var(--text-muted);
+}
+
+@media (pointer: coarse), (max-width: 768px) {
+  .moreMenuBtn,
+  .secondaryBtn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .statLink {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
 }
 
 .statCard {

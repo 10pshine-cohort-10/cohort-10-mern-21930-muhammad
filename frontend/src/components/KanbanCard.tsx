@@ -1,9 +1,19 @@
-import type { DragEvent } from 'react';
+import { useState, useRef, useEffect, type DragEvent } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { formatRelativeTime, extractPlainText } from '../utils/formatters';
+import { getNoteTilt } from '../utils/noteTilt';
 import type { Note, NoteStatus } from '../types';
 import styles from './KanbanBoard.module.css';
+
+const COLOR_CLASS_MAP: Record<string, string> = {
+  slate: styles.colorSlate,
+  sage: styles.colorSage,
+  teal: styles.colorTeal,
+  sand: styles.colorSand,
+  lavender: styles.colorLavender,
+  rose: styles.colorRose,
+};
 
 export interface KanbanColumnOption {
   status: NoteStatus;
@@ -33,27 +43,48 @@ export default function KanbanCard({
   onOpenNote,
   onMoveStatus,
 }: KanbanCardProps) {
+  const [isMoveMenuOpen, setIsMoveMenuOpen] = useState(false);
+  const moveMenuRef = useRef<HTMLDivElement>(null);
+  const moveTriggerRef = useRef<HTMLButtonElement>(null);
+
   const shouldReduceMotion = useReducedMotion();
   const shouldSwing = isJustDropped && !shouldReduceMotion;
+  const restingTilt = shouldReduceMotion ? 0 : getNoteTilt(note.id);
+  const targetTilt = isDragging ? 0 : restingTilt;
+  const cardColorClass = (note.color && COLOR_CLASS_MAP[note.color]) || styles.colorSlate;
+  const targetColumns = columns.filter((c) => c.status !== columnStatus);
+
+  useEffect(() => {
+    if (!isMoveMenuOpen) return;
+    const handleOutside = (event: MouseEvent) => {
+      if (moveMenuRef.current && !moveMenuRef.current.contains(event.target as Node)) {
+        setIsMoveMenuOpen(false);
+      }
+    };
+    window.addEventListener('mousedown', handleOutside);
+    return () => window.removeEventListener('mousedown', handleOutside);
+  }, [isMoveMenuOpen]);
 
   return (
     <div
       draggable
       onDragStart={(e) => onDragStart(e, note.id)}
       onDragEnd={onDragEnd}
-      className={`${styles.dragWrapper} ${isDragging ? styles.dragging : ''} ${shouldSwing ? styles.kanbanCardSwinging : ''}`}
+      className={`${styles.dragWrapper} ${isDragging ? styles.dragging : ''} ${shouldSwing || isMoveMenuOpen ? styles.kanbanCardSwinging : ''}`}
     >
       <motion.div
         style={{ transformOrigin: 'top center' }}
-        initial={shouldSwing ? { rotate: -8 } : false}
-        animate={{ rotate: 0 }}
+        initial={shouldSwing ? { rotate: restingTilt - 8 } : false}
+        animate={{ rotate: targetTilt }}
         transition={
           shouldSwing
             ? { type: 'spring', stiffness: 260, damping: 14, mass: 0.9 }
-            : { duration: 0 }
+            : shouldReduceMotion
+              ? { duration: 0 }
+              : { duration: 0.14 }
         }
       >
-        <div className={styles.kanbanCard}>
+        <div className={`${styles.kanbanCard} ${cardColorClass}`}>
           <div className={styles.pinIndicator} aria-hidden="true">
             <div className={styles.pinHole} />
           </div>
@@ -66,22 +97,67 @@ export default function KanbanCard({
           </button>
 
           <div className={styles.cardFooter}>
-            <span className={styles.updatedLabel}>Updated {formatRelativeTime(note.updatedAt)}</span>
-            <div className={styles.quickMoveGroup}>
-              {columns
-                .filter((c) => c.status !== columnStatus)
-                .map((target) => (
-                  <button
-                    key={target.status}
-                    type="button"
-                    className={styles.moveBtn}
-                    onClick={() => onMoveStatus(note.id, target.status)}
-                    title={`Move to ${target.label}`}
+            <div className={styles.cardFooterTop}>
+              <span className={styles.updatedLabel}>Updated {formatRelativeTime(note.updatedAt)}</span>
+              <div className={styles.moveMenuWrap} ref={moveMenuRef}>
+                <button
+                  ref={moveTriggerRef}
+                  type="button"
+                  className={styles.moveToTrigger}
+                  onClick={() => setIsMoveMenuOpen((prev) => !prev)}
+                  aria-haspopup="menu"
+                  aria-expanded={isMoveMenuOpen}
+                  aria-label="Move to column"
+                >
+                  <span>Move to</span>
+                  <ChevronDown size={11} />
+                </button>
+                {isMoveMenuOpen && (
+                  <div
+                    className={styles.moveDropdown}
+                    role="menu"
+                    aria-label="Move note to column"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape') {
+                        e.stopPropagation();
+                        setIsMoveMenuOpen(false);
+                        moveTriggerRef.current?.focus();
+                      }
+                    }}
                   >
-                    <ArrowRight size={11} />
-                    <span>{target.label}</span>
-                  </button>
-                ))}
+                    {targetColumns.map((target) => (
+                      <button
+                        key={target.status}
+                        type="button"
+                        role="menuitem"
+                        className={styles.moveDropdownItem}
+                        onClick={() => {
+                          setIsMoveMenuOpen(false);
+                          onMoveStatus(note.id, target.status);
+                        }}
+                      >
+                        <ArrowRight size={11} />
+                        <span>{target.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className={styles.quickMoveGroup}>
+              {targetColumns.map((target) => (
+                <button
+                  key={target.status}
+                  type="button"
+                  className={styles.moveBtn}
+                  onClick={() => onMoveStatus(note.id, target.status)}
+                  title={`Move to ${target.label}`}
+                >
+                  <ArrowRight size={11} />
+                  <span>{target.label}</span>
+                </button>
+              ))}
             </div>
           </div>
         </div>

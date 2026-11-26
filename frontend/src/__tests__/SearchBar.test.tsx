@@ -31,4 +31,21 @@ describe('SearchBar Component', () => {
     fireEvent.click(clearButton);
     expect(cleared).toBe(true);
   });
+
+  it('renders Command Palette shortcut badge when empty and triggers callback', () => {
+    const onOpenCommandPalette = jest.fn();
+    render(
+      <SearchBar
+        value=""
+        onChange={() => {}}
+        onClear={() => {}}
+        onOpenCommandPalette={onOpenCommandPalette}
+      />
+    );
+
+    const badge = screen.getByRole('button', { name: /Open Command Palette/i });
+    expect(badge).toBeInTheDocument();
+    fireEvent.click(badge);
+    expect(onOpenCommandPalette).toHaveBeenCalledTimes(1);
+  });
 });

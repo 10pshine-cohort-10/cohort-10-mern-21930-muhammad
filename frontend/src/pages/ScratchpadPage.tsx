@@ -1,22 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Pin, Trash2 } from 'lucide-react';
+import { Plus, Pin, Trash2, Download } from 'lucide-react';
 import Layout from '../components/Layout';
 import NoteCard from '../components/NoteCard';
 import NoteEditor from '../components/NoteEditor';
 import BentoStatsBar from '../components/BentoStatsBar';
 import CommandPalette from '../components/CommandPalette';
-import NotesEmptyState from '../components/NotesEmptyState';
 import ScratchpadBanner from '../components/ScratchpadBanner';
 import ScratchpadQuickJot from '../components/ScratchpadQuickJot';
+import UndoToast from '../components/UndoToast';
 import { usePaletteShortcut } from '../hooks/usePaletteShortcut';
 import { useAuth } from '../context/AuthContext';
 import { useNotes } from '../hooks/useNotes';
+import { downloadExportedNotes } from '../utils/noteExport';
 import {
   getGuestNotes,
   createGuestNote,
   updateGuestNote,
   deleteGuestNote,
   clearGuestNotes,
+  saveGuestNotesList,
 } from '../utils/guestStorage';
 import type { Note, NoteInput } from '../types';
 import dashboardStyles from './DashboardPage.module.css';
@@ -27,6 +29,7 @@ export default function ScratchpadPage() {
   const [filterMode, setFilterMode] = useState<'all' | 'pinned'>('all');
   const [tackingId, setTackingId] = useState<string | null>(null);
   const [statusNotice, setStatusNotice] = useState<{ text: string; isError?: boolean } | null>(null);
+  const [clearedBackup, setClearedBackup] = useState<Note[] | null>(null);
   const [activeNoteForEdit, setActiveNoteForEdit] = useState<Note | NoteInput | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
@@ -73,7 +76,7 @@ export default function ScratchpadPage() {
     setNotes((prev) => prev.map((n) => (n.id === id ? updated : n)));
   };
 
-  const handleTackToDesk = async (noteToTack: Note) => {
+  const handleTackToNotes = async (noteToTack: Note) => {
     if (tackingId) return;
     setTackingId(noteToTack.id);
     try {
@@ -85,10 +88,10 @@ export default function ScratchpadPage() {
         isPinned: noteToTack.isPinned,
       });
       handleDelete(noteToTack.id);
-      showNotice(`Tacked "${noteToTack.title || 'Untitled'}" to Desk`);
+      showNotice(`Tacked "${noteToTack.title || 'Untitled'}" to notes`);
     } catch (err) {
-      console.error('Failed to promote scratch note to desk:', err);
-      showNotice('Failed to tack draft to Desk. Please try again.', true);
+      console.error('Failed to promote scratch note:', err);
+      showNotice('Failed to tack draft to notes. Please try again.', true);
     } finally {
       setTackingId(null);
     }
@@ -109,20 +112,30 @@ export default function ScratchpadPage() {
         deleteGuestNote(n.id);
       }
       setNotes([]);
-      showNotice(`Tacked ${safeNotes.length} draft(s) to Desk`);
+      showNotice(`Tacked ${safeNotes.length} draft(s) to notes`);
     } catch (err) {
       console.error('Failed to promote all scratch notes:', err);
       setNotes(getGuestNotes());
-      showNotice('Some drafts could not be tacked to Desk.', true);
+      showNotice('Some drafts could not be tacked to notes.', true);
     } finally {
       setTackingId(null);
     }
   };
 
-  const handleClearBlotter = () => {
+  const handleClearScratchpad = () => {
+    if (safeNotes.length === 0) return;
+    setClearedBackup(safeNotes);
     clearGuestNotes();
     setNotes([]);
-    showNotice('Cleared local drafts');
+    showNotice('Cleared Scratchpad');
+  };
+
+  const handleUndoClear = () => {
+    if (!clearedBackup) return;
+    saveGuestNotesList(clearedBackup);
+    setNotes(clearedBackup);
+    setClearedBackup(null);
+    showNotice('Restored Scratchpad drafts');
   };
 
   const safeNotes = Array.isArray(notes)
@@ -135,37 +148,57 @@ export default function ScratchpadPage() {
     <div className={styles.container}>
       <ScratchpadBanner isAuthenticated={isAuthenticated} />
       <div className={styles.headerRow}>
-        <h1 className={styles.brandTitle}>{isAuthenticated ? 'Draft Blotter' : 'Notes Scratchpad'}</h1>
+        <div>
+          <h1 className={styles.brandTitle}>Scratchpad</h1>
+          <span className={styles.deviceOnlyLabel}>Saved on this device only</span>
+        </div>
         <div className={styles.headerActions}>
+          {safeNotes.length > 0 && (
+            <button
+              type="button"
+              className={styles.bulkBtn}
+              onClick={() => downloadExportedNotes(safeNotes, 'json', 'all', 'scratchpad')}
+            >
+              <Download size={14} /><span>Export</span>
+            </button>
+          )}
           {isAuthenticated && safeNotes.length > 0 && (
             <button type="button" className={styles.bulkBtn} onClick={handleTackAll} disabled={Boolean(tackingId)}>
-              <Pin size={14} /><span>Tack All to Desk</span>
+              <Pin size={14} /><span>Tack all to notes</span>
             </button>
           )}
           {safeNotes.length > 0 && (
-            <button type="button" className={styles.bulkBtn} onClick={handleClearBlotter}>
-              <Trash2 size={14} /><span>Clear Blotter</span>
+            <button type="button" className={styles.bulkBtn} onClick={handleClearScratchpad}>
+              <Trash2 size={14} /><span>Clear Scratchpad</span>
             </button>
           )}
-          <button type="button" className={styles.newNoteBtn} onClick={handleOpenNewNote}>
-            <Plus size={16} /><span>New Note</span>
-          </button>
+          {!isAuthenticated && (
+            <button type="button" className={styles.newNoteBtn} onClick={handleOpenNewNote}>
+              <Plus size={16} /><span>New Note</span>
+            </button>
+          )}
         </div>
       </div>
 
-      <BentoStatsBar
-        totalNotes={safeNotes.length} pinnedCount={pinnedCount} totalTags={0}
-        thirdStatLabel="Storage" thirdStatValue="Local"
-        activeFilter={filterMode}
-        onOpenCommandPalette={() => setIsPaletteOpen(true)}
-        onFilterAll={() => setFilterMode('all')}
-        onFilterPinned={() => setFilterMode((prev) => (prev === 'pinned' ? 'all' : 'pinned'))}
-      />
+      {safeNotes.length > 0 && (
+        <BentoStatsBar
+          totalNotes={safeNotes.length} pinnedCount={pinnedCount} totalTags={0}
+          thirdStatLabel="Storage" thirdStatValue="Local"
+          activeFilter={filterMode}
+          onOpenCommandPalette={() => setIsPaletteOpen(true)}
+          onFilterAll={() => setFilterMode('all')}
+          onFilterPinned={() => setFilterMode((prev) => (prev === 'pinned' ? 'all' : 'pinned'))}
+        />
+      )}
 
       <ScratchpadQuickJot
         onQuickSave={async (title) => {
           await handleSaveNote({ title, content: '', color: 'slate', tags: [], isPinned: false });
-          showNotice('Saved locally in browser');
+          showNotice('Saved on this device only');
+        }}
+        onSelectTemplate={(tpl) => {
+          setActiveNoteForEdit(tpl);
+          setIsEditorOpen(true);
         }}
       />
 
@@ -176,17 +209,10 @@ export default function ScratchpadPage() {
       )}
 
       {displayedNotes.length === 0 ? (
-        <NotesEmptyState
-          searchQuery=""
-          emptyTitle={isAuthenticated ? 'Your draft blotter is empty' : 'Your scratchpad is clear'}
-          emptySubtitle={
-            isAuthenticated
-              ? 'Jot a fast unfiled thought above or pick a starter blueprint below. Tack drafts to your Desk when ready.'
-              : 'Jot a quick note above — everything saves locally in this browser until you create an account to sync.'
-          }
-          onCreateNote={handleOpenNewNote}
-          onApplyTemplate={(tpl) => { setActiveNoteForEdit(tpl); setIsEditorOpen(true); }}
-        />
+        <div className={styles.emptySimple}>
+          <p className={styles.emptySimpleTitle}>Your scratchpad is clear</p>
+          <p className={styles.emptySimpleSubtitle}>Jot a quick thought above.</p>
+        </div>
       ) : (
         <div className={dashboardStyles.notesGrid}>
           {displayedNotes.map((singleNote) => (
@@ -195,9 +221,9 @@ export default function ScratchpadPage() {
               {isAuthenticated && (
                 <button
                   type="button" className={styles.tackBtn} disabled={tackingId === singleNote.id}
-                  onClick={() => handleTackToDesk(singleNote)} title="Promote this draft to your cloud desk board"
+                  onClick={() => handleTackToNotes(singleNote)} title="Promote this draft to your notes"
                 >
-                  <Pin size={13} /><span>{tackingId === singleNote.id ? 'Tacking...' : 'Tack to Desk'}</span>
+                  <Pin size={13} /><span>{tackingId === singleNote.id ? 'Tacking...' : 'Tack to notes'}</span>
                 </button>
               )}
             </div>
@@ -211,6 +237,13 @@ export default function ScratchpadPage() {
         onSelectNote={handleSelectNote} onCreateNote={handleOpenNewNote}
         onTogglePinnedFilter={() => setFilterMode((prev) => (prev === 'pinned' ? 'all' : 'pinned'))}
       />
+      {clearedBackup && (
+        <UndoToast
+          noteTitle={`${clearedBackup.length} draft(s)`}
+          onUndo={handleUndoClear}
+          onDismiss={() => setClearedBackup(null)}
+        />
+      )}
     </div>
   );
 

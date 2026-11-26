@@ -146,9 +146,11 @@
 }
 
 .navItemActive {
-  background-color: var(--border-dark);
-  color: #ffffff;
-  font-weight: 600;
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+  font-weight: 700;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
 }
 
 .railDivider {
@@ -295,7 +297,8 @@
 .folderItemActive {
   background-color: var(--bg-surface);
   color: var(--text-main);
-  font-weight: 600;
+  font-weight: 700;
+  border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-sm);
 }
 
@@ -306,7 +309,7 @@
 }
 
 .folderAddBtn {
-  color: var(--text-subtle);
+  color: var(--text-muted);
   font-size: 12px;
 }
 
@@ -413,8 +416,7 @@
 
 .topbar {
   height: 64px;
-  background-color: rgba(250, 250, 250, 0.88);
-  backdrop-filter: blur(8px);
+  background-color: var(--bg-app);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;

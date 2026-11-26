@@ -1,4 +1,3 @@
-import { Files, Pin, Folder, Terminal } from 'lucide-react';
 import styles from '../pages/DashboardPage.module.css';
 
 export interface BentoStatsBarProps {
@@ -8,7 +7,7 @@ export interface BentoStatsBarProps {
   thirdStatLabel?: string;
   thirdStatValue?: string | number;
   activeFilter?: 'all' | 'pinned';
-  onOpenCommandPalette: () => void;
+  onOpenCommandPalette?: () => void;
   onFilterAll?: () => void;
   onFilterPinned?: () => void;
 }
@@ -17,72 +16,51 @@ export default function BentoStatsBar({
   totalNotes,
   pinnedCount,
   totalTags,
-  thirdStatLabel = 'Folders',
+  thirdStatLabel = 'folders',
   thirdStatValue,
   activeFilter,
-  onOpenCommandPalette,
   onFilterAll,
   onFilterPinned,
 }: BentoStatsBarProps) {
+  const folderDisplay = thirdStatValue ?? totalTags;
+
   return (
-    <div className={styles.bentoStatsBar}>
+    <div className={styles.quietStatsLine}>
       {onFilterAll ? (
         <button
           type="button"
-          className={`${styles.statCard} ${styles.statCardBtn} ${activeFilter === 'all' ? styles.statCardActive : ''}`}
+          className={`${styles.statLink} ${activeFilter === 'all' ? styles.statLinkActive : ''}`}
           onClick={onFilterAll}
           aria-pressed={activeFilter === 'all'}
-          title="Show all notes"
         >
-          <Files size={14} aria-hidden="true" />
-          <span className={styles.statValue}>{totalNotes}</span>
-          <span className={styles.statLabel}>Total Notes</span>
+          {totalNotes} {totalNotes === 1 ? 'note' : 'notes'}
         </button>
       ) : (
-        <div className={styles.statCard}>
-          <Files size={14} aria-hidden="true" />
-          <span className={styles.statValue}>{totalNotes}</span>
-          <span className={styles.statLabel}>Total Notes</span>
-        </div>
+        <span>
+          {totalNotes} {totalNotes === 1 ? 'note' : 'notes'}
+        </span>
       )}
+
+      <span aria-hidden="true">·</span>
 
       {onFilterPinned ? (
         <button
           type="button"
-          className={`${styles.statCard} ${styles.statCardBtn} ${activeFilter === 'pinned' ? styles.statCardActive : ''}`}
+          className={`${styles.statLink} ${activeFilter === 'pinned' ? styles.statLinkActive : ''}`}
           onClick={onFilterPinned}
           aria-pressed={activeFilter === 'pinned'}
-          title="Filter pinned notes"
         >
-          <Pin size={14} color="var(--accent-orange-text)" aria-hidden="true" />
-          <span className={styles.statValue}>{pinnedCount}</span>
-          <span className={styles.statLabel}>Pinned</span>
+          {pinnedCount} pinned
         </button>
       ) : (
-        <div className={styles.statCard}>
-          <Pin size={14} color="var(--accent-orange-text)" aria-hidden="true" />
-          <span className={styles.statValue}>{pinnedCount}</span>
-          <span className={styles.statLabel}>Pinned</span>
-        </div>
+        <span>{pinnedCount} pinned</span>
       )}
 
-      <div className={styles.statCard}>
-        <Folder size={14} color="var(--accent-blue-text)" aria-hidden="true" />
-        <span className={styles.statValue}>{thirdStatValue ?? totalTags}</span>
-        <span className={styles.statLabel}>{thirdStatLabel}</span>
-      </div>
+      <span aria-hidden="true">·</span>
 
-      <button
-        type="button"
-        className={styles.cmdButton}
-        onClick={onOpenCommandPalette}
-        title="Open Command Palette"
-        aria-label="Open Command Palette"
-      >
-        <Terminal size={14} />
-        <span>Commands</span>
-        <kbd className={styles.cmdKbd}>Ctrl K</kbd>
-      </button>
+      <span>
+        <span>{folderDisplay}</span> <span>{thirdStatLabel.toLowerCase()}</span>
+      </span>
     </div>
   );
 }

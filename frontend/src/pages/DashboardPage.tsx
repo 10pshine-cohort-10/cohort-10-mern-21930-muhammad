@@ -187,14 +187,28 @@ export default function DashboardPage() {
     >
       <div className={styles.container}>
         <div className={styles.controlsBar}>
-          <SearchBar ref={searchInputRef} value={searchQuery} onChange={setSearchQuery} onClear={() => setSearchQuery('')} />
+          <SearchBar
+            ref={searchInputRef}
+            value={searchQuery}
+            onChange={setSearchQuery}
+            onClear={() => setSearchQuery('')}
+            onOpenCommandPalette={() => setIsPaletteOpen(true)}
+          />
           <ViewModeToggle
             currentMode={viewMode}
-            onChangeMode={(m) => { setViewMode(m); localStorage.setItem('notes_view_mode', m); }}
+            onChangeMode={(m) => {
+              setViewMode(m);
+              localStorage.setItem('notes_view_mode', m);
+              if (m === 'board') {
+                setIsSelectionMode(false);
+                setSelectedNoteIds([]);
+              }
+            }}
           />
           <ExportImportActions
             onExport={handleScopedExport}
             onImportFile={handleImportFileChange}
+            onOpenCommandPalette={() => setIsPaletteOpen(true)}
             selectedCount={selectedNoteIds.length}
             activeFolder={selectedTag}
             folderCount={

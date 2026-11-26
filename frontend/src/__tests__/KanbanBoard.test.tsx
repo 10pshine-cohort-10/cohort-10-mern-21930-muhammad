@@ -8,7 +8,7 @@ const sampleNotes: Note[] = [
     userId: 'u1',
     title: 'Draft API Spec',
     content: '<p>Endpoints</p>',
-    color: 'slate',
+    color: 'sand',
     status: 'todo',
     isPinned: false,
     tags: [],
@@ -45,6 +45,7 @@ describe('KanbanBoard', () => {
     expect(screen.getByRole('heading', { name: 'In Progress' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Done' })).toBeInTheDocument();
     expect(container.querySelectorAll('.pinIndicator')).toHaveLength(1);
+    expect(container.querySelector('.colorSand')).toBeInTheDocument();
   });
 
   it('moves note status when clicking quick-move button and sets swing state', () => {
@@ -90,5 +91,54 @@ describe('KanbanBoard', () => {
 
     expect(onMoveStatus).not.toHaveBeenCalled();
     expect(container.querySelector('.kanbanCardSwinging')).not.toBeInTheDocument();
+  });
+
+  it('opens column + popover, filters existing notes, promotes to column, and restores focus on Escape', () => {
+    const onMoveStatus = jest.fn().mockResolvedValue(undefined);
+    render(
+      <KanbanBoard
+        notes={sampleNotes}
+        onOpenNote={jest.fn()}
+        onMoveStatus={onMoveStatus}
+        onCreateInColumn={jest.fn()}
+      />
+    );
+
+    const addBtn = screen.getByRole('button', { name: 'Add note to In Progress' });
+    fireEvent.click(addBtn);
+
+    expect(screen.getByRole('dialog', { name: 'Add note to In Progress' })).toBeInTheDocument();
+    expect(screen.getByText('Reference Note')).toBeInTheDocument();
+
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(addBtn).toHaveFocus();
+
+    fireEvent.click(addBtn);
+    fireEvent.click(screen.getByText('Reference Note'));
+    expect(onMoveStatus).toHaveBeenCalledWith('n2', 'in_progress');
+  });
+
+  it('moves note via the Move to menu fallback and restores focus on Escape', () => {
+    const onMoveStatus = jest.fn().mockResolvedValue(undefined);
+    render(
+      <KanbanBoard
+        notes={sampleNotes}
+        onOpenNote={jest.fn()}
+        onMoveStatus={onMoveStatus}
+        onCreateInColumn={jest.fn()}
+      />
+    );
+
+    const moveTrigger = screen.getByRole('button', { name: 'Move to column' });
+    fireEvent.click(moveTrigger);
+    const menu = screen.getByRole('menu', { name: 'Move note to column' });
+    fireEvent.keyDown(menu, { key: 'Escape' });
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    expect(moveTrigger).toHaveFocus();
+
+    fireEvent.click(moveTrigger);
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Done' }));
+    expect(onMoveStatus).toHaveBeenCalledWith('n1', 'done');
   });
 });

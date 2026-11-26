@@ -60,12 +60,14 @@ describe('ScratchpadPage', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Working in Guest Scratchpad. Your notes are saved locally in this browser.')).toBeInTheDocument();
+    expect(screen.getByText('Working in Scratchpad. Your notes are saved on this device only.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /create account to sync/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /log in/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Notes Scratchpad' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Scratchpad' })).toBeInTheDocument();
+    expect(screen.getByText('Saved on this device only')).toBeInTheDocument();
     expect(screen.getByText('Your scratchpad is clear')).toBeInTheDocument();
-    expect(screen.getByText('Local')).toBeInTheDocument();
+    expect(screen.queryByText('Local')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /from template/i })).toBeInTheDocument();
 
     mockedGuestStorage.createGuestNote.mockReturnValue({
       id: 'guest-jot',
@@ -94,7 +96,7 @@ describe('ScratchpadPage', () => {
     });
   });
 
-  it('renders Draft Blotter and allows tacking note to desk when authenticated', async () => {
+  it('renders Scratchpad and allows tacking note to notes when authenticated', async () => {
     mockedUseAuth.mockReturnValue({
       user: { id: 'u1', name: 'Tester', email: 'tester@example.com' },
       token: 'fake-token',
@@ -128,10 +130,10 @@ describe('ScratchpadPage', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Personal Draft Blotter — Fast, unfiled thoughts stored locally.')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Draft Blotter' })).toBeInTheDocument();
+    expect(screen.queryByText('Personal Draft Blotter — Fast, unfiled thoughts stored locally.')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Scratchpad' })).toBeInTheDocument();
 
-    const tackButton = screen.getByRole('button', { name: /tack to desk/i });
+    const tackButton = screen.getByRole('button', { name: /tack to notes/i });
     expect(tackButton).toBeInTheDocument();
 
     fireEvent.click(tackButton);
@@ -145,11 +147,11 @@ describe('ScratchpadPage', () => {
         isPinned: false,
       });
       expect(mockedGuestStorage.deleteGuestNote).toHaveBeenCalledWith('guest-1');
-      expect(screen.getByRole('status')).toHaveTextContent('Tacked "Quick Brainstorm" to Desk');
+      expect(screen.getByRole('status')).toHaveTextContent('Tacked "Quick Brainstorm" to notes');
     });
   });
 
-  it('clears all local drafts when Clear Blotter is clicked', () => {
+  it('clears all local drafts when Clear Scratchpad is clicked', () => {
     mockedUseAuth.mockReturnValue({
       user: null,
       token: null,
@@ -181,7 +183,7 @@ describe('ScratchpadPage', () => {
       </MemoryRouter>
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /clear blotter/i }));
+    fireEvent.click(screen.getByRole('button', { name: /clear scratchpad/i }));
     expect(mockedGuestStorage.clearGuestNotes).toHaveBeenCalledTimes(1);
     expect(screen.getByText('Your scratchpad is clear')).toBeInTheDocument();
   });
