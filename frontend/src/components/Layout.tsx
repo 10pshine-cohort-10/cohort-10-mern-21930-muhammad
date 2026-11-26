@@ -122,6 +122,8 @@ export default function Layout({
             {!isCollapsed && <span>Archive</span>}
           </Link>
 
+          {isCollapsed && <div className={styles.railDivider} aria-hidden="true" />}
+
           <Link
             to="/profile"
             title="My Profile"
@@ -133,27 +135,25 @@ export default function Layout({
         </nav>
 
         <div className={styles.sidebarFooter}>
-          <div className={styles.userInfo}>
-            <div className={styles.avatar} title={user?.name}>{userInitial}</div>
+          <Link to="/profile" className={styles.userInfo} title="View My Profile">
+            <div className={styles.avatar}>{userInitial}</div>
             {!isCollapsed && (
               <div className={styles.userDetails}>
                 <span className={styles.userName}>{user?.name}</span>
                 <span className={styles.userEmail}>{user?.email}</span>
               </div>
             )}
-          </div>
+          </Link>
 
-          {!isCollapsed && (
-            <button
-              type="button"
-              className={styles.logoutButton}
-              onClick={logout}
-              title="Log out"
-              aria-label="Log out"
-            >
-              <LogOut size={16} />
-            </button>
-          )}
+          <button
+            type="button"
+            className={styles.logoutButton}
+            onClick={logout}
+            title="Log out"
+            aria-label="Log out"
+          >
+            <LogOut size={16} />
+          </button>
         </div>
       </aside>
 
@@ -190,9 +190,9 @@ export default function Layout({
                 <span>New Note</span>
               </button>
             )}
-            <div className={styles.mobileAvatar} title={user?.name}>
+            <Link to="/profile" className={styles.mobileAvatar} title={user?.name} aria-label="My Profile">
               {userInitial}
-            </div>
+            </Link>
           </div>
         </header>
 

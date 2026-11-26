@@ -36,6 +36,7 @@ describe('Layout collapsible sidebar', () => {
     fireEvent.click(collapseBtn);
 
     expect(screen.queryByText('Notes Workspace')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /log out/i })).toBeInTheDocument();
     expect(localStorage.getItem('notes_sidebar_collapsed')).toBe('true');
 
     const expandBtn = screen.getByRole('button', { name: /expand sidebar$/i });

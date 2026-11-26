@@ -40,7 +40,7 @@ describe('ScratchpadPage', () => {
     });
   });
 
-  it('renders guest scratchpad with sync banner when unauthenticated', () => {
+  it('renders guest scratchpad with sync banner when unauthenticated', async () => {
     mockedUseAuth.mockReturnValue({
       user: null,
       token: null,
@@ -64,6 +64,34 @@ describe('ScratchpadPage', () => {
     expect(screen.getByRole('link', { name: /create account to sync/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /log in/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Notes Scratchpad' })).toBeInTheDocument();
+    expect(screen.getByText('Your scratchpad is clear')).toBeInTheDocument();
+    expect(screen.getByText('Local')).toBeInTheDocument();
+
+    mockedGuestStorage.createGuestNote.mockReturnValue({
+      id: 'guest-jot',
+      userId: 'guest',
+      title: 'Fast idea',
+      content: '',
+      color: 'slate',
+      isPinned: false,
+      tags: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    const quickJot = screen.getByLabelText('Quick jot input');
+    fireEvent.change(quickJot, { target: { value: 'Fast idea' } });
+    fireEvent.keyDown(quickJot, { key: 'Enter' });
+
+    await waitFor(() => {
+      expect(mockedGuestStorage.createGuestNote).toHaveBeenCalledWith({
+        title: 'Fast idea',
+        content: '',
+        color: 'slate',
+        tags: [],
+        isPinned: false,
+      });
+    });
   });
 
   it('renders Draft Blotter and allows tacking note to desk when authenticated', async () => {
@@ -117,6 +145,44 @@ describe('ScratchpadPage', () => {
         isPinned: false,
       });
       expect(mockedGuestStorage.deleteGuestNote).toHaveBeenCalledWith('guest-1');
+      expect(screen.getByRole('status')).toHaveTextContent('Tacked "Quick Brainstorm" to Desk');
     });
+  });
+
+  it('clears all local drafts when Clear Blotter is clicked', () => {
+    mockedUseAuth.mockReturnValue({
+      user: null,
+      token: null,
+      isAuthenticated: false,
+      isLoading: false,
+      login: jest.fn(),
+      register: jest.fn(),
+      logout: jest.fn(),
+      refreshUser: jest.fn(),
+    });
+
+    mockedGuestStorage.getGuestNotes.mockReturnValue([
+      {
+        id: 'guest-2',
+        userId: 'guest',
+        title: 'Temp note',
+        content: '',
+        color: 'slate',
+        isPinned: false,
+        tags: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ]);
+
+    render(
+      <MemoryRouter>
+        <ScratchpadPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /clear blotter/i }));
+    expect(mockedGuestStorage.clearGuestNotes).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Your scratchpad is clear')).toBeInTheDocument();
   });
 });

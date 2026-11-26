@@ -15,6 +15,7 @@ export default function MobileNavDock({ onQuickAddClick }: MobileNavDockProps) {
         to="/dashboard"
         className={`${styles.item} ${location.pathname === '/dashboard' ? styles.active : ''}`}
         title="Dashboard"
+        aria-label="Dashboard"
       >
         <Home size={20} />
       </Link>
@@ -23,6 +24,7 @@ export default function MobileNavDock({ onQuickAddClick }: MobileNavDockProps) {
         to="/scratchpad"
         className={`${styles.item} ${location.pathname === '/scratchpad' ? styles.active : ''}`}
         title="Scratchpad"
+        aria-label="Scratchpad"
       >
         <Edit3 size={20} />
       </Link>
@@ -42,6 +44,7 @@ export default function MobileNavDock({ onQuickAddClick }: MobileNavDockProps) {
         to="/archive"
         className={`${styles.item} ${location.pathname === '/archive' ? styles.active : ''}`}
         title="Archive"
+        aria-label="Archive"
       >
         <Archive size={20} />
       </Link>
@@ -50,6 +53,7 @@ export default function MobileNavDock({ onQuickAddClick }: MobileNavDockProps) {
         to="/profile"
         className={`${styles.item} ${location.pathname === '/profile' ? styles.active : ''}`}
         title="Profile"
+        aria-label="Profile"
       >
         <User size={20} />
       </Link>

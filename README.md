@@ -35,14 +35,21 @@ Full-stack note-taking application built with Node.js, Express, MongoDB (Mongoos
 │   │   ├── components/      # UI components (Layout, NoteCard, NoteEditor, etc. .tsx)
 │   │   ├── context/         # AuthContext state provider (.tsx)
 │   │   ├── hooks/           # useNotes and useAuth hooks (.ts)
-│   │   ├── pages/           # LoginPage, RegisterPage, DashboardPage, ProfilePage (.tsx)
+│   │   ├── pages/           # LoginPage, RegisterPage, DashboardPage, ScratchpadPage, ArchivePage, ProfilePage (.tsx)
 │   │   ├── styles/          # Eye-soothing global styles and CSS modules
 │   │   ├── types/           # Frontend TypeScript type declarations
-│   │   └── utils/           # Formatters and plain text extraction (.ts)
+│   │   └── utils/           # Formatters, guestStorage, and guestSync (.ts)
 │   └── __tests__/           # Jest unit test suites (.tsx)
 ├── sonar-project.properties # SonarQube configuration
 └── package.json             # Root workspace orchestrator
 ```
+
+## Scratchpad & Draft Blotter (`/scratchpad`)
+
+The `/scratchpad` route serves two complementary workflows depending on authentication state:
+
+- **Guest Scratchpad (Unauthenticated):** Provides a zero-friction, instant local-first workspace backed by `localStorage` (`notes_guest_drafts`). Visitors can jot quick thoughts via the inline Quick-Jot bar or the rich-text editor without signing up. Creating an account or logging in automatically syncs local drafts to the cloud via `syncGuestNotesIfAny`.
+- **Draft Blotter (Authenticated):** Acts as an ephemeral local staging area for fast, unfiled thoughts so rough drafts do not clutter the synced cloud board (`/dashboard`). Authenticated users can promote individual notes via **Tack to Desk**, promote all drafts at once via **Tack All to Desk**, or clear staging notes via **Clear Blotter**.
 
 ## Prerequisites
 

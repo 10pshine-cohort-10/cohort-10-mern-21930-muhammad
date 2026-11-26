@@ -21,16 +21,30 @@ export default function SidebarFolders({
 
   return (
     <div className={styles.folderTree}>
-      <button
-        type="button"
-        className={styles.folderToggle}
-        onClick={() => setIsExpanded((prev) => !prev)}
-        aria-expanded={isExpanded}
-      >
-        {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-        <span>Folders</span>
-        <span className={styles.folderCount}>{folders.length}</span>
-      </button>
+      <div className={styles.folderTreeHeader}>
+        <button
+          type="button"
+          className={styles.folderToggle}
+          onClick={() => setIsExpanded((prev) => !prev)}
+          aria-expanded={isExpanded}
+        >
+          {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          <span>Folders</span>
+          <span className={styles.folderCount}>{folders.length}</span>
+        </button>
+
+        {onAddFolder && (
+          <button
+            type="button"
+            className={styles.folderInlineAdd}
+            onClick={() => setIsModalOpen(true)}
+            title="New Folder"
+            aria-label="New Folder"
+          >
+            <FolderPlus size={14} />
+          </button>
+        )}
+      </div>
 
       {isExpanded && (
         <div className={styles.folderList}>
@@ -48,17 +62,6 @@ export default function SidebarFolders({
               </button>
             );
           })}
-
-          {onAddFolder && (
-            <button
-              type="button"
-              className={styles.folderAddBtn}
-              onClick={() => setIsModalOpen(true)}
-            >
-              <FolderPlus size={14} />
-              <span>New Folder</span>
-            </button>
-          )}
         </div>
       )}
 

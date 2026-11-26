@@ -5,6 +5,8 @@ export interface BentoStatsBarProps {
   totalNotes: number;
   pinnedCount: number;
   totalTags: number;
+  thirdStatLabel?: string;
+  thirdStatValue?: string | number;
   onOpenCommandPalette: () => void;
   onFilterAll?: () => void;
   onFilterPinned?: () => void;
@@ -14,6 +16,8 @@ export default function BentoStatsBar({
   totalNotes,
   pinnedCount,
   totalTags,
+  thirdStatLabel = 'Folders',
+  thirdStatValue,
   onOpenCommandPalette,
   onFilterAll,
   onFilterPinned,
@@ -45,8 +49,8 @@ export default function BentoStatsBar({
       </div>
 
       <div className={styles.statCard}>
-        <span className={styles.statValue}>{totalTags}</span>
-        <span className={styles.statLabel}>Folders</span>
+        <span className={styles.statValue}>{thirdStatValue ?? totalTags}</span>
+        <span className={styles.statLabel}>{thirdStatLabel}</span>
       </div>
 
       <button
