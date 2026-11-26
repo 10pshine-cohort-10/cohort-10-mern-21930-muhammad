@@ -1,5 +1,6 @@
 import { Response, NextFunction } from 'express';
 import * as noteService from '../services/noteService';
+import * as activityService from '../services/activityService';
 import AppError from '../utils/appError';
 import { AuthRequest } from '../types';
 
@@ -7,6 +8,17 @@ export async function handleGetNotes(req: AuthRequest, res: Response, next: Next
   try {
     const notes = await noteService.getNotes(req.userId as string, { tag: req.query.tag as string });
     res.status(200).json({ success: true, data: notes });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function handleGetActivity(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const days = req.query.days ? Number(req.query.days) : undefined;
+    const limit = req.query.limit ? Number(req.query.limit) : undefined;
+    const activity = await activityService.getUserActivity(req.userId as string, { days, limit });
+    res.status(200).json({ success: true, data: activity });
   } catch (err) {
     next(err);
   }

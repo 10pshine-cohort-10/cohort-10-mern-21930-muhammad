@@ -2,6 +2,11 @@ import { Types } from 'mongoose';
 import Note from '../models/Note';
 import AppError from '../utils/appError';
 import { emitNoteChange } from '../socket/noteSocket';
+import {
+  recordNoteCreated,
+  recordNoteUpdated,
+  deleteNoteActivity,
+} from './activityService';
 import { INote, NoteCreateInput, NoteUpdateInput, ExportResult, NoteColor, NoteStatus } from '../types';
 
 const ALLOWED_STATUSES: NoteStatus[] = ['todo', 'in_progress', 'done'];
@@ -91,11 +96,17 @@ export async function createNote(userId: string | Types.ObjectId, noteData: Note
 
   await note.save();
   const serialized = note.toJSON();
+  await recordNoteCreated(userId, serialized);
   emitNoteChange(userId, 'note:created', serialized);
   return serialized;
 }
 
 export async function updateNote(noteId: string, userId: string | Types.ObjectId, updateData: NoteUpdateInput): Promise<any> {
+  const existingNote = await Note.findOne({ _id: noteId, userId });
+  if (!existingNote) {
+    throw new AppError('Note not found', 404);
+  }
+
   const updatePayload: Record<string, any> = {};
 
   if (typeof updateData.title === 'string') {
@@ -136,6 +147,7 @@ export async function updateNote(noteId: string, userId: string | Types.ObjectId
   }
 
   const serialized = note.toJSON();
+  await recordNoteUpdated(userId, existingNote.status, serialized, updatePayload);
   emitNoteChange(userId, 'note:updated', serialized);
   return serialized;
 }
@@ -146,6 +158,7 @@ export async function deleteNote(noteId: string, userId: string | Types.ObjectId
     throw new AppError('Note not found', 404);
   }
 
+  await deleteNoteActivity(noteId, userId);
   emitNoteChange(userId, 'note:deleted', { id: noteId });
   return { id: noteId };
 }

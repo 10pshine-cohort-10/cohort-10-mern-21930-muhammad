@@ -2,6 +2,7 @@ import { Router } from 'express';
 import authMiddleware from '../middleware/authMiddleware';
 import {
   handleGetNotes,
+  handleGetActivity,
   handleGetNoteById,
   handleCreateNote,
   handleUpdateNote,
@@ -16,6 +17,7 @@ const router = Router();
 router.use(authMiddleware as any);
 
 router.get('/search', handleSearchNotes as any);
+router.get('/activity', handleGetActivity as any);
 router.get('/export', handleExportNotes as any);
 router.post('/import', handleImportNotes as any);
 
