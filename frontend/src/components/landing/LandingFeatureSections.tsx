@@ -1,151 +1,163 @@
-import { useRef, type ReactNode } from 'react';
-import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
-import { Pin, Folder, Terminal, Search, Download } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Pin, Folder, Command } from 'lucide-react';
 import LandingInteractiveScratchpad from './LandingInteractiveScratchpad';
 import styles from '../../pages/LandingPage.module.css';
 
 export const LANDING_SECTIONS = [
-  { id: 'capture-desk', label: 'Capture & Draft' },
-  { id: 'organize-desk', label: 'Pinning & Folders' },
-  { id: 'command-own', label: 'Command & Export' },
-];
-
-const SLIDE_EASE = [0.22, 1, 0.36, 1] as const;
-
-function FocusAct({ id, alt = false, children }: { id: string; alt?: boolean; children: ReactNode }) {
-  const ref = useRef<HTMLElement>(null);
-  const shouldReduceMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const scale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.96, 1, 1, 0.97]);
-  const opacity = useTransform(scrollYProgress, [0, 0.25, 0.75, 1], [0.55, 1, 1, 0.6]);
-
-  return (
-    <section id={id} ref={ref} className={`${styles.featureSection} ${alt ? styles.featureAlt : ''}`}>
-      <motion.div
-        style={shouldReduceMotion ? undefined : { scale, opacity, width: '100%' }}
-      >
-        {children}
-      </motion.div>
-    </section>
-  );
-}
+  { id: 'board', label: 'Kanban Board' },
+  { id: 'progress', label: 'Progress' },
+  { id: 'essentials', label: 'Essentials' },
+] as const;
 
 export default function LandingFeatureSections() {
+  const shouldReduceMotion = useReducedMotion();
+
+  const reveal = (delay = 0) =>
+    shouldReduceMotion
+      ? {}
+      : {
+          initial: { opacity: 0, y: 20 },
+          whileInView: { opacity: 1, y: 0 },
+          viewport: { once: true, amount: 0.25 },
+          transition: { duration: 0.45, delay, ease: [0.16, 1, 0.3, 1] as const },
+        };
+
   return (
     <>
-      <FocusAct id="capture-desk" alt>
-        <div className={styles.actGrid}>
-          <motion.div
-            className={styles.actCopy}
-            initial={{ opacity: 0, x: -36 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.45, ease: SLIDE_EASE }}
-          >
-            <span className={styles.keycap}>ENTER · LOCAL → CLOUD</span>
-            <h2 className={styles.sectionHeading}>Capture messy drafts. Tack finished notes.</h2>
-            <p className={styles.sectionLead}>
-              Press Enter to save locally in your Scratchpad with zero signup, then snap drafts onto your synced Cloud Desk whenever you are ready.
-            </p>
-          </motion.div>
+      <section id="board" className={styles.centeredSection}>
+        <motion.div className={styles.centeredInner} {...reveal()}>
+          <h2 className={styles.sectionHeading}>Move plans forward at your own pace.</h2>
+          <p className={styles.sectionLead}>
+            Three clear columns—To Do, In Progress, Done—with color-matched cards that settle softly when moved.
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, x: 36 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.45, ease: SLIDE_EASE }}
-          >
-            <LandingInteractiveScratchpad />
-          </motion.div>
-        </div>
-      </FocusAct>
-
-      <FocusAct id="organize-desk">
-        <div className={`${styles.actGrid} ${styles.actGridFlipped}`}>
-          <motion.div
-            className={styles.organizeComposite}
-            initial={{ opacity: 0, x: -36 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.45, ease: SLIDE_EASE }}
-          >
-            <div className={`${styles.visualStage} ${styles.visualStageMint}`} style={{ minHeight: 'auto' }}>
-              <span className={styles.pinDot} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong style={{ fontSize: 16 }}>Release checklist</strong>
-                <Pin size={15} />
+          <div className={styles.boardPreviewGrid} aria-hidden="true">
+            <div className={styles.boardPreviewCol}>
+              <div className={styles.boardPreviewHeader}>
+                <span className={styles.boardDotTodo} />
+                <span>To Do</span>
               </div>
-              <p className={styles.mintBody}>Pinned above Recent notes · Grid | Stream toggle</p>
+              <div className={`${styles.boardPreviewCard} ${styles.boardCardSand}`}>
+                <span className={styles.miniPushpin} />
+                <span>Outline release checklist</span>
+              </div>
             </div>
 
-            <div className={styles.recessedStage}>
-              <div className={styles.miniDraftRow}><Folder size={14} /><span>#work</span><span className={styles.kbdBadge}>Active</span></div>
-              <div className={styles.miniDraftRow}><Folder size={14} /><span>#ideas</span><span className={styles.kbdBadge}>4</span></div>
+            <div className={styles.boardPreviewCol}>
+              <div className={styles.boardPreviewHeader}>
+                <span className={styles.boardDotProgress} />
+                <span>In Progress</span>
+              </div>
+              <div className={`${styles.boardPreviewCard} ${styles.boardCardSage}`}>
+                <span className={styles.miniPushpin} />
+                <span>Ship v1 roadmap</span>
+              </div>
             </div>
-          </motion.div>
 
-          <motion.div
-            className={styles.actCopy}
-            initial={{ opacity: 0, x: 36 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.45, ease: SLIDE_EASE }}
-          >
-            <span className={styles.keycap}>PIN · #FOLDERS · GRID | STREAM</span>
-            <h2 className={styles.sectionHeading}>Pin priorities. Keep #folders one click away.</h2>
-            <p className={styles.sectionLead}>
-              Pushpin cards stay anchored at the top while your collapsible folder tree and Grid/Stream switch keep the rest of your board tidy.
-            </p>
-          </motion.div>
-        </div>
-      </FocusAct>
+            <div className={styles.boardPreviewCol}>
+              <div className={styles.boardPreviewHeader}>
+                <span className={styles.boardDotDone} />
+                <span>Done</span>
+              </div>
+              <div className={`${styles.boardPreviewCard} ${styles.boardCardTeal}`}>
+                <span className={styles.miniPushpin} />
+                <span>Draft onboarding notes</span>
+              </div>
+            </div>
+          </div>
 
-      <FocusAct id="command-own" alt>
-        <div className={styles.actGrid}>
-          <motion.div
-            className={styles.actCopy}
-            initial={{ opacity: 0, x: -36 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.45, ease: SLIDE_EASE }}
-          >
-            <span className={styles.keycap}>CTRL + K · SEARCH · EXPORT</span>
-            <h2 className={styles.sectionHeading}>Stay on the keyboard. Own every byte.</h2>
-            <p className={styles.sectionLead}>
-              Open the Command Palette with Ctrl+K, search titles and tags, archive completed work, or export JSON and Markdown backups anytime.
-            </p>
-          </motion.div>
+          <p className={styles.leadInLine}>
+            Every card you move leaves a quiet trace of progress.
+          </p>
+        </motion.div>
+      </section>
 
-          <motion.div
-            className={styles.visualStage}
-            initial={{ opacity: 0, x: 36 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.45, ease: SLIDE_EASE }}
-          >
-            <div className={styles.miniInputRow}>
-              <Terminal size={16} />
-              <span style={{ color: 'var(--text-subtle)', fontSize: 14 }}>Type a command or search notes...</span>
-              <motion.kbd
-                className={styles.kbdBadge}
-                whileInView={{ scale: [1, 0.9, 1] }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.35, delay: 0.2 }}
-              >
-                CTRL K
-              </motion.kbd>
+      <section id="progress" className={styles.centeredSection}>
+        <motion.div className={styles.centeredInner} {...reveal()}>
+          <h2 className={styles.sectionHeading}>See how far you have come—never a streak to break.</h2>
+          <p className={styles.sectionLead}>
+            Factual 7-day and 30-day activity bars, a plan completion ring, and recent updates—built without red arrows or missed-day guilt.
+          </p>
+
+          <div className={styles.progressPreviewGrid} aria-hidden="true">
+            <div className={styles.progressPreviewCard}>
+              <div className={styles.boardPreviewHeader}>
+                <span>Consistency</span>
+                <span style={{ marginLeft: 'auto', color: 'var(--accent-blue-text)', fontSize: '12px' }}>7d</span>
+              </div>
+              <div className={styles.miniBarsRow}>
+                <div className={styles.miniBar} style={{ height: '42%' }} />
+                <div className={`${styles.miniBar} ${styles.miniBarMuted}`} style={{ height: '14%' }} />
+                <div className={styles.miniBar} style={{ height: '68%' }} />
+                <div className={styles.miniBar} style={{ height: '54%' }} />
+                <div className={styles.miniBar} style={{ height: '85%' }} />
+                <div className={`${styles.miniBar} ${styles.miniBarMuted}`} style={{ height: '14%' }} />
+                <div className={styles.miniBar} style={{ height: '72%' }} />
+              </div>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Active 5 of the last 7 days</span>
             </div>
-            <div className={styles.miniDraftRow}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Search size={14} /> Full-text search & #archive</span>
-              <kbd className={styles.kbdBadge}>/</kbd>
+
+            <div className={styles.progressPreviewCard}>
+              <div className={styles.boardPreviewHeader}>
+                <span>Plan Growth</span>
+                <span style={{ marginLeft: 'auto', color: 'var(--accent-orange-text)', fontSize: '12px' }}>1 Done · 2 Active</span>
+              </div>
+              <div className={styles.miniRingRow}>
+                <svg width="68" height="68" viewBox="0 0 68 68">
+                  <circle cx="34" cy="34" r="26" fill="none" stroke="var(--bg-muted)" strokeWidth="7" />
+                  <circle
+                    cx="34" cy="34" r="26" fill="none" stroke="var(--accent-blue)" strokeWidth="7"
+                    strokeDasharray="108 164" strokeLinecap="round" transform="rotate(-90 34 34)"
+                  />
+                  <circle
+                    cx="34" cy="34" r="26" fill="none" stroke="var(--accent-orange)" strokeWidth="7"
+                    strokeDasharray="54 164" strokeLinecap="round" transform="rotate(-90 34 34)"
+                  />
+                </svg>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                  <span>To Do: 1</span>
+                  <span>In Progress: 1</span>
+                  <span style={{ color: 'var(--accent-orange-text)', fontWeight: 700 }}>Done: 1</span>
+                </div>
+              </div>
             </div>
-            <div className={styles.miniDraftRow}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Download size={14} /> Export JSON · Export MD · Import</span>
-              <kbd className={styles.kbdBadge}>Backup</kbd>
-            </div>
-          </motion.div>
-        </div>
-      </FocusAct>
+          </div>
+
+          <p className={styles.leadInLine}>
+            Everything starts in one place before it reaches your board.
+          </p>
+        </motion.div>
+      </section>
+
+      <section id="essentials" className={styles.centeredSection}>
+        <motion.div className={styles.centeredInner} {...reveal()}>
+          <h2 className={styles.sectionHeading}>Scratchpad, pins & #folders, and ⌘K—always within reach.</h2>
+          <p className={styles.sectionLead}>
+            Local-first Scratchpad drafts stay on your device until you click Tack to notes, paired with #folders and the Command Palette.
+          </p>
+
+          <LandingInteractiveScratchpad />
+
+          <div className={styles.essentialsRow} aria-hidden="true">
+            <span className={styles.essentialsPill}>
+              <Pin size={13} />
+              <span>Pinned priorities</span>
+            </span>
+            <span className={styles.essentialsPill}>
+              <Folder size={13} />
+              <span>#work · #ideas</span>
+            </span>
+            <span className={styles.essentialsPill}>
+              <Command size={13} />
+              <span>⌘K Command Palette</span>
+            </span>
+          </div>
+
+          <p className={styles.leadInLine}>
+            Ready when you want a calmer place to think.
+          </p>
+        </motion.div>
+      </section>
     </>
   );
 }

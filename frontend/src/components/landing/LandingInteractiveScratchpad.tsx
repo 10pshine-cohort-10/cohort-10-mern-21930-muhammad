@@ -5,7 +5,7 @@ import styles from '../../pages/LandingPage.module.css';
 
 export default function LandingInteractiveScratchpad() {
   const [draftText, setDraftText] = useState('');
-  const [savedDraft, setSavedDraft] = useState('Draft: Outline Q3 sprint goals');
+  const [savedDraft, setSavedDraft] = useState('Ship v1 roadmap');
   const [isTacked, setIsTacked] = useState(false);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -49,7 +49,7 @@ export default function LandingInteractiveScratchpad() {
           <span style={{ fontWeight: 600 }}>{savedDraft}</span>
           <button type="button" className={styles.miniTackBtn} onClick={() => setIsTacked(false)}>
             <Check size={13} />
-            <span>Tacked to Desk</span>
+            <span>Tacked to notes</span>
           </button>
         </motion.div>
       ) : (
@@ -57,7 +57,7 @@ export default function LandingInteractiveScratchpad() {
           <span>{savedDraft}</span>
           <button type="button" className={styles.miniTackBtn} onClick={() => setIsTacked(true)}>
             <Pin size={13} />
-            <span>Tack to Desk</span>
+            <span>Tack to notes</span>
           </button>
         </div>
       )}
