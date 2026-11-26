@@ -18,6 +18,7 @@ import { usePaletteShortcut } from '../hooks/usePaletteShortcut';
 import { useDeskKeyboardNav } from '../hooks/useDeskKeyboardNav';
 import { useSoftDelete } from '../hooks/useSoftDelete';
 import { useAuth } from '../context/AuthContext';
+import { downloadExportedNotes, type ExportFormat, type ExportScope } from '../utils/noteExport';
 import type { Note, NoteInput, NoteStatus } from '../types';
 import styles from './DashboardPage.module.css';
 
@@ -47,6 +48,9 @@ export default function DashboardPage() {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [filterMode, setFilterMode] = useState('all');
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     try {
       return (localStorage.getItem('notes_view_mode') as ViewMode) || 'grid';
@@ -108,12 +112,63 @@ export default function DashboardPage() {
     ? displayedNotes.filter((n) => !n.isPinned)
     : displayedNotes;
 
-  const renderNotesList = (list: Note[], offset = 0) => (
-    <div className={viewMode === 'stream' ? styles.notesStream : styles.notesGrid}>
+  useEffect(() => {
+    if (!isSelectionMode) return;
+    const handleEscapeSelection = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !isEditorOpen && !isPaletteOpen && !isHelpOpen) {
+        setIsSelectionMode(false);
+        setSelectedNoteIds([]);
+      }
+    };
+    window.addEventListener('keydown', handleEscapeSelection);
+    return () => window.removeEventListener('keydown', handleEscapeSelection);
+  }, [isSelectionMode, isEditorOpen, isPaletteOpen, isHelpOpen]);
+
+  const toggleSelectNote = (id: string) => {
+    setIsSelectionMode(true);
+    setSelectedNoteIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleScopedExport = async (format: ExportFormat, scope: ExportScope) => {
+    if (scope === 'selected') {
+      const chosen = safeNotes.filter((n) => selectedNoteIds.includes(n.id));
+      if (chosen.length > 0) {
+        downloadExportedNotes(chosen, format, 'selected');
+      }
+      return;
+    }
+    if (scope === 'folder' && selectedTag) {
+      const folderNotes = safeNotes.filter((n) => Array.isArray(n.tags) && n.tags.includes(selectedTag));
+      downloadExportedNotes(folderNotes, format, 'folder', selectedTag);
+      return;
+    }
+    if (format === 'txt') {
+      downloadExportedNotes(safeNotes, 'txt', 'all');
+      return;
+    }
+    await exportNotes(format);
+  };
+
+  const handleExportSingleNote = (target: Note, format: ExportFormat) => {
+    downloadExportedNotes([target], format, 'single', target.title || 'note');
+  };
+
+  const renderNotesList = (list: Note[], offset = 0, isPinnedSection = false) => (
+    <div className={viewMode === 'stream' ? styles.notesStream : isPinnedSection ? styles.pinnedGrid : styles.notesGrid}>
       {list.map((singleNote: Note, idx: number) => (
         <NoteCard
-          key={singleNote.id} note={singleNote} isFocused={focusedIndex === offset + idx}
-          onSelect={openEditor} onTogglePin={togglePin} onDelete={() => triggerSoftDelete(singleNote)}
+          key={singleNote.id}
+          note={singleNote}
+          isFocused={focusedIndex === offset + idx}
+          isSelectionMode={isSelectionMode}
+          isSelected={selectedNoteIds.includes(singleNote.id)}
+          onToggleSelect={toggleSelectNote}
+          onExportNote={handleExportSingleNote}
+          onSelect={openEditor}
+          onTogglePin={togglePin}
+          onDelete={() => triggerSoftDelete(singleNote)}
         />
       ))}
     </div>
@@ -137,8 +192,51 @@ export default function DashboardPage() {
             currentMode={viewMode}
             onChangeMode={(m) => { setViewMode(m); localStorage.setItem('notes_view_mode', m); }}
           />
-          <ExportImportActions onExport={exportNotes} onImportFile={handleImportFileChange} />
+          <ExportImportActions
+            onExport={handleScopedExport}
+            onImportFile={handleImportFileChange}
+            selectedCount={selectedNoteIds.length}
+            activeFolder={selectedTag}
+            folderCount={
+              selectedTag
+                ? safeNotes.filter((n) => Array.isArray(n.tags) && n.tags.includes(selectedTag)).length
+                : 0
+            }
+            totalCount={safeNotes.length}
+            isSelectionMode={isSelectionMode}
+            isBoardView={viewMode === 'board'}
+            isMenuOpen={isExportMenuOpen}
+            onMenuOpenChange={setIsExportMenuOpen}
+            onToggleSelectionMode={() => {
+              setIsSelectionMode((prev) => {
+                if (prev) setSelectedNoteIds([]);
+                return !prev;
+              });
+            }}
+          />
         </div>
+
+        {isSelectionMode && selectedNoteIds.length > 0 && (
+          <div className={styles.selectionBar}>
+            <span>{selectedNoteIds.length} selected</span>
+            <div className={styles.selectionBarActions}>
+              <button
+                type="button"
+                className={styles.secondaryBtn}
+                onClick={() => setIsExportMenuOpen(true)}
+              >
+                Export
+              </button>
+              <button
+                type="button"
+                className={styles.secondaryBtn}
+                onClick={() => { setIsSelectionMode(false); setSelectedNoteIds([]); }}
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        )}
 
         <BentoStatsBar
           totalNotes={safeNotes.length} pinnedCount={pinnedCount} totalTags={safeTags.length}
@@ -177,7 +275,7 @@ export default function DashboardPage() {
             {pinnedNotes.length > 0 && (
               <>
                 <div className={styles.sectionHeading}>Pinned</div>
-                {renderNotesList(pinnedNotes, 0)}
+                {renderNotesList(pinnedNotes, 0, true)}
               </>
             )}
             <div className={styles.headerWithAction}>

@@ -1,8 +1,8 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  BookOpen, FileText, Edit3, Archive, BarChart3,
-  LogOut, Plus, PanelLeftClose, PanelLeftOpen, Folder,
+  BookOpen, FileText, PenLine, Archive, BarChart3,
+  LogOut, Plus, ChevronsLeft, ChevronsRight, Folder, FolderOpen,
 } from 'lucide-react';
 import MobileNavDock from './MobileNavDock';
 import SidebarFolders from './SidebarFolders';
@@ -73,7 +73,7 @@ export default function Layout({
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
-            {isCollapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+            {isCollapsed ? <ChevronsRight size={17} /> : <ChevronsLeft size={17} />}
           </button>
         </div>
 
@@ -96,7 +96,7 @@ export default function Layout({
               onClick={toggleSidebar} title={`Folders (${resolvedFolders.length})`}
               aria-label="Expand sidebar to view folders"
             >
-              <Folder size={18} />
+              {selectedFolder ? <FolderOpen size={18} /> : <Folder size={18} />}
             </button>
           )}
 
@@ -104,7 +104,7 @@ export default function Layout({
             to="/scratchpad" title="Scratchpad"
             className={`${styles.navItem} ${location.pathname === '/scratchpad' ? styles.navItemActive : ''}`}
           >
-            <Edit3 size={18} />{!isCollapsed && <span>Scratchpad</span>}
+            <PenLine size={18} />{!isCollapsed && <span>Scratchpad</span>}
           </Link>
 
           <Link

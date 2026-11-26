@@ -1,6 +1,6 @@
-import { useState, type DragEvent } from 'react';
-import { Plus, ArrowRight, Columns3 } from 'lucide-react';
-import { formatRelativeTime, extractPlainText } from '../utils/formatters';
+import { useState, useRef, useEffect, type DragEvent } from 'react';
+import { Plus, Columns3 } from 'lucide-react';
+import KanbanCard from './KanbanCard';
 import type { Note, NoteStatus } from '../types';
 import styles from './KanbanBoard.module.css';
 
@@ -31,10 +31,31 @@ export default function KanbanBoard({
 }: KanbanBoardProps) {
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<NoteStatus | null>(null);
+  const [recentlyMovedId, setRecentlyMovedId] = useState<string | null>(null);
   const [selectedNoteToAdd, setSelectedNoteToAdd] = useState<string>('');
+  const swingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (swingTimerRef.current) clearTimeout(swingTimerRef.current);
+    };
+  }, []);
 
   const boardNotes = notes.filter((n) => n.status === 'todo' || n.status === 'in_progress' || n.status === 'done');
   const untrackedNotes = notes.filter((n) => !n.status);
+
+  const triggerColumnMove = async (noteId: string, nextStatus: NoteStatus) => {
+    const current = notes.find((n) => n.id === noteId);
+    if (!current || current.status === nextStatus) return;
+
+    if (swingTimerRef.current) clearTimeout(swingTimerRef.current);
+    setRecentlyMovedId(noteId);
+    swingTimerRef.current = setTimeout(() => {
+      setRecentlyMovedId((prev) => (prev === noteId ? null : prev));
+    }, 850);
+
+    await onMoveStatus(noteId, nextStatus);
+  };
 
   const handleDragStart = (event: DragEvent<HTMLDivElement>, noteId: string) => {
     setDraggedId(noteId);
@@ -48,10 +69,7 @@ export default function KanbanBoard({
     setDraggedId(null);
     setDropTarget(null);
     if (!noteId) return;
-    const current = notes.find((n) => n.id === noteId);
-    if (current && current.status !== status) {
-      await onMoveStatus(noteId, status);
-    }
+    await triggerColumnMove(noteId, status);
   };
 
   const handleAddExisting = async () => {
@@ -149,37 +167,18 @@ export default function KanbanBoard({
 
               <div className={styles.cardList}>
                 {columnNotes.map((note) => (
-                  <div
+                  <KanbanCard
                     key={note.id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, note.id)}
+                    note={note}
+                    columnStatus={col.status}
+                    columns={COLUMNS}
+                    isDragging={draggedId === note.id}
+                    isJustDropped={recentlyMovedId === note.id}
+                    onDragStart={handleDragStart}
                     onDragEnd={() => { setDraggedId(null); setDropTarget(null); }}
-                    className={`${styles.kanbanCard} ${draggedId === note.id ? styles.dragging : ''}`}
-                  >
-                    <button type="button" className={styles.cardBodyBtn} onClick={() => onOpenNote(note)}>
-                      <div className={styles.cardTitle}>{note.title || 'Untitled'}</div>
-                      {note.content && (
-                        <p className={styles.cardPreview}>{extractPlainText(note.content).slice(0, 80)}</p>
-                      )}
-                    </button>
-                    <div className={styles.cardFooter}>
-                      <span className={styles.updatedLabel}>Updated {formatRelativeTime(note.updatedAt)}</span>
-                      <div className={styles.quickMoveGroup}>
-                        {COLUMNS.filter((c) => c.status !== col.status).map((target) => (
-                          <button
-                            key={target.status}
-                            type="button"
-                            className={styles.moveBtn}
-                            onClick={() => onMoveStatus(note.id, target.status)}
-                            title={`Move to ${target.label}`}
-                          >
-                            <ArrowRight size={11} />
-                            <span>{target.label}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                    onOpenNote={onOpenNote}
+                    onMoveStatus={triggerColumnMove}
+                  />
                 ))}
               </div>
             </div>

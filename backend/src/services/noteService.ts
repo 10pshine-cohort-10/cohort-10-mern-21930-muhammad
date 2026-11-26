@@ -223,6 +223,9 @@ export async function importNotes(userId: string | Types.ObjectId, importedNotes
     color: allowedColors.includes(rawNote.color as NoteColor)
       ? (rawNote.color as NoteColor)
       : 'slate',
+    status: ALLOWED_STATUSES.includes(rawNote.status as NoteStatus)
+      ? (rawNote.status as NoteStatus)
+      : null,
   }));
 
   try {

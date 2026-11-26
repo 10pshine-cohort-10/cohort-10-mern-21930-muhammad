@@ -42,12 +42,16 @@ export function useDeskKeyboardNav({
       if (isModalOpen || !event.key) return;
 
       const activeEl = document.activeElement;
-      const isInputActive =
+      const isInteractiveElement =
         activeEl instanceof HTMLInputElement ||
         activeEl instanceof HTMLTextAreaElement ||
-        (activeEl instanceof HTMLElement && activeEl.isContentEditable);
+        activeEl instanceof HTMLSelectElement ||
+        activeEl instanceof HTMLButtonElement ||
+        (activeEl instanceof HTMLElement &&
+          (activeEl.isContentEditable ||
+            Boolean(activeEl.closest('[role="menu"], [role="dialog"]'))));
 
-      if (isInputActive) return;
+      if (isInteractiveElement) return;
 
       const keyLower = event.key.toLowerCase();
 

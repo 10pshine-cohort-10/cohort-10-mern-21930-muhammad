@@ -1,4 +1,4 @@
-import { Terminal } from 'lucide-react';
+import { Files, Pin, Folder, Terminal } from 'lucide-react';
 import styles from '../pages/DashboardPage.module.css';
 
 export interface BentoStatsBarProps {
@@ -34,11 +34,13 @@ export default function BentoStatsBar({
           aria-pressed={activeFilter === 'all'}
           title="Show all notes"
         >
+          <Files size={14} aria-hidden="true" />
           <span className={styles.statValue}>{totalNotes}</span>
           <span className={styles.statLabel}>Total Notes</span>
         </button>
       ) : (
         <div className={styles.statCard}>
+          <Files size={14} aria-hidden="true" />
           <span className={styles.statValue}>{totalNotes}</span>
           <span className={styles.statLabel}>Total Notes</span>
         </div>
@@ -52,17 +54,20 @@ export default function BentoStatsBar({
           aria-pressed={activeFilter === 'pinned'}
           title="Filter pinned notes"
         >
+          <Pin size={14} color="var(--accent-orange-text)" aria-hidden="true" />
           <span className={styles.statValue}>{pinnedCount}</span>
           <span className={styles.statLabel}>Pinned</span>
         </button>
       ) : (
         <div className={styles.statCard}>
+          <Pin size={14} color="var(--accent-orange-text)" aria-hidden="true" />
           <span className={styles.statValue}>{pinnedCount}</span>
           <span className={styles.statLabel}>Pinned</span>
         </div>
       )}
 
       <div className={styles.statCard}>
+        <Folder size={14} color="var(--accent-blue-text)" aria-hidden="true" />
         <span className={styles.statValue}>{thirdStatValue ?? totalTags}</span>
         <span className={styles.statLabel}>{thirdStatLabel}</span>
       </div>

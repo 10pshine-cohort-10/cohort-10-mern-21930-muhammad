@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: 22px;
   padding-bottom: 112px;
+  container-type: inline-size;
 }
 
 .controlsBar {
@@ -106,7 +107,118 @@
   color: var(--text-main);
 }
 
+.actionsWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
 .actionsGroup {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.exportMenuContainer {
+  position: relative;
+}
+
+.exportPopover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 220px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  padding: 6px;
+  z-index: var(--z-floating);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scopeStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-bottom: 6px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.scopeBtn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.scopeBtnActive {
+  background: var(--color-accent-dark);
+  color: #ffffff;
+}
+
+.exportMenuItem {
+  width: 100%;
+  text-align: left;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exportScopeHeader {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-subtle);
+  padding: 4px 8px 6px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.exportMenuItem:hover,
+.exportMenuItem:focus-visible {
+  background: var(--bg-subtle);
+  outline: none;
+}
+
+.exportErrorText {
+  color: var(--danger-text);
+  font-size: 0.8rem;
+}
+
+.secondaryBtnActive {
+  background-color: var(--color-accent-dark);
+  color: #ffffff;
+  border-color: var(--color-accent-dark);
+}
+
+.selectionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.selectionBarActions {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -202,6 +314,30 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
   gap: 20px;
+}
+
+.pinnedGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@container (min-width: 540px) {
+  .pinnedGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 840px) {
+  .pinnedGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1140px) {
+  .pinnedGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .emptyState {

@@ -7,6 +7,7 @@ import EditorToolbar from './EditorToolbar';
 import NoteMetaRow from './NoteMetaRow';
 import NoteTagList from './NoteTagList';
 import { useDebouncedAutosave } from '../hooks/useDebouncedAutosave';
+import { downloadExportedNotes } from '../utils/noteExport';
 import type { Note, NoteInput, NoteColor, NoteStatus } from '../types';
 import styles from './NoteEditor.module.css';
 
@@ -117,6 +118,28 @@ function NoteEditorDrawer({ note, isOpen, onClose, onSave }: NoteEditorProps) {
           isFocusMode={isFocusMode}
           saveStatus={saveStatus}
           onToggleFocusMode={() => setIsFocusMode(!isFocusMode)}
+          onExportCurrentNote={
+            note?.id
+              ? (format) => {
+                  downloadExportedNotes(
+                    [
+                      {
+                        ...(note as Note),
+                        title: title.trim() || 'Untitled',
+                        content: getEditorContent(),
+                        color,
+                        status,
+                        isPinned,
+                        tags,
+                      },
+                    ],
+                    format,
+                    'single',
+                    title.trim() || 'note'
+                  );
+                }
+              : undefined
+          }
           onClose={onClose}
         />
 

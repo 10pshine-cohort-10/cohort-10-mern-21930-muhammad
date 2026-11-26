@@ -70,7 +70,8 @@ describe('NoteCard Component', () => {
       />
     );
 
-    fireEvent.click(screen.getByLabelText(/Delete note/i));
+    fireEvent.click(screen.getByLabelText(/More actions/i));
+    fireEvent.click(screen.getByRole('menuitem', { name: /Delete note/i }));
     expect(screen.getByText(/Delete this note\?/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByText('Delete'));

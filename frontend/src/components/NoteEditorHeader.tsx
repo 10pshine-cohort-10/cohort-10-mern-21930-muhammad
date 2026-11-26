@@ -1,4 +1,6 @@
-import { X, Maximize2, Minimize2 } from 'lucide-react';
+import { useState } from 'react';
+import { X, Maximize2, Minimize2, Download } from 'lucide-react';
+import type { ExportFormat } from '../utils/noteExport';
 import styles from './NoteEditor.module.css';
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'draft';
@@ -8,6 +10,7 @@ export interface NoteEditorHeaderProps {
   isFocusMode: boolean;
   saveStatus?: SaveStatus;
   onToggleFocusMode: () => void;
+  onExportCurrentNote?: (format: ExportFormat) => void;
   onClose: () => void;
 }
 
@@ -16,8 +19,10 @@ export default function NoteEditorHeader({
   isFocusMode,
   saveStatus = 'idle',
   onToggleFocusMode,
+  onExportCurrentNote,
   onClose,
 }: NoteEditorHeaderProps) {
+  const [isExportOpen, setIsExportOpen] = useState(false);
   let stampLabel = '';
   let stampClass = styles.saveStamp;
 
@@ -39,6 +44,59 @@ export default function NoteEditorHeader({
       </div>
 
       <div className={styles.headerActions}>
+        {isEditing && onExportCurrentNote && (
+          <>
+            <button
+              type="button"
+              className={styles.iconButton}
+              onClick={() => setIsExportOpen((prev) => !prev)}
+              aria-haspopup="menu"
+              aria-expanded={isExportOpen}
+              title="Export note"
+              aria-label="Export note"
+            >
+              <Download size={16} />
+            </button>
+            {isExportOpen && (
+              <div
+                className={styles.exportDropdown}
+                role="menu"
+                aria-label="Export note"
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    e.stopPropagation();
+                    setIsExportOpen(false);
+                  }
+                }}
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  className={styles.exportOption}
+                  onClick={() => { setIsExportOpen(false); onExportCurrentNote('json'); }}
+                >
+                  Export JSON
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  className={styles.exportOption}
+                  onClick={() => { setIsExportOpen(false); onExportCurrentNote('markdown'); }}
+                >
+                  Export Markdown
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  className={styles.exportOption}
+                  onClick={() => { setIsExportOpen(false); onExportCurrentNote('txt'); }}
+                >
+                  Export Plain Text
+                </button>
+              </div>
+            )}
+          </>
+        )}
         <button
           type="button"
           className={styles.iconButton}

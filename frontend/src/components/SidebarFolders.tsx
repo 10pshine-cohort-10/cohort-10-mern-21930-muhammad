@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Folder, FolderPlus } from 'lucide-react';
+import { ChevronDown, ChevronRight, Folder, FolderOpen, FolderPlus } from 'lucide-react';
 import AddFolderModal from './AddFolderModal';
 import styles from './Layout.module.css';
 
@@ -78,7 +78,7 @@ export default function SidebarFolders({
                 className={`${styles.folderItem} ${isActive ? styles.folderItemActive : ''}`}
                 onClick={() => onSelectFolder(isActive ? '' : folder)}
               >
-                <Folder size={14} />
+                {isActive ? <FolderOpen size={14} /> : <Folder size={14} />}
                 <span className={styles.folderName}>#{folder}</span>
               </button>
             );

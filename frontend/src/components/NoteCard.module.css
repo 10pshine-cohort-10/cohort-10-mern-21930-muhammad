@@ -25,6 +25,34 @@
   transform: translateY(-2px);
 }
 
+.cardMenuOpen {
+  z-index: 20;
+  transform: rotate(0deg);
+}
+
+.cardSelected {
+  outline: 2px solid var(--color-accent-dark);
+  outline-offset: 2px;
+}
+
+.selectBadge {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border-dark);
+  background: var(--bg-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #ffffff;
+}
+
+.selectBadgeChecked {
+  background: var(--color-accent-dark);
+  border-color: var(--color-accent-dark);
+}
+
 .cardPinned {
   transform: rotate(-1.2deg);
   animation: hangingCardSwing 360ms var(--ease-tactile);
@@ -33,12 +61,6 @@
 .cardPinned:hover {
   transform: rotate(0deg) translateY(-2px);
   box-shadow: var(--card-shadow-hover);
-}
-
-@media (min-width: 900px) {
-  .cardPinned {
-    grid-column: span 2;
-  }
 }
 
 .hangingPinIndicator {
@@ -120,9 +142,55 @@
 }
 
 .actions {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.cardMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 150px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  padding: 4px;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cardMenuItem {
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardMenuDivider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 3px 0;
+}
+
+.cardMenuItemDanger {
+  color: var(--danger-text);
+}
+
+.cardMenuItem:hover,
+.cardMenuItem:focus-visible {
+  background: var(--bg-subtle);
+  outline: none;
 }
 
 .iconButton {

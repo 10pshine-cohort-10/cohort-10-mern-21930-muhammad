@@ -1,7 +1,8 @@
-import { useState, type KeyboardEvent, type MouseEvent } from 'react';
-import { Pin, Trash2 } from 'lucide-react';
+import { useState, useRef, useEffect, type KeyboardEvent, type MouseEvent } from 'react';
+import { Pin, Trash2, MoreHorizontal, Check, FileJson, FileText, Leaf, Droplet, Star, Palette, Lightbulb, type LucideIcon } from 'lucide-react';
 import NoteCardDeleteConfirm from './NoteCardDeleteConfirm';
 import type { Note } from '../types';
+import type { ExportFormat } from '../utils/noteExport';
 import { extractPlainText, formatRelativeTime } from '../utils/formatters';
 import styles from './NoteCard.module.css';
 
@@ -14,18 +15,22 @@ const COLOR_CLASS_MAP: Record<string, string> = {
   rose: styles.colorRose,
 };
 
-const NOTE_BADGE_MAP: Record<string, string> = {
-  slate: '📝',
-  sage: '🌿',
-  teal: '💧',
-  sand: '⭐',
-  lavender: '🎨',
-  rose: '💡',
+const NOTE_ICON_MAP: Record<string, LucideIcon> = {
+  slate: FileText,
+  sage: Leaf,
+  teal: Droplet,
+  sand: Star,
+  lavender: Palette,
+  rose: Lightbulb,
 };
 
 export interface NoteCardProps {
   note: Note;
   isFocused?: boolean;
+  isSelectionMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
+  onExportNote?: (note: Note, format: ExportFormat) => void;
   onSelect: (note: Note) => void;
   onTogglePin: (id: string, isPinned: boolean) => void;
   onDelete: (id: string) => void;
@@ -34,18 +39,40 @@ export interface NoteCardProps {
 export default function NoteCard({
   note,
   isFocused = false,
+  isSelectionMode = false,
+  isSelected = false,
+  onToggleSelect,
+  onExportNote,
   onSelect,
   onTogglePin,
   onDelete,
 }: NoteCardProps) {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handleOutside = (event: globalThis.MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    window.addEventListener('mousedown', handleOutside);
+    return () => window.removeEventListener('mousedown', handleOutside);
+  }, [isMenuOpen]);
 
   const cardColorClass = (note.color && COLOR_CLASS_MAP[note.color]) || styles.colorSlate;
-  const noteBadge = note.isPinned ? '📌' : (note.color && NOTE_BADGE_MAP[note.color]) || '📝';
+  const BadgeIcon = (note.color && NOTE_ICON_MAP[note.color]) || FileText;
   const plainPreview = extractPlainText(note.content || '');
 
-  const handleCardClick = () => {
-    if (!isConfirmingDelete && onSelect) onSelect(note);
+  const handleCardClick = (event?: MouseEvent) => {
+    if (isConfirmingDelete) return;
+    if (isSelectionMode || event?.shiftKey) {
+      onToggleSelect?.(note.id);
+      return;
+    }
+    onSelect?.(note);
   };
 
   const handlePinClick = (event: MouseEvent) => {
@@ -79,10 +106,11 @@ export default function NoteCard({
 
   return (
     <div
-      className={`${styles.card} ${cardColorClass} ${note.isPinned ? styles.cardPinned : ''} ${isFocused ? styles.cardFocused : ''}`}
+      className={`${styles.card} ${cardColorClass} ${note.isPinned ? styles.cardPinned : ''} ${isFocused ? styles.cardFocused : ''} ${isMenuOpen ? styles.cardMenuOpen : ''} ${isSelected ? styles.cardSelected : ''}`}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
+      aria-selected={isSelectionMode ? isSelected : undefined}
       onKeyDown={handleKeyDown}
     >
       {note.isPinned && (
@@ -93,11 +121,22 @@ export default function NoteCard({
 
       <div className={styles.cardHeader}>
         <div className={styles.headerLeft}>
-          <span className={styles.iconBadge}>{noteBadge}</span>
+          {isSelectionMode ? (
+            <span
+              className={`${styles.selectBadge} ${isSelected ? styles.selectBadgeChecked : ''}`}
+              aria-hidden="true"
+            >
+              {isSelected && <Check size={12} />}
+            </span>
+          ) : (
+            <span className={styles.iconBadge} aria-hidden="true">
+              <BadgeIcon size={15} />
+            </span>
+          )}
           <h3 className={styles.title}>{note.title || 'Untitled'}</h3>
         </div>
 
-        <div className={styles.actions}>
+        <div className={styles.actions} ref={menuRef}>
           <button
             type="button"
             className={`${styles.iconButton} ${note.isPinned ? styles.pinActive : ''}`}
@@ -110,13 +149,65 @@ export default function NoteCard({
 
           <button
             type="button"
-            className={`${styles.iconButton} ${styles.deleteButton}`}
-            onClick={handleDeleteTrigger}
-            title="Delete note"
-            aria-label="Delete note"
+            className={styles.iconButton}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMenuOpen((prev) => !prev);
+            }}
+            aria-haspopup="menu"
+            aria-expanded={isMenuOpen}
+            aria-label="More actions"
+            title="More actions"
           >
-            <Trash2 size={15} />
+            <MoreHorizontal size={15} />
           </button>
+          {isMenuOpen && (
+            <div
+              className={styles.cardMenu}
+              role="menu"
+              aria-label="Note actions"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  e.stopPropagation();
+                  setIsMenuOpen(false);
+                }
+              }}
+            >
+              {onExportNote && (
+                <>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={styles.cardMenuItem}
+                    onClick={() => { setIsMenuOpen(false); onExportNote(note, 'json'); }}
+                  >
+                    <FileJson size={13} />
+                    <span>Export JSON</span>
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={styles.cardMenuItem}
+                    onClick={() => { setIsMenuOpen(false); onExportNote(note, 'markdown'); }}
+                  >
+                    <FileText size={13} />
+                    <span>Export Markdown</span>
+                  </button>
+                  <div className={styles.cardMenuDivider} />
+                </>
+              )}
+              <button
+                type="button"
+                role="menuitem"
+                className={`${styles.cardMenuItem} ${styles.cardMenuItemDanger}`}
+                onClick={(e) => { setIsMenuOpen(false); handleDeleteTrigger(e); }}
+              >
+                <Trash2 size={13} />
+                <span>Delete note</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

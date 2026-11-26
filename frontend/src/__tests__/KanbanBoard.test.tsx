@@ -30,8 +30,8 @@ const sampleNotes: Note[] = [
 ];
 
 describe('KanbanBoard', () => {
-  it('renders board notes in columns and excludes untracked notes from columns', () => {
-    render(
+  it('renders board notes in columns with pushpin and excludes untracked notes', () => {
+    const { container } = render(
       <KanbanBoard
         notes={sampleNotes}
         onOpenNote={jest.fn()}
@@ -44,11 +44,12 @@ describe('KanbanBoard', () => {
     expect(screen.getByRole('heading', { name: 'To Do' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'In Progress' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Done' })).toBeInTheDocument();
+    expect(container.querySelectorAll('.pinIndicator')).toHaveLength(1);
   });
 
-  it('moves note status when clicking quick-move button', () => {
+  it('moves note status when clicking quick-move button and sets swing state', () => {
     const onMoveStatus = jest.fn().mockResolvedValue(undefined);
-    render(
+    const { container } = render(
       <KanbanBoard
         notes={sampleNotes}
         onOpenNote={jest.fn()}
@@ -59,5 +60,35 @@ describe('KanbanBoard', () => {
 
     fireEvent.click(screen.getByTitle('Move to In Progress'));
     expect(onMoveStatus).toHaveBeenCalledWith('n1', 'in_progress');
+    expect(container.querySelector('.kanbanCardSwinging')).toBeInTheDocument();
+  });
+
+  it('does not trigger swing or move when dropped into the same column', () => {
+    const onMoveStatus = jest.fn().mockResolvedValue(undefined);
+    const { container } = render(
+      <KanbanBoard
+        notes={sampleNotes}
+        onOpenNote={jest.fn()}
+        onMoveStatus={onMoveStatus}
+        onCreateInColumn={jest.fn()}
+      />
+    );
+
+    const card = screen.getByText('Draft API Spec').closest('[draggable="true"]') as HTMLElement;
+    const todoHeading = screen.getByRole('heading', { name: 'To Do' });
+    const todoColumn = todoHeading.closest('.column') as HTMLElement;
+
+    const dataTransfer = {
+      data: {} as Record<string, string>,
+      setData(key: string, val: string) { this.data[key] = val; },
+      getData(key: string) { return this.data[key] || ''; },
+      effectAllowed: 'move',
+    };
+
+    fireEvent.dragStart(card, { dataTransfer });
+    fireEvent.drop(todoColumn, { dataTransfer });
+
+    expect(onMoveStatus).not.toHaveBeenCalled();
+    expect(container.querySelector('.kanbanCardSwinging')).not.toBeInTheDocument();
   });
 });
