@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Edit3, Plus, Archive, User } from 'lucide-react';
+import { Home, Edit3, Plus, Archive, BarChart3 } from 'lucide-react';
 import styles from './MobileNavDock.module.css';
 
 export interface MobileNavDockProps {
@@ -41,21 +41,21 @@ export default function MobileNavDock({ onQuickAddClick }: MobileNavDockProps) {
       )}
 
       <Link
+        to="/insights"
+        className={`${styles.item} ${location.pathname === '/insights' ? styles.active : ''}`}
+        title="Progress"
+        aria-label="Progress"
+      >
+        <BarChart3 size={20} />
+      </Link>
+
+      <Link
         to="/archive"
         className={`${styles.item} ${location.pathname === '/archive' ? styles.active : ''}`}
         title="Archive"
         aria-label="Archive"
       >
         <Archive size={20} />
-      </Link>
-
-      <Link
-        to="/profile"
-        className={`${styles.item} ${location.pathname === '/profile' ? styles.active : ''}`}
-        title="Profile"
-        aria-label="Profile"
-      >
-        <User size={20} />
       </Link>
     </nav>
   );

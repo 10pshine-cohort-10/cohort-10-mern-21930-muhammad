@@ -7,7 +7,7 @@ import EditorToolbar from './EditorToolbar';
 import NoteMetaRow from './NoteMetaRow';
 import NoteTagList from './NoteTagList';
 import { useDebouncedAutosave } from '../hooks/useDebouncedAutosave';
-import type { Note, NoteInput, NoteColor } from '../types';
+import type { Note, NoteInput, NoteColor, NoteStatus } from '../types';
 import styles from './NoteEditor.module.css';
 
 export interface NoteEditorProps {
@@ -25,6 +25,7 @@ export default function NoteEditor(props: NoteEditorProps) {
 function NoteEditorDrawer({ note, isOpen, onClose, onSave }: NoteEditorProps) {
   const [title, setTitle] = useState<string>('');
   const [color, setColor] = useState<NoteColor>('slate');
+  const [status, setStatus] = useState<NoteStatus | null>(null);
   const [isPinned, setIsPinned] = useState<boolean>(false);
   const [tags, setTags] = useState<string[]>([]);
   const [isFocusMode, setIsFocusMode] = useState<boolean>(false);
@@ -55,6 +56,7 @@ function NoteEditorDrawer({ note, isOpen, onClose, onSave }: NoteEditorProps) {
   useEffect(() => {
     setTitle(note?.title || '');
     setColor(note?.color || 'slate');
+    setStatus(note?.status ?? null);
     setIsPinned(Boolean(note?.isPinned));
     setTags(Array.isArray(note?.tags) ? note.tags : []);
     if (editor && !editor.isDestroyed) {
@@ -84,6 +86,7 @@ function NoteEditorDrawer({ note, isOpen, onClose, onSave }: NoteEditorProps) {
         title: title.trim() || 'Untitled',
         content: getEditorContent(),
         color,
+        status,
         isPinned,
         tags,
       });
@@ -146,8 +149,10 @@ function NoteEditorDrawer({ note, isOpen, onClose, onSave }: NoteEditorProps) {
               <NoteMetaRow
                 color={color}
                 isPinned={isPinned}
+                status={status}
                 onColorChange={setColor}
                 onTogglePin={() => setIsPinned(!isPinned)}
+                onStatusChange={setStatus}
               />
               <NoteTagList
                 tags={tags}

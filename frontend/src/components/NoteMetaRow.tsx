@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { Pin } from 'lucide-react';
-import type { NoteColor } from '../types';
+import type { NoteColor, NoteStatus } from '../types';
 import styles from './NoteEditor.module.css';
 
 interface ColorOption {
@@ -21,15 +21,19 @@ const AVAILABLE_COLORS: ColorOption[] = [
 export interface NoteMetaRowProps {
   color: NoteColor;
   isPinned: boolean;
+  status?: NoteStatus | null;
   onColorChange: (color: NoteColor) => void;
   onTogglePin: () => void;
+  onStatusChange?: (status: NoteStatus | null) => void;
 }
 
 export default function NoteMetaRow({
   color,
   isPinned,
+  status = null,
   onColorChange,
   onTogglePin,
+  onStatusChange,
 }: NoteMetaRowProps) {
   return (
     <div className={styles.optionsRow}>
@@ -44,6 +48,20 @@ export default function NoteMetaRow({
           />
         ))}
       </div>
+
+      {onStatusChange && (
+        <select
+          aria-label="Board status"
+          className={styles.pinToggle}
+          value={status || ''}
+          onChange={(e) => onStatusChange((e.target.value || null) as NoteStatus | null)}
+        >
+          <option value="">No board status</option>
+          <option value="todo">To Do</option>
+          <option value="in_progress">In Progress</option>
+          <option value="done">Done</option>
+        </select>
+      )}
 
       <button
         type="button"

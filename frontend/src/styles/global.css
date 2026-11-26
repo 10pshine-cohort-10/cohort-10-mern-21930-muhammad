@@ -28,8 +28,18 @@
   --text-subtle: #71717a;
 
   --card-border: #18181b;
-  --card-shadow: 3px 3px 0px #18181b;
-  --card-shadow-hover: 4px 5px 0px #18181b;
+  --card-shadow: 2px 2px 0px rgba(24, 24, 27, 0.85);
+  --card-shadow-hover: 3px 4px 0px rgba(24, 24, 27, 0.9);
+
+  --accent-blue: #0ea5e9;
+  --accent-blue-text: #0369a1;
+  --accent-blue-border: #bae6fd;
+  --accent-blue-surface: #f0f9ff;
+
+  --accent-orange: #f97316;
+  --accent-orange-text: #c2410c;
+  --accent-orange-border: #fed7aa;
+  --accent-orange-surface: #fff7ed;
 
   --color-slate-bg: #ffffff;
   --color-sage-bg: #dcfce7;

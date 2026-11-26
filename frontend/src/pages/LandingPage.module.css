@@ -1,7 +1,8 @@
 .page {
-  min-height: 100vh;
+  min-height: 100svh;
   background-color: var(--bg-app);
   color: var(--text-main);
+  overflow-x: clip;
 }
 
 .topNav {
@@ -100,13 +101,13 @@
 
 .heroTrack {
   position: relative;
-  min-height: 175vh;
+  min-height: 135svh;
 }
 
 .heroSticky {
   position: sticky;
   top: 64px;
-  min-height: calc(100vh - 64px);
+  min-height: calc(100svh - 64px);
   display: flex;
   align-items: center;
   padding: 40px 24px;
@@ -144,14 +145,6 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-}
-
-.ghostLink {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-decoration: underline;
-  padding: 8px 6px;
 }
 
 .deskStage {
@@ -242,89 +235,196 @@
   color: var(--text-main);
 }
 
-.section {
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 88px 24px;
+.featureSection {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  border-top: 1px solid var(--border-subtle);
 }
 
-.sectionHeading {
-  font-size: clamp(1.85rem, 3.6vw, 2.75rem);
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  line-height: 1.12;
-  margin: 0 0 12px;
-}
-
-.sectionLead {
-  font-size: 16px;
-  color: var(--text-muted);
-  max-width: 58ch;
-  margin: 0 0 36px;
-}
-
-.bentoGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-.bentoCard,
-.powerCard,
-.storyCard {
+.featureAlt {
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  box-shadow: var(--shadow-sm);
+}
+
+.actGrid {
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.actGridFlipped {
+  grid-template-columns: 1.05fr 0.95fr;
+}
+
+.actCopy {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 16px;
+}
+
+.organizeComposite {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.recessedStage {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0.88;
+  transform: scale(0.98);
+}
+
+.pinnedSnapCard {
+  position: relative;
+  background-color: var(--color-sage-bg);
+  border: 2px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
 }
 
-.bentoMint {
+.featureCentered {
+  max-width: min(820px, 92vw);
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.keycap {
+  font-family: var(--font-family-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+}
+
+.sectionHeading {
+  font-size: clamp(2rem, 4.2vw, 3.1rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.sectionLead {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  max-width: 56ch;
+  margin: 0 0 12px;
+}
+
+.visualStage {
+  width: 100%;
+  min-height: 240px;
+  max-height: 54svh;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  text-align: left;
+}
+
+.visualStageMint {
+  position: relative;
   background-color: var(--color-sage-bg);
   border: 2px solid var(--card-border);
   box-shadow: var(--card-shadow);
 }
 
-.cardTitle {
-  font-size: 17px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.cardCopy {
-  font-size: 14px;
-  line-height: 1.55;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-.mockupBox {
-  margin-top: auto;
-  padding: 12px;
-  border-radius: var(--radius-sm);
-  background-color: var(--bg-subtle);
+.miniInputRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background-color: var(--bg-app);
   border: 1px solid var(--border-subtle);
-  font-size: 12px;
+  border-radius: 10px;
+}
+
+.miniInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
   color: var(--text-main);
+}
+
+.miniDraftRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-subtle);
 }
 
-.storyGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+.miniTackBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background-color: var(--border-dark);
+  color: #ffffff;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.powerGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+.progressRail {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 20;
+}
+
+.railDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--border-subtle);
+  border: 1px solid var(--text-subtle);
+  display: block;
 }
 
 .finalBand {
@@ -357,6 +457,12 @@
   gap: 12px;
 }
 
+@media (max-width: 1023px) {
+  .progressRail {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .heroTrack {
     min-height: auto;
@@ -367,12 +473,23 @@
     padding: 36px 20px;
   }
   .heroInner,
-  .bentoGrid,
-  .storyGrid,
-  .powerGrid {
+  .actGrid,
+  .actGridFlipped {
     grid-template-columns: 1fr;
+    gap: 28px;
   }
-  .section,
+  .actCopy {
+    align-items: center;
+    text-align: center;
+  }
+  .featureSection {
+    min-height: auto;
+    padding: 64px 20px;
+  }
+  .visualStage {
+    max-height: none;
+    padding: 20px;
+  }
   .finalBand {
     padding: 56px 20px;
   }

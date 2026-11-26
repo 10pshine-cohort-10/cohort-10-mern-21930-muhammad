@@ -3,7 +3,7 @@ import { MotionConfig } from 'framer-motion';
 import { BookOpen, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import LandingHero from '../components/landing/LandingHero';
-import LandingFeatureSections from '../components/landing/LandingFeatureSections';
+import LandingFeatureSections, { LANDING_SECTIONS } from '../components/landing/LandingFeatureSections';
 import styles from './LandingPage.module.css';
 
 export default function LandingPage() {
@@ -36,6 +36,12 @@ export default function LandingPage() {
           </div>
         </header>
 
+        <nav className={styles.progressRail} aria-label="Section progress">
+          {LANDING_SECTIONS.map((sec) => (
+            <a key={sec.id} href={`#${sec.id}`} className={styles.railDot} title={sec.label} aria-label={sec.label} />
+          ))}
+        </nav>
+
         <main>
           <LandingHero />
           <LandingFeatureSections />
@@ -50,6 +56,9 @@ export default function LandingPage() {
                 <Link to="/register" className={styles.primaryCta}>
                   <span>Get started</span>
                   <ArrowRight size={16} />
+                </Link>
+                <Link to="/scratchpad" className={styles.secondaryLink}>
+                  Try Scratchpad
                 </Link>
                 <Link to="/login" className={styles.secondaryLink}>
                   Log in

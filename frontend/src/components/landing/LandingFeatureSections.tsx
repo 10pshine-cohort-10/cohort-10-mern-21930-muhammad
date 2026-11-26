@@ -1,165 +1,151 @@
-import { motion } from 'framer-motion';
-import {
-  Pin, Folder, LayoutGrid, Search, Download, Terminal, FileText,
-} from 'lucide-react';
+import { useRef, type ReactNode } from 'react';
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
+import { Pin, Folder, Terminal, Search, Download } from 'lucide-react';
+import LandingInteractiveScratchpad from './LandingInteractiveScratchpad';
 import styles from '../../pages/LandingPage.module.css';
 
-const REVEAL_VIEWPORT = { once: true, amount: 0.2 } as const;
+export const LANDING_SECTIONS = [
+  { id: 'capture-desk', label: 'Capture & Draft' },
+  { id: 'organize-desk', label: 'Pinning & Folders' },
+  { id: 'command-own', label: 'Command & Export' },
+];
+
+const SLIDE_EASE = [0.22, 1, 0.36, 1] as const;
+
+function FocusAct({ id, alt = false, children }: { id: string; alt?: boolean; children: ReactNode }) {
+  const ref = useRef<HTMLElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const scale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.96, 1, 1, 0.97]);
+  const opacity = useTransform(scrollYProgress, [0, 0.25, 0.75, 1], [0.55, 1, 1, 0.6]);
+
+  return (
+    <section id={id} ref={ref} className={`${styles.featureSection} ${alt ? styles.featureAlt : ''}`}>
+      <motion.div
+        style={shouldReduceMotion ? undefined : { scale, opacity, width: '100%' }}
+      >
+        {children}
+      </motion.div>
+    </section>
+  );
+}
 
 export default function LandingFeatureSections() {
   return (
     <>
-      <section className={styles.section}>
-        <h2 className={styles.sectionHeading}>Built for capture, pinning, and tidy folders.</h2>
-        <p className={styles.sectionLead}>
-          Switch between tactile Grid cards and compact Stream lists while keeping important notes pinned at the top.
-        </p>
-
-        <div className={styles.bentoGrid}>
-          <motion.article
-            className={`${styles.bentoCard} ${styles.bentoMint}`}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={REVEAL_VIEWPORT}
-            transition={{ duration: 0.35 }}
-          >
-            <Pin size={20} />
-            <h3 className={styles.cardTitle}>Pinning & Quick Capture</h3>
-            <p className={styles.cardCopy}>
-              Press Enter in the floating Quick-Tack dock to save immediately, and pin key notes into a dedicated Pinned row.
-            </p>
-            <div className={styles.mockupBox}>
-              <span>Quick tack to board</span>
-              <kbd className={styles.kbdBadge}>t</kbd>
-            </div>
-          </motion.article>
-
-          <motion.article
-            className={styles.bentoCard}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={REVEAL_VIEWPORT}
-            transition={{ duration: 0.35, delay: 0.08 }}
-          >
-            <Folder size={20} />
-            <h3 className={styles.cardTitle}>Collapsible #Folders</h3>
-            <p className={styles.cardCopy}>
-              Create custom folders, filter notes across routes, and keep your sidebar rail expanded or collapsed.
-            </p>
-            <div className={styles.mockupBox}>
-              <span>#work · #ideas · #reading</span>
-              <span>+ Folder</span>
-            </div>
-          </motion.article>
-
-          <motion.article
-            className={styles.bentoCard}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={REVEAL_VIEWPORT}
-            transition={{ duration: 0.35, delay: 0.16 }}
-          >
-            <LayoutGrid size={20} />
-            <h3 className={styles.cardTitle}>Grid & Stream Views</h3>
-            <p className={styles.cardCopy}>
-              Toggle between a cardboard desk grid and a dense stream list with a single click—persisted per device.
-            </p>
-            <div className={styles.mockupBox}>
-              <span>Grid | Stream</span>
-              <kbd className={styles.kbdBadge}>Saved</kbd>
-            </div>
-          </motion.article>
-        </div>
-      </section>
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionHeading}>Start in Scratchpad. Promote to your Cloud Desk.</h2>
-        <p className={styles.sectionLead}>
-          Separate messy local thoughts from your synced workspace until they are ready to keep.
-        </p>
-
-        <div className={styles.storyGrid}>
+      <FocusAct id="capture-desk" alt>
+        <div className={styles.actGrid}>
           <motion.div
-            className={styles.storyCard}
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={REVEAL_VIEWPORT}
-            transition={{ duration: 0.35 }}
+            className={styles.actCopy}
+            initial={{ opacity: 0, x: -36 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.45, ease: SLIDE_EASE }}
           >
-            <h3 className={styles.cardTitle}>Guest Scratchpad</h3>
-            <p className={styles.cardCopy}>
-              Write right away in browser storage with zero signup. When you create an account or log in, local drafts sync automatically.
+            <span className={styles.keycap}>ENTER · LOCAL → CLOUD</span>
+            <h2 className={styles.sectionHeading}>Capture messy drafts. Tack finished notes.</h2>
+            <p className={styles.sectionLead}>
+              Press Enter to save locally in your Scratchpad with zero signup, then snap drafts onto your synced Cloud Desk whenever you are ready.
             </p>
-            <div className={styles.mockupBox}>
-              <span>Local browser drafts</span>
-              <span>Auto-sync on sign in</span>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 36 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.45, ease: SLIDE_EASE }}
+          >
+            <LandingInteractiveScratchpad />
+          </motion.div>
+        </div>
+      </FocusAct>
+
+      <FocusAct id="organize-desk">
+        <div className={`${styles.actGrid} ${styles.actGridFlipped}`}>
+          <motion.div
+            className={styles.organizeComposite}
+            initial={{ opacity: 0, x: -36 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.45, ease: SLIDE_EASE }}
+          >
+            <div className={`${styles.visualStage} ${styles.visualStageMint}`} style={{ minHeight: 'auto' }}>
+              <span className={styles.pinDot} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <strong style={{ fontSize: 16 }}>Release checklist</strong>
+                <Pin size={15} />
+              </div>
+              <p className={styles.mintBody}>Pinned above Recent notes · Grid | Stream toggle</p>
+            </div>
+
+            <div className={styles.recessedStage}>
+              <div className={styles.miniDraftRow}><Folder size={14} /><span>#work</span><span className={styles.kbdBadge}>Active</span></div>
+              <div className={styles.miniDraftRow}><Folder size={14} /><span>#ideas</span><span className={styles.kbdBadge}>4</span></div>
             </div>
           </motion.div>
 
           <motion.div
-            className={styles.storyCard}
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={REVEAL_VIEWPORT}
-            transition={{ duration: 0.35, delay: 0.08 }}
+            className={styles.actCopy}
+            initial={{ opacity: 0, x: 36 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.45, ease: SLIDE_EASE }}
           >
-            <h3 className={styles.cardTitle}>Draft Blotter & Real-Time Sync</h3>
-            <p className={styles.cardCopy}>
-              Stage unfiled thoughts locally while signed in, then click Tack to Desk to promote them with live Socket.IO updates.
+            <span className={styles.keycap}>PIN · #FOLDERS · GRID | STREAM</span>
+            <h2 className={styles.sectionHeading}>Pin priorities. Keep #folders one click away.</h2>
+            <p className={styles.sectionLead}>
+              Pushpin cards stay anchored at the top while your collapsible folder tree and Grid/Stream switch keep the rest of your board tidy.
             </p>
-            <div className={styles.mockupBox}>
-              <span>Tack to Desk</span>
-              <span>Synced via Socket.IO</span>
-            </div>
           </motion.div>
         </div>
-      </section>
+      </FocusAct>
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionHeading}>Everything else stays fast and yours.</h2>
-        <div className={styles.powerGrid}>
-          {[
-            {
-              icon: FileText,
-              title: 'Rich-Text Editor & Color Themes',
-              copy: 'TipTap formatting, Focus Mode, debounced autosave, and 6 tactile card colors.',
-            },
-            {
-              icon: Terminal,
-              title: 'Command Palette & Keyboard Nav',
-              copy: 'Open Ctrl+K anywhere, navigate cards with j/k, and recover deletes with UndoToast.',
-            },
-            {
-              icon: Search,
-              title: 'Full-Text Search & Archive',
-              copy: 'Search titles, content, and tags instantly, or tuck finished notes into Archive.',
-            },
-            {
-              icon: Download,
-              title: 'Export & Import Anytime',
-              copy: 'Back up your workspace to JSON or Markdown and re-import JSON backups in one click.',
-            },
-          ].map((item, idx) => {
-            const Icon = item.icon;
-            return (
-              <motion.div
-                key={item.title}
-                className={styles.powerCard}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={REVEAL_VIEWPORT}
-                transition={{ duration: 0.3, delay: idx * 0.05 }}
+      <FocusAct id="command-own" alt>
+        <div className={styles.actGrid}>
+          <motion.div
+            className={styles.actCopy}
+            initial={{ opacity: 0, x: -36 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.45, ease: SLIDE_EASE }}
+          >
+            <span className={styles.keycap}>CTRL + K · SEARCH · EXPORT</span>
+            <h2 className={styles.sectionHeading}>Stay on the keyboard. Own every byte.</h2>
+            <p className={styles.sectionLead}>
+              Open the Command Palette with Ctrl+K, search titles and tags, archive completed work, or export JSON and Markdown backups anytime.
+            </p>
+          </motion.div>
+
+          <motion.div
+            className={styles.visualStage}
+            initial={{ opacity: 0, x: 36 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.45, ease: SLIDE_EASE }}
+          >
+            <div className={styles.miniInputRow}>
+              <Terminal size={16} />
+              <span style={{ color: 'var(--text-subtle)', fontSize: 14 }}>Type a command or search notes...</span>
+              <motion.kbd
+                className={styles.kbdBadge}
+                whileInView={{ scale: [1, 0.9, 1] }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.35, delay: 0.2 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Icon size={18} />
-                  <h3 className={styles.cardTitle}>{item.title}</h3>
-                </div>
-                <p className={styles.cardCopy}>{item.copy}</p>
-              </motion.div>
-            );
-          })}
+                CTRL K
+              </motion.kbd>
+            </div>
+            <div className={styles.miniDraftRow}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Search size={14} /> Full-text search & #archive</span>
+              <kbd className={styles.kbdBadge}>/</kbd>
+            </div>
+            <div className={styles.miniDraftRow}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Download size={14} /> Export JSON · Export MD · Import</span>
+              <kbd className={styles.kbdBadge}>Backup</kbd>
+            </div>
+          </motion.div>
         </div>
-      </section>
+      </FocusAct>
     </>
   );
 }

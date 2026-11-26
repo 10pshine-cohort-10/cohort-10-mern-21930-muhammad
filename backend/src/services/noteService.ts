@@ -2,7 +2,9 @@ import { Types } from 'mongoose';
 import Note from '../models/Note';
 import AppError from '../utils/appError';
 import { emitNoteChange } from '../socket/noteSocket';
-import { INote, NoteCreateInput, NoteUpdateInput, ExportResult, NoteColor } from '../types';
+import { INote, NoteCreateInput, NoteUpdateInput, ExportResult, NoteColor, NoteStatus } from '../types';
+
+const ALLOWED_STATUSES: NoteStatus[] = ['todo', 'in_progress', 'done'];
 
 const ALLOWED_TAGS = new Set([
   'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
@@ -75,6 +77,7 @@ export async function createNote(userId: string | Types.ObjectId, noteData: Note
 
   const allowedColors: NoteColor[] = ['slate', 'sage', 'teal', 'sand', 'lavender', 'rose'];
   const color = allowedColors.includes(noteData.color as NoteColor) ? (noteData.color as NoteColor) : 'slate';
+  const status = ALLOWED_STATUSES.includes(noteData.status as NoteStatus) ? (noteData.status as NoteStatus) : null;
 
   const note = new Note({
     userId,
@@ -83,6 +86,7 @@ export async function createNote(userId: string | Types.ObjectId, noteData: Note
     isPinned,
     tags,
     color,
+    status,
   });
 
   await note.save();
@@ -113,6 +117,12 @@ export async function updateNote(noteId: string, userId: string | Types.ObjectId
   const allowedColors: NoteColor[] = ['slate', 'sage', 'teal', 'sand', 'lavender', 'rose'];
   if (allowedColors.includes(updateData.color as NoteColor)) {
     updatePayload.color = updateData.color;
+  }
+
+  if (updateData.status === null) {
+    updatePayload.status = null;
+  } else if (ALLOWED_STATUSES.includes(updateData.status as NoteStatus)) {
+    updatePayload.status = updateData.status;
   }
 
   const note = await Note.findOneAndUpdate(

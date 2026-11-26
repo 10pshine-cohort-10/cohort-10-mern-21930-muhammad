@@ -12,8 +12,8 @@ describe('MobileNavDock Component', () => {
 
     expect(screen.getByTitle('Dashboard')).toBeInTheDocument();
     expect(screen.getByTitle('Scratchpad')).toBeInTheDocument();
+    expect(screen.getByTitle('Progress')).toBeInTheDocument();
     expect(screen.getByTitle('Archive')).toBeInTheDocument();
-    expect(screen.getByTitle('Profile')).toBeInTheDocument();
   });
 
   it('triggers onQuickAddClick when center plus button is clicked', () => {

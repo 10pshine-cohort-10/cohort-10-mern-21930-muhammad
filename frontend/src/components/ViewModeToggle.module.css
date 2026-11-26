@@ -1,7 +1,7 @@
 .toggleContainer {
   position: relative;
   display: inline-grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
   background-color: var(--color-surface);
   border: 1px solid var(--border-subtle);
@@ -14,7 +14,7 @@
   position: absolute;
   top: 2px;
   left: 2px;
-  width: calc(50% - 2px);
+  width: calc((100% - 4px) / 3);
   height: calc(100% - 4px);
   background-color: var(--color-accent-dark);
   border-radius: 6px;
@@ -24,6 +24,10 @@
 
 .slidingPillStream {
   transform: translateX(100%);
+}
+
+.slidingPillBoard {
+  transform: translateX(200%);
 }
 
 .toggleBtn {

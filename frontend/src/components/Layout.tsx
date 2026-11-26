@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  BookOpen, FileText, Edit3, Archive,
+  BookOpen, FileText, Edit3, Archive, BarChart3,
   LogOut, Plus, PanelLeftClose, PanelLeftOpen, Folder,
 } from 'lucide-react';
 import MobileNavDock from './MobileNavDock';
@@ -13,6 +13,7 @@ import styles from './Layout.module.css';
 const SIDEBAR_STORAGE_KEY = 'notes_sidebar_collapsed';
 const ROUTE_TITLES: Record<string, string> = {
   '/dashboard': 'All Notes',
+  '/insights': 'Progress',
   '/scratchpad': 'Scratchpad',
   '/archive': 'Archive',
   '/profile': 'My Profile',
@@ -104,6 +105,13 @@ export default function Layout({
             className={`${styles.navItem} ${location.pathname === '/scratchpad' ? styles.navItemActive : ''}`}
           >
             <Edit3 size={18} />{!isCollapsed && <span>Scratchpad</span>}
+          </Link>
+
+          <Link
+            to="/insights" title="Progress"
+            className={`${styles.navItem} ${location.pathname === '/insights' ? styles.navItemActive : ''}`}
+          >
+            <BarChart3 size={18} />{!isCollapsed && <span>Progress</span>}
           </Link>
 
           <Link

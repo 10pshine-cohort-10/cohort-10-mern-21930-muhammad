@@ -10,6 +10,7 @@ export interface User {
 }
 
 export type NoteColor = 'slate' | 'sage' | 'teal' | 'sand' | 'lavender' | 'rose';
+export type NoteStatus = 'todo' | 'in_progress' | 'done';
 
 export interface Note {
   id: string;
@@ -17,6 +18,7 @@ export interface Note {
   title: string;
   content: string;
   color: NoteColor;
+  status?: NoteStatus | null;
   isPinned: boolean;
   tags: string[];
   createdAt: string;
@@ -28,6 +30,7 @@ export interface NoteInput {
   title?: string;
   content?: string;
   color?: NoteColor;
+  status?: NoteStatus | null;
   isPinned?: boolean;
   tags?: string[];
 }

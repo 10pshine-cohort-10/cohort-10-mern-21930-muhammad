@@ -8,6 +8,7 @@ import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
 import ScratchpadPage from './pages/ScratchpadPage';
 import ArchivePage from './pages/ArchivePage';
+import InsightsPage from './pages/InsightsPage';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/insights" element={<InsightsPage />} />
             <Route path="/archive" element={<ArchivePage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>

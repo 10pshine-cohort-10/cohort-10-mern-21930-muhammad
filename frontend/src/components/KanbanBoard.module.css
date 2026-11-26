@@ -1,0 +1,271 @@
+.boardWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.boardToolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.columnsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.column {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 14px;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.columnDropOver {
+  border-color: var(--accent-blue);
+  background: var(--accent-blue-surface);
+}
+
+.columnHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.columnTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+}
+
+.dotTodo {
+  background: var(--text-subtle);
+}
+
+.dotInProgress {
+  background: var(--accent-blue);
+}
+
+.dotDone {
+  background: var(--accent-orange);
+}
+
+.columnTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.columnCount {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.columnAddBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+.columnAddBtn:hover {
+  background: var(--bg-subtle);
+  color: var(--text-main);
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kanbanCard {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--card-shadow);
+  padding: 12px;
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 140ms var(--ease-tactile), box-shadow 140ms var(--ease-tactile);
+}
+
+.kanbanCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+.cardBodyBtn {
+  text-align: left;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardTitle {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.cardPreview {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.cardFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.updatedLabel {
+  font-size: 0.72rem;
+  color: var(--text-subtle);
+}
+
+.quickMoveGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.moveBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.moveBtn:hover {
+  color: var(--text-main);
+  background: var(--bg-muted);
+}
+
+.emptyBoard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 40px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.emptyIcon {
+  color: var(--accent-blue-text);
+}
+
+.emptyTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.emptyText {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-width: 440px;
+}
+
+.emptyActions {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.promoteRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.promoteSelect {
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.84rem;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-accent-dark);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+.secondaryBtn {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.secondaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .columnsGrid {
+    grid-template-columns: 1fr;
+  }
+}

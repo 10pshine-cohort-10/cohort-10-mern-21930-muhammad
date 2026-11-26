@@ -11,13 +11,14 @@ import CommandPalette from '../components/CommandPalette';
 import QuickTackBar from '../components/QuickTackBar';
 import UndoToast from '../components/UndoToast';
 import ViewModeToggle, { type ViewMode } from '../components/ViewModeToggle';
+import KanbanBoard from '../components/KanbanBoard';
 import KeyboardHelpModal from '../components/KeyboardHelpModal';
 import { useNotes } from '../hooks/useNotes';
 import { usePaletteShortcut } from '../hooks/usePaletteShortcut';
 import { useDeskKeyboardNav } from '../hooks/useDeskKeyboardNav';
 import { useSoftDelete } from '../hooks/useSoftDelete';
 import { useAuth } from '../context/AuthContext';
-import type { Note, NoteInput } from '../types';
+import type { Note, NoteInput, NoteStatus } from '../types';
 import styles from './DashboardPage.module.css';
 
 export default function DashboardPage() {
@@ -132,6 +133,10 @@ export default function DashboardPage() {
       <div className={styles.container}>
         <div className={styles.controlsBar}>
           <SearchBar ref={searchInputRef} value={searchQuery} onChange={setSearchQuery} onClear={() => setSearchQuery('')} />
+          <ViewModeToggle
+            currentMode={viewMode}
+            onChangeMode={(m) => { setViewMode(m); localStorage.setItem('notes_view_mode', m); }}
+          />
           <ExportImportActions onExport={exportNotes} onImportFile={handleImportFileChange} />
         </div>
 
@@ -156,6 +161,15 @@ export default function DashboardPage() {
           <div className={styles.skeletonGrid} aria-busy="true" aria-label="Loading notes">
             <div className={styles.skeletonCard} /><div className={styles.skeletonCard} />
           </div>
+        ) : viewMode === 'board' ? (
+          <KanbanBoard
+            notes={displayedNotes}
+            onOpenNote={openEditor}
+            onMoveStatus={async (noteId: string, nextStatus: NoteStatus) => {
+              await updateNote(noteId, { status: nextStatus });
+            }}
+            onCreateInColumn={(status: NoteStatus) => openEditor({ status })}
+          />
         ) : displayedNotes.length === 0 ? (
           <NotesEmptyState searchQuery={searchQuery} onCreateNote={() => openEditor(null)} onApplyTemplate={openEditor} />
         ) : (
@@ -170,7 +184,6 @@ export default function DashboardPage() {
               <div className={`${styles.sectionHeading} ${styles.sectionHeadingCompact}`}>
                 {filterMode === 'pinned' ? 'Pinned notes' : 'Recent notes'}
               </div>
-              <ViewModeToggle currentMode={viewMode} onChangeMode={(m) => { setViewMode(m); localStorage.setItem('notes_view_mode', m); }} />
             </div>
             {renderNotesList(regularNotes, pinnedNotes.length)}
           </>

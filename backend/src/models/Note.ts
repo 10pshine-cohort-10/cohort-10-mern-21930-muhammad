@@ -32,6 +32,11 @@ const noteSchema = new Schema<INote>(
       enum: ['slate', 'sage', 'teal', 'sand', 'lavender', 'rose'],
       default: 'slate',
     },
+    status: {
+      type: String,
+      enum: ['todo', 'in_progress', 'done'],
+      default: null,
+    },
   },
   {
     timestamps: true,

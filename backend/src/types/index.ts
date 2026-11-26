@@ -2,6 +2,7 @@ import { Request } from 'express';
 import { Types, Document } from 'mongoose';
 
 export type NoteColor = 'slate' | 'sage' | 'teal' | 'sand' | 'lavender' | 'rose';
+export type NoteStatus = 'todo' | 'in_progress' | 'done';
 
 export interface IUser {
   _id: Types.ObjectId;
@@ -21,6 +22,7 @@ export interface INote {
   title: string;
   content: string;
   color: NoteColor;
+  status?: NoteStatus | null;
   isPinned: boolean;
   tags: string[];
   createdAt: Date;
@@ -53,6 +55,7 @@ export interface NoteCreateInput {
   title?: string;
   content?: string;
   color?: string;
+  status?: NoteStatus | null;
   isPinned?: boolean;
   tags?: string[];
 }
@@ -61,6 +64,7 @@ export interface NoteUpdateInput {
   title?: string;
   content?: string;
   color?: string;
+  status?: NoteStatus | null;
   isPinned?: boolean;
   tags?: string[];
 }

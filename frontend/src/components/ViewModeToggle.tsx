@@ -1,7 +1,7 @@
-import { LayoutGrid, List } from 'lucide-react';
+import { LayoutGrid, List, Columns3 } from 'lucide-react';
 import styles from './ViewModeToggle.module.css';
 
-export type ViewMode = 'grid' | 'stream';
+export type ViewMode = 'grid' | 'stream' | 'board';
 
 export interface ViewModeToggleProps {
   currentMode: ViewMode;
@@ -9,12 +9,16 @@ export interface ViewModeToggleProps {
 }
 
 export default function ViewModeToggle({ currentMode, onChangeMode }: ViewModeToggleProps) {
+  const pillClass =
+    currentMode === 'stream'
+      ? styles.slidingPillStream
+      : currentMode === 'board'
+        ? styles.slidingPillBoard
+        : '';
+
   return (
     <div className={styles.toggleContainer} role="radiogroup" aria-label="Layout view mode">
-      <span
-        aria-hidden="true"
-        className={`${styles.slidingPill} ${currentMode === 'stream' ? styles.slidingPillStream : ''}`}
-      />
+      <span aria-hidden="true" className={`${styles.slidingPill} ${pillClass}`} />
       <button
         type="button"
         role="radio"
@@ -37,6 +41,18 @@ export default function ViewModeToggle({ currentMode, onChangeMode }: ViewModeTo
       >
         <List size={15} />
         <span>Stream</span>
+      </button>
+
+      <button
+        type="button"
+        role="radio"
+        aria-checked={currentMode === 'board'}
+        className={`${styles.toggleBtn} ${currentMode === 'board' ? styles.toggleBtnActive : ''}`}
+        onClick={() => onChangeMode('board')}
+        title="Kanban board view"
+      >
+        <Columns3 size={15} />
+        <span>Board</span>
       </button>
     </div>
   );
