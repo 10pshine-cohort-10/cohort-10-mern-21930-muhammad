@@ -1,0 +1,500 @@
+.boardWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.boardToolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.columnsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.column {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 14px;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.columnDropOver {
+  border-color: var(--accent-blue);
+  background: var(--accent-blue-surface);
+}
+
+.columnHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.columnTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+}
+
+.dotTodo {
+  background: var(--text-subtle);
+}
+
+.dotInProgress {
+  background: var(--accent-blue);
+}
+
+.dotDone {
+  background: var(--accent-orange);
+}
+
+.columnTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.columnCount {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.columnAddBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+.columnAddBtn:hover {
+  background: var(--bg-subtle);
+  color: var(--text-main);
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dragWrapper {
+  position: relative;
+}
+
+.motionCard {
+  transform-origin: top center;
+}
+
+.kanbanCardSwinging {
+  z-index: 5;
+}
+
+.kanbanCard {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--card-shadow);
+  padding: 13px 12px 12px;
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 140ms var(--ease-tactile), box-shadow 140ms var(--ease-tactile);
+}
+
+.pinIndicator {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  background-color: var(--pin-red);
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-full);
+  box-shadow: 0 1px 2px rgba(24, 24, 27, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.pinHole {
+  width: 3px;
+  height: 3px;
+  background-color: var(--pin-red-hole);
+  border-radius: var(--radius-full);
+}
+
+.kanbanCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.colorSlate {
+  background-color: var(--color-slate-bg);
+}
+
+.colorSage {
+  background-color: var(--color-sage-bg);
+}
+
+.colorTeal {
+  background-color: var(--color-teal-bg);
+}
+
+.colorSand {
+  background-color: var(--color-sand-bg);
+}
+
+.colorLavender {
+  background-color: var(--color-lavender-bg);
+}
+
+.colorRose {
+  background-color: var(--color-rose-bg);
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+.cardBodyBtn {
+  text-align: left;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardTitle {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.cardPreview {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.cardFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.cardFooterTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.updatedLabel {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.moveMenuWrap {
+  position: relative;
+}
+
+.moveToTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-subtle);
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.moveToTrigger:hover {
+  background: var(--bg-muted);
+  color: var(--text-main);
+}
+
+.moveDropdown {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: 0;
+  min-width: 136px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  padding: 4px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.moveDropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.moveDropdownItem:hover {
+  background: var(--bg-subtle);
+}
+
+@media (pointer: coarse), (max-width: 768px) {
+  .moveToTrigger {
+    min-height: 44px;
+    padding: 0 10px;
+  }
+}
+
+.unstagedHintBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+.columnEmptyHint {
+  padding: 20px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-subtle);
+  font-size: 0.8rem;
+  color: var(--text-subtle);
+  text-align: center;
+}
+
+.emptyBoard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 40px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.emptyIcon {
+  color: var(--accent-blue-text);
+}
+
+.emptyTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.emptyText {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-width: 440px;
+}
+
+.emptyActions {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.promoteRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.promoteSelect {
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.84rem;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-accent-dark);
+  color: var(--text-inverse);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+}
+
+.secondaryBtn {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.secondaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.columnPopover {
+  position: fixed;
+  width: 240px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  padding: 8px;
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.popoverNewBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-main);
+  text-align: left;
+}
+
+.popoverNewBtn:hover {
+  background: var(--bg-subtle);
+}
+
+.popoverDivider {
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+.popoverSearchBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.popoverSearchIcon {
+  position: absolute;
+  left: 8px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.popoverSearchInput {
+  width: 100%;
+  padding: 6px 8px 6px 26px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  font-size: 0.8rem;
+  color: var(--text-main);
+  background: var(--bg-app);
+}
+
+.popoverList {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.popoverNoteItem {
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.popoverNoteItem:hover {
+  background: var(--bg-subtle);
+}
+
+.popoverEmpty {
+  padding: 10px 8px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media (pointer: coarse), (max-width: 768px) {
+  .columnAddBtn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 900px) {
+  .columnsGrid {
+    grid-template-columns: 1fr;
+  }
+}

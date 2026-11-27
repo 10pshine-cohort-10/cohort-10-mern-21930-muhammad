@@ -1,0 +1,103 @@
+.topNav {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-topbar, 10);
+  background-color: var(--bg-app);
+}
+
+.topNavInner {
+  max-width: 1160px;
+  margin: 0 auto;
+  height: 64px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.brandMark {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background-color: var(--border-dark);
+  color: var(--text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.secondaryLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease;
+}
+
+.secondaryLink:hover {
+  background-color: var(--bg-subtle);
+  transform: translateY(-1px);
+}
+
+.secondaryLink:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.primaryCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  background-color: var(--border-dark);
+  border: 1.5px solid var(--border-dark);
+  color: var(--text-inverse);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease;
+}
+
+.primaryCta:hover {
+  background-color: var(--accent-ink-hover);
+  color: var(--text-inverse);
+  transform: translateY(-1px);
+}
+
+.primaryCta:active {
+  transform: translateY(0) scale(0.98);
+}
+
+@media (pointer: coarse), (max-width: 768px) {
+  .secondaryLink,
+  .primaryCta {
+    min-height: 44px;
+  }
+}

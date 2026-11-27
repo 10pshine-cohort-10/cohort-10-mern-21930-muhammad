@@ -1,0 +1,66 @@
+.toggleContainer {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.slidingPill {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: calc((100% - 4px) / 3);
+  height: calc(100% - 4px);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  border-radius: 6px;
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.slidingPillStream {
+  transform: translateX(100%);
+}
+
+.slidingPillBoard {
+  transform: translateX(200%);
+}
+
+.toggleBtn {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 140ms ease;
+}
+
+.toggleBtn:not(.toggleBtnActive):hover {
+  color: var(--text-dark);
+}
+
+.toggleBtnActive,
+.toggleBtnActive:hover {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+@media (pointer: coarse), (max-width: 768px) {
+  .toggleBtn {
+    min-height: 44px;
+  }
+}

@@ -1,0 +1,7 @@
+spec: test/**/*.test.ts
+timeout: 180000
+exit: true
+require:
+  - tsx/cjs
+  - test/setup.ts
+recursive: true

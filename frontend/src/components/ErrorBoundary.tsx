@@ -1,0 +1,92 @@
+import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { AlertTriangle, RotateCcw, Home } from 'lucide-react';
+import styles from './ErrorBoundary.module.css';
+
+export interface ErrorBoundaryProps {
+  children: ReactNode;
+  onReload?: () => void;
+  onNavigateHome?: () => void;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  errorMessage: string;
+}
+
+export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, errorMessage: '' };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return {
+      hasError: true,
+      errorMessage: error.message || 'An unexpected error occurred',
+    };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('ErrorBoundary caught rendering error:', error, errorInfo);
+  }
+
+  handleReload = () => {
+    this.setState({ hasError: false, errorMessage: '' });
+    if (this.props.onReload) {
+      this.props.onReload();
+    } else {
+      window.location.reload();
+    }
+  };
+
+  handleNavigateHome = () => {
+    this.setState({ hasError: false, errorMessage: '' });
+    if (this.props.onNavigateHome) {
+      this.props.onNavigateHome();
+    } else {
+      let hasSession = false;
+      try {
+        hasSession = Boolean(localStorage.getItem('notes_auth_token'));
+      } catch {
+        hasSession = false;
+      }
+      window.location.assign(hasSession ? '/dashboard' : '/');
+    }
+  };
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className={styles.container} role="alert">
+          <div className={styles.card}>
+            <AlertTriangle size={36} color="var(--danger-text)" />
+            <h2 className={styles.title}>Something went wrong in Pinnate</h2>
+            <p className={styles.subtitle}>
+              An unexpected render issue occurred. Your saved notes are completely safe.
+            </p>
+            <div className={styles.actions}>
+              <button
+                type="button"
+                className={styles.reloadBtn}
+                onClick={this.handleReload}
+              >
+                <RotateCcw size={15} />
+                <span>Reload Pinnate</span>
+              </button>
+              <button
+                type="button"
+                className={styles.homeBtn}
+                onClick={this.handleNavigateHome}
+              >
+                <Home size={15} />
+                <span>Return to Notes</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}

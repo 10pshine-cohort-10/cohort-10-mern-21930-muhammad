@@ -1,0 +1,741 @@
+.page {
+  min-height: 100svh;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  overflow-x: clip;
+}
+
+/* ── Shared button styles ── */
+.secondaryLink {
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease;
+}
+
+.secondaryLink:hover {
+  background-color: var(--bg-subtle);
+  transform: translateY(-1px);
+}
+
+.secondaryLink:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.primaryCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  background-color: var(--border-dark);
+  border: 1.5px solid var(--border-dark);
+  color: var(--text-inverse);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: transform 140ms var(--ease-tactile), background-color 140ms ease;
+}
+
+.primaryCta:hover {
+  background-color: var(--accent-ink-hover);
+  color: var(--text-inverse);
+  transform: translateY(-1px);
+}
+
+.primaryCta:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.ctaGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mainCanvas {
+  position: relative;
+}
+
+.heroTrack {
+  position: relative;
+  min-height: calc(100svh - 64px);
+  z-index: 2;
+}
+
+.heroSticky {
+  min-height: calc(100svh - 64px);
+  display: flex;
+  align-items: center;
+  padding: 40px 24px 64px;
+}
+
+.heroInner {
+  max-width: 1160px;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  color: var(--text-main);
+  margin: 0 0 20px;
+}
+
+.heroSubtitle {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  max-width: 50ch;
+  text-wrap: pretty;
+  margin: 0 0 28px;
+}
+
+.deskStage {
+  position: relative;
+  padding: 20px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.mintCard {
+  position: relative;
+  background-color: var(--color-sage-bg);
+  border: 2px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mintHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pinDot {
+  position: absolute;
+  top: -10px;
+  left: 20px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  background-color: var(--pin-red);
+  border: 2px solid var(--border-dark);
+}
+
+.mintTitle {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.mintBody {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.tagRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.tagChip {
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background-color: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--border-dark);
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.dockPreview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--text-subtle);
+}
+
+.kbdBadge {
+  margin-left: auto;
+  font-family: var(--font-family-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  color: var(--text-main);
+}
+
+.leadInLine {
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-wrap: pretty;
+}
+
+.scrollThreadLayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  display: block;
+}
+
+.tabsSection {
+  position: relative;
+  z-index: 2;
+  padding: 72px 24px 96px;
+}
+
+.tabsInner {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.tabsBar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  align-self: center;
+}
+
+.tabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 120ms ease, background-color 120ms ease;
+  min-height: 36px;
+}
+
+.tabBtn:hover:not(.tabBtnActive) {
+  color: var(--text-main);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.tabBtnActive {
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.tabPanel {
+  min-height: 420px;
+}
+
+.tabPanelInner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tabCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.tabVisual {
+  width: 100%;
+}
+
+/* ── Shared section text ── */
+.sectionHeading {
+  font-size: clamp(1.9rem, 3.8vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  text-wrap: balance;
+  max-width: 24ch;
+  margin: 0;
+}
+
+.sectionLead {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  max-width: 52ch;
+  text-wrap: pretty;
+  margin: 0 0 12px;
+}
+
+/* ── Board preview ── */
+.boardPreviewGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  text-align: left;
+  margin-top: 8px;
+}
+
+.boardPreviewCol {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.boardPreviewHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.boardDotTodo,
+.boardDotProgress,
+.boardDotDone {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.boardDotTodo { background: var(--text-subtle); }
+.boardDotProgress { background: var(--accent-blue); }
+.boardDotDone { background: var(--accent-orange); }
+
+.boardPreviewCard {
+  position: relative;
+  border: 1.5px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--card-shadow);
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.boardCardSand { background-color: var(--color-sand-bg); transform: rotate(-0.8deg); }
+.boardCardSage { background-color: var(--color-sage-bg); transform: rotate(0.9deg); }
+.boardCardTeal { background-color: var(--color-teal-bg); transform: rotate(-0.7deg); }
+.boardCardLavender { background-color: var(--color-lavender-bg); transform: rotate(1.2deg); }
+.boardCardRose { background-color: var(--color-rose-bg); transform: rotate(-0.5deg); }
+
+.miniPushpin {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-full);
+  background: var(--pin-red);
+  border: 1.5px solid var(--border-dark);
+}
+
+/* ── Progress preview ── */
+.progressPreviewGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  text-align: left;
+  margin-top: 8px;
+}
+
+.progressPreviewCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.miniBarsRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 76px;
+}
+
+.miniBar {
+  flex: 1;
+  border-radius: 4px;
+  background: var(--accent-blue);
+}
+
+.miniBarMuted { background: var(--bg-muted); }
+
+.miniRingRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.activityRangeTag {
+  margin-left: auto;
+  color: var(--accent-blue-text);
+  font-size: 12px;
+}
+
+.plansSummaryTag {
+  margin-left: auto;
+  color: var(--accent-orange-text);
+  font-size: 12px;
+}
+
+.mutedMetaNote {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.ringLegendCol {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.doneLegendItem {
+  color: var(--accent-orange-text);
+  font-weight: 700;
+}
+
+.visualStageCompact {
+  min-height: auto;
+  max-height: none;
+}
+
+.draftTitleText {
+  font-weight: 600;
+}
+
+.cmdIcon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ── Scratchpad preview ── */
+.visualStage {
+  width: 100%;
+  min-height: 240px;
+  max-height: 54svh;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  text-align: left;
+}
+
+.miniInputRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+}
+
+.miniInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+.miniDraftRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-subtle);
+}
+
+.miniTackBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background-color: var(--border-dark);
+  color: var(--text-inverse);
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pinnedSnapCard {
+  position: relative;
+  background-color: var(--color-sage-bg);
+  border: 2px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* ── Commands preview ── */
+.commandsPreview {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.commandsSearchRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-app);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.commandsPlaceholder {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.commandsResultList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.commandsResultRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+.commandsResultRow:first-child {
+  background: var(--bg-subtle);
+}
+
+.commandsResultIcon {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+}
+
+.commandsResultLabel {
+  flex: 1;
+}
+
+/* ── Pinned-note CTA ── */
+.pinnedCtaSection {
+  padding: 72px 24px 96px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.pinnedCtaCard {
+  position: relative;
+  background-color: var(--color-sand-bg);
+  border: 2px solid var(--card-border);
+  box-shadow: var(--card-shadow-hover);
+  border-radius: var(--radius-md);
+  padding: 48px 48px 40px;
+  max-width: 560px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.pinnedCtaPin {
+  position: absolute;
+  top: -14px;
+  left: 40px;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background-color: var(--pin-red);
+  border: 2px solid var(--border-dark);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.pinnedCtaTape {
+  position: absolute;
+  top: -8px;
+  right: 60px;
+  width: 48px;
+  height: 16px;
+  background-color: rgba(24, 24, 27, 0.06);
+  border: 1px solid rgba(24, 24, 27, 0.14);
+  border-radius: 2px;
+  transform: rotate(2deg);
+}
+
+.pinnedCtaHeading {
+  font-size: clamp(1.4rem, 2.8vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.pinnedCtaBody {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  text-wrap: pretty;
+  max-width: 46ch;
+  margin: 0;
+}
+
+.pinnedCtaMeta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-subtle);
+  margin-top: 4px;
+}
+
+.pronounceInline {
+  font-family: var(--font-family-mono);
+  font-size: 12px;
+  color: var(--text-subtle);
+}
+
+/* ── Footer ── */
+.footer {
+  position: relative;
+  z-index: 2;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 24px 112px 36px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 13px;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+@media (max-width: 1023px) {
+  .scrollThreadLayer {
+    z-index: 0;
+    opacity: 0.45;
+  }
+}
+
+@media (max-width: 768px) {
+  .boardPreviewGrid { grid-template-columns: 1fr; }
+  .progressPreviewGrid { grid-template-columns: 1fr; }
+
+  .heroTrack { min-height: auto; }
+  .heroSticky {
+    position: static;
+    min-height: auto;
+    padding: 36px 20px;
+  }
+  .heroInner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .tabsBar {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .tabsSection { padding: 48px 20px 64px; }
+
+  .visualStage { max-height: none; padding: 20px; }
+
+  .pinnedCtaCard {
+    padding: 40px 28px 32px;
+  }
+}

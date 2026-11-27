@@ -1,0 +1,59 @@
+import { render, screen, fireEvent } from '@testing-library/react';
+import ErrorBoundary from '../components/ErrorBoundary';
+
+function ProblematicChild({ shouldThrow }: { shouldThrow: boolean }) {
+  if (shouldThrow) {
+    throw new Error('Test explosion');
+  }
+  return <div>Desk is clean</div>;
+}
+
+describe('ErrorBoundary', () => {
+  const originalError = console.error;
+
+  beforeEach(() => {
+    console.error = jest.fn();
+  });
+
+  afterEach(() => {
+    console.error = originalError;
+  });
+
+  it('renders children when no error occurs', () => {
+    render(
+      <ErrorBoundary>
+        <ProblematicChild shouldThrow={false} />
+      </ErrorBoundary>
+    );
+
+    expect(screen.getByText('Desk is clean')).toBeInTheDocument();
+  });
+
+  it('renders tactile fallback card when a child throws', () => {
+    render(
+      <ErrorBoundary>
+        <ProblematicChild shouldThrow={true} />
+      </ErrorBoundary>
+    );
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText('Something went wrong in Pinnate')).toBeInTheDocument();
+    expect(screen.queryByText('Test explosion')).not.toBeInTheDocument();
+    expect(screen.getByText('Reload Pinnate')).toBeInTheDocument();
+  });
+
+  it('triggers reload callback when reload button is clicked', () => {
+    const handleReload = jest.fn();
+
+    render(
+      <ErrorBoundary onReload={handleReload}>
+        <ProblematicChild shouldThrow={true} />
+      </ErrorBoundary>
+    );
+
+    const reloadButton = screen.getByRole('button', { name: /reload pinnate/i });
+    fireEvent.click(reloadButton);
+
+    expect(handleReload).toHaveBeenCalledTimes(1);
+  });
+});
