@@ -10,10 +10,14 @@ describe('MobileNavDock Component', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByTitle('Dashboard')).toBeInTheDocument();
+    expect(screen.getByTitle('Notes')).toBeInTheDocument();
     expect(screen.getByTitle('Scratchpad')).toBeInTheDocument();
     expect(screen.getByTitle('Progress')).toBeInTheDocument();
     expect(screen.getByTitle('Archive')).toBeInTheDocument();
+    expect(screen.getByText('Notes')).toBeInTheDocument();
+    expect(screen.getByText('Scratch')).toBeInTheDocument();
+    expect(screen.getByText('Progress')).toBeInTheDocument();
+    expect(screen.getByText('Archive')).toBeInTheDocument();
   });
 
   it('triggers onQuickAddClick when center plus button is clicked', () => {

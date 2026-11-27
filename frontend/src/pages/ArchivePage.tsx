@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Archive, Trash2 } from 'lucide-react';
 import Layout from '../components/Layout';
 import ArchiveNoteCard from '../components/ArchiveNoteCard';
@@ -6,23 +7,48 @@ import type { Note } from '../types';
 import styles from './ArchivePage.module.css';
 
 export default function ArchivePage() {
-  const { notes, isLoading, updateNote, deleteNote } = useNotes();
+  const { notes, isLoading, errorMessage, fetchNotes, updateNote, deleteNote } = useNotes();
+  const [isConfirmingEmpty, setIsConfirmingEmpty] = useState(false);
+  const [isEmptying, setIsEmptying] = useState(false);
+  const [actionError, setActionError] = useState('');
 
   const archivedNotes = notes.filter(
     (singleNote: Note) => Array.isArray(singleNote.tags) && singleNote.tags.includes('archive')
   );
 
   const handleRestoreNote = async (noteToRestore: Note) => {
-    const updatedTags = (noteToRestore.tags || []).filter((tag) => tag !== 'archive');
-    await updateNote(noteToRestore.id, { tags: updatedTags });
+    setActionError('');
+    try {
+      const updatedTags = (noteToRestore.tags || []).filter((tag) => tag !== 'archive');
+      await updateNote(noteToRestore.id, { tags: updatedTags });
+    } catch (err) {
+      console.error('Failed to restore archived note:', err);
+      setActionError(`Could not restore "${noteToRestore.title || 'Untitled'}". Please try again.`);
+    }
   };
 
   const handleDeletePermanent = async (noteId: string) => {
-    await deleteNote(noteId);
+    setActionError('');
+    try {
+      await deleteNote(noteId);
+    } catch (err) {
+      console.error('Failed to permanently delete archived note:', err);
+      setActionError('Could not permanently delete this note. Please try again.');
+    }
   };
 
   const handleEmptyArchive = async () => {
-    await Promise.all(archivedNotes.map((singleNote) => deleteNote(singleNote.id)));
+    setIsEmptying(true);
+    setActionError('');
+    try {
+      await Promise.all(archivedNotes.map((singleNote) => deleteNote(singleNote.id)));
+      setIsConfirmingEmpty(false);
+    } catch (err) {
+      console.error('Failed to empty archive:', err);
+      setActionError('Could not delete all archived notes. Please try again.');
+    } finally {
+      setIsEmptying(false);
+    }
   };
 
   return (
@@ -30,17 +56,17 @@ export default function ArchivePage() {
       <div className={styles.container}>
         <div className={styles.headerRow}>
           <div className={styles.titleGroup}>
-            <h2 className={styles.title}>Archive & Soft Trash</h2>
+            <h1 className={styles.title}>Archive</h1>
             <p className={styles.subtitle}>
-              Resting place for cleared thoughts. Restore items to your active desk or delete them forever.
+              Restore notes to your workspace or delete them permanently.
             </p>
           </div>
 
-          {archivedNotes.length > 0 && (
+          {archivedNotes.length > 0 && !isConfirmingEmpty && (
             <button
               type="button"
               className={styles.emptyAllBtn}
-              onClick={handleEmptyArchive}
+              onClick={() => setIsConfirmingEmpty(true)}
             >
               <Trash2 size={15} />
               <span>Empty Archive ({archivedNotes.length})</span>
@@ -48,14 +74,55 @@ export default function ArchivePage() {
           )}
         </div>
 
+        {isConfirmingEmpty && archivedNotes.length > 0 && (
+          <div className={styles.confirmBar} role="region" aria-label="Confirm empty archive">
+            <span>
+              Delete all {archivedNotes.length} archived {archivedNotes.length === 1 ? 'note' : 'notes'} permanently?
+            </span>
+            <div className={styles.confirmBarActions}>
+              <button
+                type="button"
+                className={styles.confirmDangerBtn}
+                onClick={handleEmptyArchive}
+                disabled={isEmptying}
+              >
+                {isEmptying ? 'Deleting...' : 'Delete all forever'}
+              </button>
+              <button
+                type="button"
+                className={styles.confirmCancelBtn}
+                onClick={() => setIsConfirmingEmpty(false)}
+                disabled={isEmptying}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {actionError && (
+          <div className={styles.confirmBar} role="alert">
+            <span>{actionError}</span>
+          </div>
+        )}
+
+        {errorMessage && (
+          <div className={styles.confirmBar} role="alert">
+            <span>{errorMessage}</span>
+            <button type="button" className={styles.confirmCancelBtn} onClick={() => fetchNotes()}>
+              Retry
+            </button>
+          </div>
+        )}
+
         {isLoading ? (
-          <p className={styles.emptySubtitle}>Loading archive items...</p>
+          <p className={styles.emptySubtitle}>Loading archived notes...</p>
         ) : archivedNotes.length === 0 ? (
           <div className={styles.emptyState}>
             <Archive size={40} color="var(--text-subtle)" />
-            <h4 className={styles.emptyTitle}>Archive is clear</h4>
+            <h2 className={styles.emptyTitle}>Archive is clear</h2>
             <p className={styles.emptySubtitle}>
-              Notes marked as archived or moved to trash will appear here.
+              Notes you archive will appear here until you restore or delete them.
             </p>
           </div>
         ) : (

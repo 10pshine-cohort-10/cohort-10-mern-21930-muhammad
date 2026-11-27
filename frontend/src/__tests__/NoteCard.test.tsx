@@ -77,4 +77,35 @@ describe('NoteCard Component', () => {
     fireEvent.click(screen.getByText('Delete'));
     expect(deletedId).toBe('note-123');
   });
+
+  it('renders semantic stage badge without decorative color icon', () => {
+    const { container } = render(
+      <NoteCard
+        note={{ ...sampleNote, status: 'in_progress' }}
+        onSelect={() => { }}
+        onTogglePin={() => { }}
+        onDelete={() => { }}
+      />
+    );
+
+    expect(screen.getByText('In Progress')).toBeInTheDocument();
+    expect(container.querySelector('.iconBadge')).not.toBeInTheDocument();
+  });
+
+  it('triggers onArchive when Archive note is chosen from the card menu', () => {
+    const onArchive = jest.fn();
+    render(
+      <NoteCard
+        note={sampleNote}
+        onSelect={() => { }}
+        onTogglePin={() => { }}
+        onDelete={() => { }}
+        onArchive={onArchive}
+      />
+    );
+
+    fireEvent.click(screen.getByLabelText(/More actions/i));
+    fireEvent.click(screen.getByRole('menuitem', { name: /Archive note/i }));
+    expect(onArchive).toHaveBeenCalledWith(sampleNote);
+  });
 });

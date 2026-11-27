@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { RotateCcw, Trash2 } from 'lucide-react';
 import type { Note } from '../types';
 import { extractPlainText, formatRelativeTime } from '../utils/formatters';
@@ -14,6 +15,7 @@ export default function ArchiveNoteCard({
   onRestore,
   onDeletePermanent,
 }: ArchiveNoteCardProps) {
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const plainPreview = extractPlainText(note.content || '');
 
   return (
@@ -23,7 +25,7 @@ export default function ArchiveNoteCard({
       </div>
 
       <p className={styles.preview}>
-        {plainPreview || <span style={{ fontStyle: 'italic', opacity: 0.6 }}>Empty note</span>}
+        {plainPreview || <span className={styles.emptyPreviewMuted}>Empty note</span>}
       </p>
 
       <div className={styles.footer}>
@@ -34,7 +36,7 @@ export default function ArchiveNoteCard({
             type="button"
             className={styles.restoreBtn}
             onClick={() => onRestore(note)}
-            title="Restore note to active desk"
+            title="Restore note"
           >
             <RotateCcw size={13} />
             <span>Restore</span>
@@ -43,14 +45,40 @@ export default function ArchiveNoteCard({
           <button
             type="button"
             className={styles.deleteBtn}
-            onClick={() => onDeletePermanent(note.id)}
+            onClick={() => setIsConfirmingDelete((prev) => !prev)}
             title="Delete permanently"
             aria-label="Delete permanently"
+            aria-expanded={isConfirmingDelete}
           >
             <Trash2 size={15} />
           </button>
         </div>
       </div>
+
+      {isConfirmingDelete && (
+        <div className={styles.confirmPromptRow} role="alert">
+          <span>Delete forever?</span>
+          <div className={styles.actions}>
+            <button
+              type="button"
+              className={styles.restoreBtn}
+              onClick={() => setIsConfirmingDelete(false)}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className={styles.confirmDangerBtn}
+              onClick={() => {
+                setIsConfirmingDelete(false);
+                onDeletePermanent(note.id);
+              }}
+            >
+              Delete forever
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

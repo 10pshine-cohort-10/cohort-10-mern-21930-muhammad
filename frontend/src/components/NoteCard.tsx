@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, type KeyboardEvent, type MouseEvent } from 'react';
-import { Pin, Trash2, MoreHorizontal, Check, FileJson, FileText, Leaf, Droplet, Star, Palette, Lightbulb, type LucideIcon } from 'lucide-react';
+import { Pin, Trash2, MoreHorizontal, Check, FileJson, FileText, Archive, ArchiveRestore } from 'lucide-react';
 import NoteCardDeleteConfirm from './NoteCardDeleteConfirm';
 import type { Note } from '../types';
 import type { ExportFormat } from '../utils/noteExport';
@@ -15,15 +15,6 @@ const COLOR_CLASS_MAP: Record<string, string> = {
   rose: styles.colorRose,
 };
 
-const NOTE_ICON_MAP: Record<string, LucideIcon> = {
-  slate: FileText,
-  sage: Leaf,
-  teal: Droplet,
-  sand: Star,
-  lavender: Palette,
-  rose: Lightbulb,
-};
-
 export interface NoteCardProps {
   note: Note;
   isFocused?: boolean;
@@ -31,6 +22,7 @@ export interface NoteCardProps {
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
   onExportNote?: (note: Note, format: ExportFormat) => void;
+  onArchive?: (note: Note) => void;
   onSelect: (note: Note) => void;
   onTogglePin: (id: string, isPinned: boolean) => void;
   onDelete: (id: string) => void;
@@ -43,6 +35,7 @@ export default function NoteCard({
   isSelected = false,
   onToggleSelect,
   onExportNote,
+  onArchive,
   onSelect,
   onTogglePin,
   onDelete,
@@ -63,8 +56,8 @@ export default function NoteCard({
   }, [isMenuOpen]);
 
   const cardColorClass = (note.color && COLOR_CLASS_MAP[note.color]) || styles.colorSlate;
-  const BadgeIcon = (note.color && NOTE_ICON_MAP[note.color]) || FileText;
   const plainPreview = extractPlainText(note.content || '');
+  const isArchived = Array.isArray(note.tags) && note.tags.includes('archive');
 
   const handleCardClick = (event?: MouseEvent) => {
     if (isConfirmingDelete) return;
@@ -105,13 +98,9 @@ export default function NoteCard({
   };
 
   return (
-    <div
+    <article
       className={`${styles.card} ${cardColorClass} ${note.isPinned ? styles.cardPinned : ''} ${isFocused ? styles.cardFocused : ''} ${isMenuOpen ? styles.cardMenuOpen : ''} ${isSelected ? styles.cardSelected : ''}`}
-      onClick={handleCardClick}
-      role="button"
-      tabIndex={0}
       aria-selected={isSelectionMode ? isSelected : undefined}
-      onKeyDown={handleKeyDown}
     >
       {note.isPinned && (
         <div className={styles.hangingPinIndicator} title="Pinned to board">
@@ -120,23 +109,39 @@ export default function NoteCard({
       )}
 
       <div className={styles.cardHeader}>
-        <div className={styles.headerLeft}>
-          {isSelectionMode ? (
-            <span
-              className={`${styles.selectBadge} ${isSelected ? styles.selectBadgeChecked : ''}`}
-              aria-hidden="true"
-            >
-              {isSelected && <Check size={12} />}
-            </span>
-          ) : (
-            <span className={styles.iconBadge} aria-hidden="true">
-              <BadgeIcon size={15} />
-            </span>
-          )}
-          <h3 className={styles.title}>{note.title || 'Untitled'}</h3>
-        </div>
+        <button
+          type="button"
+          className={styles.cardBodyBtn}
+          onClick={handleCardClick}
+          onKeyDown={handleKeyDown}
+        >
+          <div className={styles.headerLeft}>
+            {isSelectionMode && (
+              <span
+                className={`${styles.selectBadge} ${isSelected ? styles.selectBadgeChecked : ''}`}
+                aria-hidden="true"
+              >
+                {isSelected && <Check size={12} />}
+              </span>
+            )}
+            <h3 className={styles.title}>{note.title || 'Untitled'}</h3>
+          </div>
+        </button>
 
         <div className={styles.actions} ref={menuRef}>
+          {note.status && (
+            <span
+              className={`${styles.stageBadge} ${
+                note.status === 'done'
+                  ? styles.stageDone
+                  : note.status === 'in_progress'
+                    ? styles.stageInProgress
+                    : styles.stageTodo
+              }`}
+            >
+              {note.status === 'done' ? 'Done' : note.status === 'in_progress' ? 'In Progress' : 'To Do'}
+            </span>
+          )}
           <button
             type="button"
             className={`${styles.iconButton} ${note.isPinned ? styles.pinActive : ''}`}
@@ -197,6 +202,17 @@ export default function NoteCard({
                   <div className={styles.cardMenuDivider} />
                 </>
               )}
+              {onArchive && (
+                <button
+                  type="button"
+                  role="menuitem"
+                  className={styles.cardMenuItem}
+                  onClick={() => { setIsMenuOpen(false); onArchive(note); }}
+                >
+                  {isArchived ? <ArchiveRestore size={13} /> : <Archive size={13} />}
+                  <span>{isArchived ? 'Restore note' : 'Archive note'}</span>
+                </button>
+              )}
               <button
                 type="button"
                 role="menuitem"
@@ -211,26 +227,28 @@ export default function NoteCard({
         </div>
       </div>
 
-      <p className={styles.preview}>
-        {plainPreview || <span style={{ fontStyle: 'italic', opacity: 0.6 }}>Empty note</span>}
-      </p>
+      <button type="button" className={styles.cardBodyBtn} onClick={handleCardClick}>
+        <p className={styles.preview}>
+          {plainPreview || <span className={styles.emptyPreviewMuted}>Empty note</span>}
+        </p>
 
-      <div className={styles.cardFooter}>
-        <div className={styles.tagsList}>
-          {Array.isArray(note.tags) &&
-            note.tags.map((tag) => (
-              <span key={tag} className={styles.tagPill}>
-                #{tag}
-              </span>
-            ))}
+        <div className={styles.cardFooter}>
+          <div className={styles.tagsList}>
+            {Array.isArray(note.tags) &&
+              note.tags.map((tag) => (
+                <span key={tag} className={styles.tagPill}>
+                  #{tag}
+                </span>
+              ))}
+          </div>
+
+          <span className={styles.timestamp}>{formatRelativeTime(note.createdAt || '')}</span>
         </div>
-
-        <span className={styles.timestamp}>{formatRelativeTime(note.createdAt || '')}</span>
-      </div>
+      </button>
 
       {isConfirmingDelete && (
         <NoteCardDeleteConfirm onConfirm={handleConfirmDelete} onCancel={handleCancelDelete} />
       )}
-    </div>
+    </article>
   );
 }

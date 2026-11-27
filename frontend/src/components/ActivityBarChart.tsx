@@ -27,6 +27,7 @@ export default function ActivityBarChart({ series, days, activeDays }: ActivityB
         <svg
           viewBox={`0 0 ${series.length * 24} ${chartHeight + 24}`}
           className={styles.barSvg}
+          style={{ minWidth: `${Math.max(240, series.length * 16)}px` }}
           role="img"
           aria-label={`Daily note updates over the last ${days} days`}
         >

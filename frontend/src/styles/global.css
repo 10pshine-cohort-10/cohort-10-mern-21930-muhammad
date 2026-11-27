@@ -6,6 +6,9 @@
 
   --color-surface: #ffffff;
   --color-accent-dark: #18181b;
+  --accent-ink-hover: #27272a;
+  --text-inverse: #ffffff;
+  --text-on-ink-muted: #a1a1aa;
   --shadow-dark: rgba(0, 0, 0, 0.08);
   --text-dark: #18181b;
 
@@ -25,11 +28,15 @@
 
   --text-main: #18181b;
   --text-muted: #52525b;
-  --text-subtle: #71717a;
+  --text-subtle: #5c5c66;
 
   --card-border: #18181b;
   --card-shadow: 2px 2px 0px rgba(24, 24, 27, 0.85);
   --card-shadow-hover: 3px 4px 0px rgba(24, 24, 27, 0.9);
+  --shadow-pin-dot: 1px 2px 0px #18181b;
+  --shadow-pin-btn: 1px 1px 0px var(--border-dark);
+  --shadow-control-hard: 2px 2px 0px var(--border-dark);
+  --shadow-modal-hard: 4px 5px 0px var(--border-dark);
 
   --accent-blue: #0ea5e9;
   --accent-blue-text: #0369a1;
@@ -37,9 +44,21 @@
   --accent-blue-surface: #f0f9ff;
 
   --accent-orange: #f97316;
-  --accent-orange-text: #c2410c;
+  --accent-orange-text: #9a3412;
   --accent-orange-border: #fed7aa;
   --accent-orange-surface: #fff7ed;
+
+  --pin-red: #ef4444;
+  --pin-red-hole: #7f1d1d;
+
+  --surface-overlay: rgba(24, 24, 27, 0.35);
+  --surface-overlay-strong: rgba(24, 24, 27, 0.4);
+  --surface-glass-pill: rgba(255, 255, 255, 0.94);
+
+  --stamp-saving-bg: #fef08a;
+  --stamp-saving-text: #854d0e;
+  --stamp-saved-bg: #dcfce7;
+  --stamp-saved-text: #166534;
 
   --color-slate-bg: #ffffff;
   --color-sage-bg: #dcfce7;
@@ -52,9 +71,11 @@
   --danger-border: #18181b;
   --danger-text: #b91c1c;
 
+  --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 18px;
+  --radius-xl: 22px;
   --radius-full: 9999px;
 
   --font-family-base: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -111,10 +132,18 @@ select {
   transition: border-color 120ms ease;
 }
 
-input:focus,
-textarea:focus,
-select:focus {
+input:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+select:focus:not(:focus-visible) {
   outline: none;
+  border-color: var(--border-focus);
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--border-dark);
+  outline-offset: 2px;
   border-color: var(--border-focus);
 }
 

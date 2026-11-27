@@ -1,12 +1,12 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(24, 24, 27, 0.4);
+  background-color: var(--surface-overlay-strong);
   display: flex;
   align-items: flex-start;
   justify-content: center;
   padding-top: 15vh;
-  z-index: 1000;
+  z-index: var(--z-modal, 100);
   animation: fadeIn 120ms ease-out;
 }
 
@@ -16,7 +16,7 @@
   background-color: var(--bg-surface);
   border: 2px solid var(--border-dark);
   border-radius: var(--radius-md);
-  box-shadow: 4px 5px 0px var(--border-dark);
+  box-shadow: var(--shadow-modal-hard);
   overflow: hidden;
   animation: fadeInScale 180ms var(--ease-tactile);
 }
@@ -85,7 +85,7 @@
 
 .commandItemActive {
   background-color: var(--border-dark);
-  color: #ffffff;
+  color: var(--text-inverse);
 }
 
 .itemLabelGroup {

@@ -1,7 +1,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(24, 24, 27, 0.35);
+  background-color: var(--surface-overlay);
   backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
@@ -60,6 +60,13 @@
 .closeBtn:hover {
   background-color: var(--bg-subtle);
   color: var(--text-main);
+}
+
+@media (pointer: coarse), (max-width: 768px) {
+  .closeBtn {
+    min-width: 44px;
+    min-height: 44px;
+  }
 }
 
 .form {
@@ -144,7 +151,7 @@
   border: 1px solid var(--border-dark);
   border-radius: var(--radius-sm);
   background-color: var(--border-dark);
-  color: #ffffff;
+  color: var(--text-inverse);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -152,7 +159,7 @@
 }
 
 .submitBtn:hover {
-  background-color: #27272a;
+  background-color: var(--accent-ink-hover);
   transform: translateY(-1px);
 }
 

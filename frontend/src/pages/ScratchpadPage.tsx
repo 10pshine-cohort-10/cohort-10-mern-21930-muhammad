@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Pin, Trash2, Download } from 'lucide-react';
+import { Plus, ArrowUpRight, Columns3, Trash2, Download } from 'lucide-react';
 import Layout from '../components/Layout';
 import NoteCard from '../components/NoteCard';
 import NoteEditor from '../components/NoteEditor';
@@ -20,14 +20,25 @@ import {
   clearGuestNotes,
   saveGuestNotesList,
 } from '../utils/guestStorage';
-import type { Note, NoteInput } from '../types';
+import type { Note, NoteInput, NoteStatus } from '../types';
 import dashboardStyles from './DashboardPage.module.css';
 import styles from './ScratchpadPage.module.css';
+
+function toPromotedPayload(draft: Note, status?: NoteStatus): NoteInput {
+  return {
+    title: draft.title,
+    content: draft.content,
+    color: draft.color,
+    tags: Array.isArray(draft.tags) && draft.tags.length ? draft.tags : ['scratch'],
+    isPinned: draft.isPinned,
+    ...(status ? { status } : {}),
+  };
+}
 
 export default function ScratchpadPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [filterMode, setFilterMode] = useState<'all' | 'pinned'>('all');
-  const [tackingId, setTackingId] = useState<string | null>(null);
+  const [promotingId, setPromotingId] = useState<string | null>(null);
   const [statusNotice, setStatusNotice] = useState<{ text: string; isError?: boolean } | null>(null);
   const [clearedBackup, setClearedBackup] = useState<Note[] | null>(null);
   const [activeNoteForEdit, setActiveNoteForEdit] = useState<Note | NoteInput | null>(null);
@@ -76,49 +87,38 @@ export default function ScratchpadPage() {
     setNotes((prev) => prev.map((n) => (n.id === id ? updated : n)));
   };
 
-  const handleTackToNotes = async (noteToTack: Note) => {
-    if (tackingId) return;
-    setTackingId(noteToTack.id);
+  const handlePromoteToNotes = async (draft: Note, status?: NoteStatus) => {
+    if (promotingId) return;
+    setPromotingId(draft.id);
     try {
-      await createNote({
-        title: noteToTack.title,
-        content: noteToTack.content,
-        color: noteToTack.color,
-        tags: Array.isArray(noteToTack.tags) && noteToTack.tags.length ? noteToTack.tags : ['scratch'],
-        isPinned: noteToTack.isPinned,
-      });
-      handleDelete(noteToTack.id);
-      showNotice(`Tacked "${noteToTack.title || 'Untitled'}" to notes`);
+      await createNote(toPromotedPayload(draft, status));
+      handleDelete(draft.id);
+      const destinationLabel = status === 'todo' ? 'Board (To Do)' : 'notes';
+      showNotice(`Added "${draft.title || 'Untitled'}" to ${destinationLabel}`);
     } catch (err) {
       console.error('Failed to promote scratch note:', err);
-      showNotice('Failed to tack draft to notes. Please try again.', true);
+      showNotice('Failed to add draft to notes. Please try again.', true);
     } finally {
-      setTackingId(null);
+      setPromotingId(null);
     }
   };
 
-  const handleTackAll = async () => {
-    if (tackingId || safeNotes.length === 0) return;
-    setTackingId('__all__');
+  const handlePromoteAll = async () => {
+    if (promotingId || safeNotes.length === 0) return;
+    setPromotingId('__all__');
     try {
-      for (const n of safeNotes) {
-        await createNote({
-          title: n.title,
-          content: n.content,
-          color: n.color,
-          tags: Array.isArray(n.tags) && n.tags.length ? n.tags : ['scratch'],
-          isPinned: n.isPinned,
-        });
-        deleteGuestNote(n.id);
+      for (const draft of safeNotes) {
+        await createNote(toPromotedPayload(draft));
+        deleteGuestNote(draft.id);
       }
       setNotes([]);
-      showNotice(`Tacked ${safeNotes.length} draft(s) to notes`);
+      showNotice(`Added ${safeNotes.length} draft(s) to notes`);
     } catch (err) {
       console.error('Failed to promote all scratch notes:', err);
       setNotes(getGuestNotes());
-      showNotice('Some drafts could not be tacked to notes.', true);
+      showNotice('Some drafts could not be added to notes.', true);
     } finally {
-      setTackingId(null);
+      setPromotingId(null);
     }
   };
 
@@ -163,8 +163,8 @@ export default function ScratchpadPage() {
             </button>
           )}
           {isAuthenticated && safeNotes.length > 0 && (
-            <button type="button" className={styles.bulkBtn} onClick={handleTackAll} disabled={Boolean(tackingId)}>
-              <Pin size={14} /><span>Tack all to notes</span>
+            <button type="button" className={styles.bulkBtn} onClick={handlePromoteAll} disabled={Boolean(promotingId)}>
+              <ArrowUpRight size={14} /><span>Add all to notes</span>
             </button>
           )}
           {safeNotes.length > 0 && (
@@ -219,12 +219,28 @@ export default function ScratchpadPage() {
             <div key={singleNote.id} className={styles.scratchpadItem}>
               <NoteCard note={singleNote} onSelect={handleSelectNote} onTogglePin={handleTogglePin} onDelete={handleDelete} />
               {isAuthenticated && (
-                <button
-                  type="button" className={styles.tackBtn} disabled={tackingId === singleNote.id}
-                  onClick={() => handleTackToNotes(singleNote)} title="Promote this draft to your notes"
-                >
-                  <Pin size={13} /><span>{tackingId === singleNote.id ? 'Tacking...' : 'Tack to notes'}</span>
-                </button>
+                <div className={styles.promoteActionsRow}>
+                  <button
+                    type="button"
+                    className={styles.tackBtn}
+                    disabled={promotingId === singleNote.id}
+                    onClick={() => handlePromoteToNotes(singleNote)}
+                    title="Promote this draft to your notes"
+                  >
+                    <ArrowUpRight size={13} />
+                    <span>{promotingId === singleNote.id ? 'Adding...' : 'Add to notes'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.tackBtn} ${styles.boardPromoteBtn}`}
+                    disabled={promotingId === singleNote.id}
+                    onClick={() => handlePromoteToNotes(singleNote, 'todo')}
+                    title="Move this draft straight to Board (To Do)"
+                  >
+                    <Columns3 size={13} />
+                    <span>Move to Board</span>
+                  </button>
+                </div>
               )}
             </div>
           ))}
@@ -236,6 +252,7 @@ export default function ScratchpadPage() {
         isOpen={isPaletteOpen} onClose={() => setIsPaletteOpen(false)} notes={safeNotes}
         onSelectNote={handleSelectNote} onCreateNote={handleOpenNewNote}
         onTogglePinnedFilter={() => setFilterMode((prev) => (prev === 'pinned' ? 'all' : 'pinned'))}
+        isGuest={!isAuthenticated}
       />
       {clearedBackup && (
         <UndoToast
@@ -247,5 +264,5 @@ export default function ScratchpadPage() {
     </div>
   );
 
-  return isAuthenticated ? <Layout onNewNoteClick={handleOpenNewNote}>{content}</Layout> : content;
+  return isAuthenticated ? <Layout onNewNoteClick={handleOpenNewNote} hasCustomPalette>{content}</Layout> : content;
 }

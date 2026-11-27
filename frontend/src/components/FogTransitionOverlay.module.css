@@ -1,0 +1,49 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  overflow: hidden;
+}
+
+.veil {
+  position: absolute;
+  inset: 0;
+  background-color: var(--bg-app);
+}
+
+.blob {
+  position: absolute;
+  width: 56vw;
+  height: 56vw;
+  border-radius: 9999px;
+  will-change: transform, opacity;
+}
+
+.blueBlob {
+  top: -8vw;
+  left: -10vw;
+  background: radial-gradient(
+    circle,
+    rgba(14, 165, 233, 0.28) 0%,
+    rgba(14, 165, 233, 0.1) 42%,
+    rgba(14, 165, 233, 0) 70%
+  );
+}
+
+.orangeBlob {
+  bottom: -10vw;
+  right: -10vw;
+  background: radial-gradient(
+    circle,
+    rgba(249, 115, 22, 0.25) 0%,
+    rgba(249, 115, 22, 0.08) 42%,
+    rgba(249, 115, 22, 0) 70%
+  );
+}
+
+@media (max-width: 767px) {
+  .blob {
+    width: 74vw;
+    height: 74vw;
+  }
+}

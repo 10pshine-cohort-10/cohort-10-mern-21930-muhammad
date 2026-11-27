@@ -1,6 +1,6 @@
 import { useState, type FormEvent, type RefObject } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen } from 'lucide-react';
+import PinnateBrand from '../brand/PinnateBrand';
 import { mapAuthError, validateLoginFields, type LoginFieldErrors } from '../../utils/authValidation';
 import styles from '../../pages/AuthSplitLayout.module.css';
 
@@ -44,12 +44,9 @@ export default function LoginForm({
 
   return (
     <div className={styles.formInner}>
-      <div className={styles.brand}>
-        <span className={styles.brandIcon} aria-hidden="true">
-          <BookOpen size={18} />
-        </span>
-        <span className={styles.brandName}>Notes Workspace</span>
-      </div>
+      <Link to="/" className={styles.brand} aria-label="Pinnate home">
+        <PinnateBrand markSize={34} />
+      </Link>
 
       <h1 ref={headingRef} tabIndex={-1} className={styles.heading}>
         Welcome back

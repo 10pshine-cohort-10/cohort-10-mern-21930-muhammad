@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Pin, FileJson, FileText, User, LogOut } from 'lucide-react';
+import {
+  Search, Plus, Pin, FileJson, FileText, User, LogOut,
+  Columns3, LayoutGrid, AlignJustify, BarChart3, PenLine, Archive, HelpCircle,
+} from 'lucide-react';
 import type { Note } from '../types';
+import type { ViewMode } from './ViewModeToggle';
 import styles from './CommandPalette.module.css';
 
 export interface CommandPaletteProps {
@@ -11,8 +15,11 @@ export interface CommandPaletteProps {
   onSelectNote: (note: Note) => void;
   onCreateNote: () => void;
   onTogglePinnedFilter: () => void;
+  onChangeViewMode?: (mode: ViewMode) => void;
+  onOpenHelp?: () => void;
   onExportNotes?: (format: 'json' | 'markdown') => void;
   onLogout?: () => void;
+  isGuest?: boolean;
 }
 
 interface PaletteAction {
@@ -20,11 +27,22 @@ interface PaletteAction {
   label: string;
   shortcut?: string;
   icon: typeof Plus;
+  isPrimary?: boolean;
   run: () => void;
 }
 
 export default function CommandPalette({
-  isOpen, onClose, notes, onSelectNote, onCreateNote, onTogglePinnedFilter, onExportNotes, onLogout,
+  isOpen,
+  onClose,
+  notes,
+  onSelectNote,
+  onCreateNote,
+  onTogglePinnedFilter,
+  onChangeViewMode,
+  onOpenHelp,
+  onExportNotes,
+  onLogout,
+  isGuest = false,
 }: CommandPaletteProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -42,20 +60,35 @@ export default function CommandPalette({
   if (!isOpen) return null;
 
   const baseActions: PaletteAction[] = [
-    { id: 'create', label: 'Create new note', shortcut: 'N', icon: Plus, run: () => { onCreateNote(); onClose(); } },
-    { id: 'pinned', label: 'Toggle pinned notes filter', shortcut: 'P', icon: Pin, run: () => { onTogglePinnedFilter(); onClose(); } },
-    { id: 'export-json', label: 'Export notes as JSON', icon: FileJson, run: () => { onExportNotes?.('json'); onClose(); } },
-    { id: 'export-md', label: 'Export notes as Markdown', icon: FileText, run: () => { onExportNotes?.('markdown'); onClose(); } },
-    { id: 'profile', label: 'View profile', icon: User, run: () => { navigate('/profile'); onClose(); } },
+    { id: 'create', label: 'Create new note', shortcut: 'N', icon: Plus, isPrimary: true, run: () => { onCreateNote(); onClose(); } },
+    ...(onChangeViewMode ? [
+      { id: 'view-board', label: 'Switch to Board view', icon: Columns3, isPrimary: true, run: () => { onChangeViewMode('board'); onClose(); } },
+      { id: 'view-grid', label: 'Switch to Grid view', icon: LayoutGrid, run: () => { onChangeViewMode('grid'); onClose(); } },
+      { id: 'view-stream', label: 'Switch to Stream view', icon: AlignJustify, run: () => { onChangeViewMode('stream'); onClose(); } },
+    ] : []),
+    { id: 'pinned', label: 'Toggle pinned notes filter', shortcut: 'P', icon: Pin, isPrimary: true, run: () => { onTogglePinnedFilter(); onClose(); } },
+    ...(!isGuest ? [
+      { id: 'nav-progress', label: 'Open Progress', icon: BarChart3, isPrimary: true, run: () => { navigate('/insights'); onClose(); } },
+      { id: 'nav-notes', label: 'Open Notes', icon: FileText, run: () => { navigate('/dashboard'); onClose(); } },
+      { id: 'nav-scratchpad', label: 'Open Scratchpad', icon: PenLine, run: () => { navigate('/scratchpad'); onClose(); } },
+      { id: 'nav-archive', label: 'Open Archive', icon: Archive, run: () => { navigate('/archive'); onClose(); } },
+    ] : []),
+    ...(onOpenHelp ? [{ id: 'help', label: 'Keyboard shortcuts', shortcut: '?', icon: HelpCircle, run: () => { onClose(); onOpenHelp(); } }] : []),
+    ...(onExportNotes ? [
+      { id: 'export-json', label: 'Export notes as JSON', icon: FileJson, run: () => { onExportNotes('json'); onClose(); } },
+      { id: 'export-md', label: 'Export notes as Markdown', icon: FileText, run: () => { onExportNotes('markdown'); onClose(); } },
+    ] : []),
+    ...(!isGuest ? [{ id: 'profile', label: 'View profile', icon: User, run: () => { navigate('/profile'); onClose(); } }] : []),
+    ...(onLogout ? [{ id: 'logout', label: 'Log out', icon: LogOut, run: () => { onLogout(); onClose(); } }] : []),
   ];
 
-  if (onLogout) {
-    baseActions.push({ id: 'logout', label: 'Log out', icon: LogOut, run: () => { onLogout(); onClose(); } });
-  }
-
   const query = searchTerm.trim().toLowerCase();
-  const filteredActions = baseActions.filter((action) => action.label.toLowerCase().includes(query));
-  const filteredNotes = notes.filter((n) => (n.title || '').toLowerCase().includes(query) || (n.content || '').toLowerCase().includes(query)).slice(0, 5);
+  const filteredActions = query
+    ? baseActions.filter((action) => action.label.toLowerCase().includes(query))
+    : baseActions.filter((action) => action.isPrimary).slice(0, 4);
+  const filteredNotes = notes
+    .filter((n) => (n.title || '').toLowerCase().includes(query) || (n.content || '').toLowerCase().includes(query))
+    .slice(0, query ? 5 : 4);
 
   const totalItemsCount = filteredActions.length + filteredNotes.length;
 
@@ -85,7 +118,14 @@ export default function CommandPalette({
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()} onKeyDown={handleKeyDown}>
+      <div
+        className={styles.modal}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Command palette"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={handleKeyDown}
+      >
         <div className={styles.searchHeader}>
           <Search size={18} className={styles.searchIcon} />
           <input
@@ -93,6 +133,7 @@ export default function CommandPalette({
             type="text"
             className={styles.searchInput}
             placeholder="Type a command or search notes..."
+            aria-label="Command or search notes"
             value={searchTerm}
             onChange={(e) => { setSearchTerm(e.target.value); setSelectedIndex(0); }}
           />

@@ -69,7 +69,7 @@ export default function ScratchpadQuickJot({ onQuickSave, onSelectTemplate }: Sc
 
   return (
     <div className={styles.captureRow}>
-      <div className={styles.quickJotBar} style={{ flex: '1 1 260px' }}>
+      <div className={styles.quickJotBar}>
         <Plus size={16} />
         <input
           type="text"

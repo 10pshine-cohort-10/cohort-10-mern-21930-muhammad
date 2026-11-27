@@ -14,10 +14,11 @@ export default function MobileNavDock({ onQuickAddClick }: MobileNavDockProps) {
       <Link
         to="/dashboard"
         className={`${styles.item} ${location.pathname === '/dashboard' ? styles.active : ''}`}
-        title="Dashboard"
-        aria-label="Dashboard"
+        title="Notes"
+        aria-label="Notes"
       >
-        <Home size={20} />
+        <Home size={19} />
+        <span className={styles.itemLabel}>Notes</span>
       </Link>
 
       <Link
@@ -26,7 +27,8 @@ export default function MobileNavDock({ onQuickAddClick }: MobileNavDockProps) {
         title="Scratchpad"
         aria-label="Scratchpad"
       >
-        <Edit3 size={20} />
+        <Edit3 size={19} />
+        <span className={styles.itemLabel}>Scratch</span>
       </Link>
 
       {onQuickAddClick && (
@@ -46,7 +48,8 @@ export default function MobileNavDock({ onQuickAddClick }: MobileNavDockProps) {
         title="Progress"
         aria-label="Progress"
       >
-        <BarChart3 size={20} />
+        <BarChart3 size={19} />
+        <span className={styles.itemLabel}>Progress</span>
       </Link>
 
       <Link
@@ -55,7 +58,8 @@ export default function MobileNavDock({ onQuickAddClick }: MobileNavDockProps) {
         title="Archive"
         aria-label="Archive"
       >
-        <Archive size={20} />
+        <Archive size={19} />
+        <span className={styles.itemLabel}>Archive</span>
       </Link>
     </nav>
   );

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, type DragEvent } from 'react';
-import { Plus, Columns3 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import KanbanCard from './KanbanCard';
 import KanbanColumnAddMenu from './KanbanColumnAddMenu';
 import type { Note, NoteStatus } from '../types';
@@ -19,6 +19,7 @@ const COLUMNS: ColumnDef[] = [
 
 export interface KanbanBoardProps {
   notes: Note[];
+  searchQuery?: string;
   onOpenNote: (note: Note) => void;
   onMoveStatus: (noteId: string, nextStatus: NoteStatus) => Promise<void>;
   onCreateInColumn: (status: NoteStatus) => void;
@@ -26,6 +27,7 @@ export interface KanbanBoardProps {
 
 export default function KanbanBoard({
   notes,
+  searchQuery = '',
   onOpenNote,
   onMoveStatus,
   onCreateInColumn,
@@ -73,26 +75,28 @@ export default function KanbanBoard({
     await triggerColumnMove(noteId, status);
   };
 
-  if (boardNotes.length === 0) {
-    return (
-      <div className={styles.emptyBoard}>
-        <Columns3 size={28} className={styles.emptyIcon} />
-        <h3 className={styles.emptyTitle}>Your plan board is clear</h3>
-        <p className={styles.emptyText}>
-          Only notes you add to the board appear here, keeping your reference notes clutter-free.
-        </p>
-        <div className={styles.emptyActions}>
+  const hasSearch = searchQuery.trim().length > 0;
+
+  return (
+    <div className={styles.boardWrapper}>
+      {(boardNotes.length === 0 || untrackedNotes.length > 0) && (
+        <div className={styles.unstagedHintBar}>
+          <span>
+            {hasSearch && boardNotes.length === 0
+              ? 'No board notes match your search.'
+              : boardNotes.length === 0
+                ? untrackedNotes.length > 0
+                  ? `Your plan board is clear. Use + on any column to pull in from ${untrackedNotes.length} unstaged notes or start a new one.`
+                  : 'Your plan board is clear. Add a note to To Do, In Progress, or Done.'
+                : `${untrackedNotes.length} unstaged ${untrackedNotes.length === 1 ? 'note is' : 'notes are'} hidden from Board — use + on any column to stage.`}
+          </span>
           <button type="button" className={styles.primaryBtn} onClick={() => onCreateInColumn('todo')}>
             <Plus size={15} />
             <span>New Plan Note</span>
           </button>
         </div>
-      </div>
-    );
-  }
+      )}
 
-  return (
-    <div className={styles.boardWrapper}>
       <div className={styles.columnsGrid}>
         {COLUMNS.map((col) => {
           const columnNotes = boardNotes.filter((n) => n.status === col.status);
@@ -130,20 +134,24 @@ export default function KanbanBoard({
               </div>
 
               <div className={styles.cardList}>
-                {columnNotes.map((note) => (
-                  <KanbanCard
-                    key={note.id}
-                    note={note}
-                    columnStatus={col.status}
-                    columns={COLUMNS}
-                    isDragging={draggedId === note.id}
-                    isJustDropped={recentlyMovedId === note.id}
-                    onDragStart={handleDragStart}
-                    onDragEnd={() => { setDraggedId(null); setDropTarget(null); }}
-                    onOpenNote={onOpenNote}
-                    onMoveStatus={triggerColumnMove}
-                  />
-                ))}
+                {columnNotes.length === 0 ? (
+                  <p className={styles.columnEmptyHint}>Drop a note here or click +</p>
+                ) : (
+                  columnNotes.map((note) => (
+                    <KanbanCard
+                      key={note.id}
+                      note={note}
+                      columnStatus={col.status}
+                      columns={COLUMNS}
+                      isDragging={draggedId === note.id}
+                      isJustDropped={recentlyMovedId === note.id}
+                      onDragStart={handleDragStart}
+                      onDragEnd={() => { setDraggedId(null); setDropTarget(null); }}
+                      onOpenNote={onOpenNote}
+                      onMoveStatus={triggerColumnMove}
+                    />
+                  ))
+                )}
               </div>
             </div>
           );

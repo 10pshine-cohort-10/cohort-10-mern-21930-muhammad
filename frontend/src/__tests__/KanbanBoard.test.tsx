@@ -30,10 +30,14 @@ const sampleNotes: Note[] = [
 ];
 
 describe('KanbanBoard', () => {
-  it('renders board notes in columns with pushpin and excludes untracked notes', () => {
+  it('renders pin indicator only on pinned cards and excludes untracked notes', () => {
+    const notesWithPin: Note[] = [
+      { ...sampleNotes[0], isPinned: true },
+      { ...sampleNotes[1], status: 'in_progress', isPinned: false },
+    ];
     const { container } = render(
       <KanbanBoard
-        notes={sampleNotes}
+        notes={notesWithPin}
         onOpenNote={jest.fn()}
         onMoveStatus={jest.fn()}
         onCreateInColumn={jest.fn()}
@@ -48,7 +52,23 @@ describe('KanbanBoard', () => {
     expect(container.querySelector('.colorSand')).toBeInTheDocument();
   });
 
-  it('moves note status when clicking quick-move button and sets swing state', () => {
+  it('keeps all stage columns rendered with hint when board has no staged notes yet', () => {
+    render(
+      <KanbanBoard
+        notes={[sampleNotes[1]]}
+        onOpenNote={jest.fn()}
+        onMoveStatus={jest.fn()}
+        onCreateInColumn={jest.fn()}
+      />
+    );
+
+    expect(screen.getByText(/Your plan board is clear/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'To Do' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'In Progress' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Done' })).toBeInTheDocument();
+  });
+
+  it('moves note status via the Move to menu and sets swing state', () => {
     const onMoveStatus = jest.fn().mockResolvedValue(undefined);
     const { container } = render(
       <KanbanBoard
@@ -59,7 +79,8 @@ describe('KanbanBoard', () => {
       />
     );
 
-    fireEvent.click(screen.getByTitle('Move to In Progress'));
+    fireEvent.click(screen.getByRole('button', { name: 'Move to column' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: 'In Progress' }));
     expect(onMoveStatus).toHaveBeenCalledWith('n1', 'in_progress');
     expect(container.querySelector('.kanbanCardSwinging')).toBeInTheDocument();
   });

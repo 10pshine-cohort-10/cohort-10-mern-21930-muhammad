@@ -26,7 +26,9 @@ function loadTagList(key: string): string[] {
 }
 
 export function getCachedFolders(): string[] {
-  return Array.from(new Set([...loadTagList(KNOWN_TAGS_KEY), ...loadTagList(CUSTOM_FOLDERS_KEY)])).sort();
+  return Array.from(new Set([...loadTagList(KNOWN_TAGS_KEY), ...loadTagList(CUSTOM_FOLDERS_KEY)]))
+    .filter((tag) => tag !== 'archive')
+    .sort();
 }
 
 export interface UseNotesOptions {

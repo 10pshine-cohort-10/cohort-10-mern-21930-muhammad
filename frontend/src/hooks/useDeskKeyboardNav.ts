@@ -4,6 +4,7 @@ import type { Note } from '../types';
 export interface UseDeskKeyboardNavOptions {
   notes: Note[];
   isModalOpen: boolean;
+  isDisabled?: boolean;
   onSelectNote: (note: Note) => void;
   onTogglePin: (id: string, isPinned: boolean) => void;
   onDeleteNote: (id: string) => void;
@@ -17,6 +18,7 @@ export interface UseDeskKeyboardNavOptions {
 export function useDeskKeyboardNav({
   notes,
   isModalOpen,
+  isDisabled = false,
   onSelectNote,
   onTogglePin,
   onDeleteNote,
@@ -39,7 +41,7 @@ export function useDeskKeyboardNav({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (isModalOpen || !event.key) return;
+      if (isModalOpen || isDisabled || !event.key) return;
 
       const activeEl = document.activeElement;
       const isInteractiveElement =

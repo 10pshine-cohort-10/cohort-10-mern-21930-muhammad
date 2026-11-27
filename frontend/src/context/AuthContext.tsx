@@ -9,6 +9,9 @@ export interface AuthProviderProps {
   children: ReactNode;
 }
 
+export const GUEST_SYNC_COUNT_KEY = 'pinnate_synced_guest_count';
+export const GUEST_SYNC_ERROR_KEY = 'pinnate_guest_sync_error';
+
 export function AuthProvider({ children }: AuthProviderProps) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('notes_auth_token'));
   const currentTokenRef = useRef<string | null>(token);
@@ -67,18 +70,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [token, user, refreshUser]);
 
+  const persistSessionAndSyncGuestNotes = async (receivedToken: string, receivedUser: User): Promise<User> => {
+    currentTokenRef.current = receivedToken;
+    localStorage.setItem('notes_auth_token', receivedToken);
+    localStorage.setItem('notes_user_data', JSON.stringify(receivedUser));
+    setToken(receivedToken);
+    setUser(receivedUser);
+
+    const { syncedCount, hasError } = await syncGuestNotesIfAny(receivedToken);
+    try {
+      if (syncedCount > 0) {
+        sessionStorage.setItem(GUEST_SYNC_COUNT_KEY, String(syncedCount));
+      }
+      if (hasError) {
+        sessionStorage.setItem(GUEST_SYNC_ERROR_KEY, 'true');
+      }
+    } catch {
+      // Ignore storage restrictions
+    }
+    return receivedUser;
+  };
+
   const login = async (email: string, password: string): Promise<User> => {
     try {
       const response = await client.post<ApiResponse<AuthResponseData>>('/auth/login', { email, password });
       const { token: receivedToken, user: receivedUser } = response.data.data!;
-
-      currentTokenRef.current = receivedToken;
-      localStorage.setItem('notes_auth_token', receivedToken);
-      localStorage.setItem('notes_user_data', JSON.stringify(receivedUser));
-      setToken(receivedToken);
-      setUser(receivedUser);
-      syncGuestNotesIfAny(receivedToken);
-      return receivedUser;
+      return persistSessionAndSyncGuestNotes(receivedToken, receivedUser);
     } catch (err) {
       console.error('Login request failed:', err);
       throw err;
@@ -89,14 +106,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const response = await client.post<ApiResponse<AuthResponseData>>('/auth/register', { name, email, password });
       const { token: receivedToken, user: receivedUser } = response.data.data!;
-
-      currentTokenRef.current = receivedToken;
-      localStorage.setItem('notes_auth_token', receivedToken);
-      localStorage.setItem('notes_user_data', JSON.stringify(receivedUser));
-      setToken(receivedToken);
-      setUser(receivedUser);
-      syncGuestNotesIfAny(receivedToken);
-      return receivedUser;
+      return persistSessionAndSyncGuestNotes(receivedToken, receivedUser);
     } catch (err) {
       console.error('Registration request failed:', err);
       throw err;
@@ -107,6 +117,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     currentTokenRef.current = null;
     localStorage.removeItem('notes_auth_token');
     localStorage.removeItem('notes_user_data');
+    localStorage.removeItem('notes_known_tags');
+    localStorage.removeItem('notes_custom_folders');
     setToken(null);
     setUser(null);
   };

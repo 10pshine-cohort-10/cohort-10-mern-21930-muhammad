@@ -10,17 +10,20 @@ describe('KeyboardHelpModal Component', () => {
   it('renders shortcut cheat list when isOpen is true', () => {
     render(<KeyboardHelpModal isOpen={true} onClose={jest.fn()} />);
 
-    expect(screen.getByText('Desk Keyboard Shortcuts')).toBeInTheDocument();
-    expect(screen.getByText('Next note on desk')).toBeInTheDocument();
-    expect(screen.getByText('Focus Quick-Tack bar')).toBeInTheDocument();
-    expect(screen.getByText('Undo delete')).toBeInTheDocument();
+    expect(screen.getByText('Keyboard Shortcuts')).toBeInTheDocument();
+    expect(screen.getByText('Next note')).toBeInTheDocument();
+    expect(screen.getByText('Quick add note')).toBeInTheDocument();
+    expect(screen.getByText('Delete or undo')).toBeInTheDocument();
   });
 
-  it('calls onClose when close button is clicked', () => {
+  it('calls onClose when close button or Escape is pressed', () => {
     const handleClose = jest.fn();
     render(<KeyboardHelpModal isOpen={true} onClose={handleClose} />);
 
     fireEvent.click(screen.getByLabelText('Close shortcuts modal'));
     expect(handleClose).toHaveBeenCalledTimes(1);
+
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(handleClose).toHaveBeenCalledTimes(2);
   });
 });

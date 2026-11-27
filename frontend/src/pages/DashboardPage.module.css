@@ -6,6 +6,66 @@
   container-type: inline-size;
 }
 
+.pageHeadingRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pageHeading {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.syncNoticeBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--accent-blue-surface);
+  border: 1px solid var(--accent-blue-border);
+  border-radius: var(--radius-sm);
+  color: var(--accent-blue-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.syncDismissBtn {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent-blue-border);
+  background: var(--bg-surface);
+  color: var(--accent-blue-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mobileFolderStrip {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobileFolderStrip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .mobileFolderStrip::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 .controlsBar {
   display: flex;
   align-items: center;
@@ -103,78 +163,6 @@
   }
 }
 
-.statCard {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-sm);
-  font-size: 13px;
-  transition: transform 140ms var(--ease-tactile), border-color 140ms ease, background-color 140ms ease;
-}
-
-.statCardBtn {
-  cursor: pointer;
-}
-
-.statCardBtn:hover {
-  transform: translateY(-1px);
-  background-color: var(--bg-subtle);
-}
-
-.statCardBtn:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.statCardActive {
-  border-color: var(--border-dark);
-  background-color: var(--bg-subtle);
-}
-
-.statValue {
-  font-weight: 800;
-  color: var(--text-main);
-}
-
-.statLabel {
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-.cmdButton {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 14px;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-sm);
-  color: var(--text-main);
-  font-size: 13px;
-  font-weight: 600;
-  transition: all 120ms ease;
-}
-
-.cmdButton:hover {
-  background-color: var(--bg-subtle);
-  transform: translateY(-1px);
-}
-
-.cmdKbd {
-  font-family: var(--font-family-mono);
-  font-size: 11px;
-  padding: 2px 6px;
-  background-color: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  color: var(--text-main);
-}
-
 .actionsWrapper {
   display: flex;
   flex-direction: column;
@@ -209,27 +197,43 @@
   gap: 4px;
 }
 
-.scopeStrip {
+.secondaryBtnActive {
+  background-color: var(--color-accent-dark);
+  color: var(--text-inverse);
+  border-color: var(--color-accent-dark);
+}
+
+.selectionBar {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   flex-wrap: wrap;
-  gap: 4px;
-  padding-bottom: 6px;
-  margin-bottom: 2px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.scopeBtn {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-muted);
+  padding: 10px 14px;
   background: var(--bg-subtle);
-  padding: 4px 8px;
-  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-main);
 }
 
-.scopeBtnActive {
-  background: var(--color-accent-dark);
-  color: #ffffff;
+.selectionBarActions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.batchStageSelect {
+  min-height: 36px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .exportMenuItem {
@@ -263,33 +267,6 @@
 .exportErrorText {
   color: var(--danger-text);
   font-size: 0.8rem;
-}
-
-.secondaryBtnActive {
-  background-color: var(--color-accent-dark);
-  color: #ffffff;
-  border-color: var(--color-accent-dark);
-}
-
-.selectionBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 10px 14px;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  font-size: 0.86rem;
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-.selectionBarActions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .secondaryBtn {
@@ -354,9 +331,10 @@
 }
 
 .tagChip {
-  padding: 6px 16px;
+  min-height: 36px;
+  padding: 6px 14px;
   border-radius: var(--radius-full);
-  background-color: #ffffff;
+  background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   color: var(--text-main);
   font-size: 13px;
@@ -373,9 +351,15 @@
 
 .tagChipActive {
   background-color: var(--border-dark);
-  color: #ffffff;
+  color: var(--text-inverse);
   border-color: var(--border-dark);
   box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 768px) {
+  .tagChip {
+    min-height: 44px;
+  }
 }
 
 .notesGrid {
@@ -439,13 +423,13 @@
   border: 1.5px solid var(--border-dark);
   box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
   border-radius: var(--radius-sm);
-  color: #ffffff;
+  color: var(--text-inverse);
   font-weight: 600;
   font-size: 14px;
 }
 
 .primaryButton:hover {
-  background-color: #27272a;
+  background-color: var(--accent-ink-hover);
 }
 
 .skeletonGrid {
@@ -493,9 +477,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background-color: #ffffff;
+  background-color: var(--bg-surface);
   border: 1.5px solid var(--border-dark);
-  box-shadow: 2px 2px 0px var(--border-dark);
+  box-shadow: var(--shadow-control-hard);
   border-radius: var(--radius-sm);
   padding: 8px 14px;
   font-size: 13px;
@@ -514,28 +498,6 @@
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
-  }
-
-  .bentoStatsBar {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-
-  .statCard {
-    padding: 8px 6px;
-    justify-content: center;
-    flex-direction: column;
-    gap: 2px;
-    text-align: center;
-    font-size: 11px;
-  }
-
-  .cmdButton {
-    grid-column: span 3;
-    justify-content: center;
-    margin-left: 0;
-    width: 100%;
   }
 
   .notesGrid {

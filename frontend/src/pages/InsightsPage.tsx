@@ -10,7 +10,7 @@ import styles from './InsightsPage.module.css';
 
 export default function InsightsPage() {
   const navigate = useNavigate();
-  const { notes, allTags, isLoading } = useNotes();
+  const { notes, allTags, isLoading, errorMessage, fetchNotes } = useNotes();
   const [days, setDays] = useState<7 | 30>(7);
 
   const safeNotes = Array.isArray(notes) ? notes : [];
@@ -19,7 +19,7 @@ export default function InsightsPage() {
   const breakdown = getPlanBreakdown(safeNotes);
 
   return (
-    <Layout folders={Array.isArray(allTags) ? allTags : []}>
+    <Layout folders={Array.isArray(allTags) ? allTags.filter((tag) => tag !== 'archive') : []}>
       <div className={styles.container}>
         <div className={styles.headerRow}>
           <div>
@@ -48,6 +48,15 @@ export default function InsightsPage() {
             </button>
           </div>
         </div>
+
+        {errorMessage && (
+          <div className={styles.errorBanner} role="alert">
+            <span>{errorMessage}</span>
+            <button type="button" className={styles.retryBtn} onClick={() => fetchNotes()}>
+              Retry
+            </button>
+          </div>
+        )}
 
         {isLoading ? (
           <div className={styles.loadingState} aria-busy="true">Loading progress…</div>

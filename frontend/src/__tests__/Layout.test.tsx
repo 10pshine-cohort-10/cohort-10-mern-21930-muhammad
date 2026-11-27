@@ -43,15 +43,16 @@ describe('Layout collapsible sidebar', () => {
     expect(localStorage.getItem('notes_folders_expanded')).toBe('false');
 
     fireEvent.click(collapseBtn);
-    expect(screen.queryByText('Notes Workspace')).not.toBeInTheDocument();
+    expect(screen.queryByText('Pinnate')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /log out/i })).toBeInTheDocument();
     expect(localStorage.getItem('notes_sidebar_collapsed')).toBe('true');
 
     unmount();
 
+    const handleOpenHelp = jest.fn();
     render(
       <MemoryRouter initialEntries={['/scratchpad']}>
-        <Layout>
+        <Layout onOpenHelp={handleOpenHelp}>
           <div>Scratchpad body</div>
         </Layout>
       </MemoryRouter>
@@ -59,7 +60,10 @@ describe('Layout collapsible sidebar', () => {
 
     const expandBtn = screen.getByRole('button', { name: /expand sidebar$/i });
     fireEvent.click(expandBtn);
-    expect(screen.getByText('Notes Workspace')).toBeInTheDocument();
+    expect(screen.getByText('Pinnate')).toBeInTheDocument();
     expect(localStorage.getItem('notes_folders_expanded')).toBe('false');
+
+    fireEvent.click(screen.getAllByRole('button', { name: /keyboard shortcuts/i })[0]);
+    expect(handleOpenHelp).toHaveBeenCalledTimes(1);
   });
 });

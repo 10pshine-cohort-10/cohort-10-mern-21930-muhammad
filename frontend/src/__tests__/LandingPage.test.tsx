@@ -56,7 +56,7 @@ describe('LandingPage', () => {
     expect(loginLinks[0]).toHaveAttribute('href', '/login');
 
     // Board tab is active by default and its heading is visible
-    expect(screen.getByText('Move plans forward at your own pace.')).toBeInTheDocument();
+    expect(screen.getByText('Move plans forward at your own pace')).toBeInTheDocument();
 
     // Tab buttons exist
     expect(screen.getByRole('tab', { name: /board/i })).toBeInTheDocument();
@@ -72,18 +72,20 @@ describe('LandingPage', () => {
     fireEvent.keyDown(miniInput, { key: 'Enter' });
     expect(screen.getByText('Ship landing page')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /tack to notes/i }));
-    expect(screen.getByRole('button', { name: /tacked to notes/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /add to notes/i }));
+    expect(screen.getByRole('button', { name: /added to notes/i })).toBeInTheDocument();
 
-    // Pinned-note CTA is present
-    expect(screen.getByText('Start writing in a workspace that stays out of your way.')).toBeInTheDocument();
+    // Brand pronunciation cue and Pinnate tagline are visible
+    expect(screen.getAllByText(/PIN-ayt/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Start writing in a place that stays out of your way.')).toBeInTheDocument();
 
     // Decorative scroll thread SVG mounts cleanly inside the canvas wrapper
     const threadSvg = container.querySelector('svg[aria-hidden="true"]');
     expect(threadSvg).toBeInTheDocument();
 
-    // No Cloud Desk, no Desk branding
+    // No Cloud Desk, Desk, or Tack branding
     expect(screen.queryByText(/Cloud Desk/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Desk/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/\bDesk\b/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/\bTack\b/i)).not.toBeInTheDocument();
   });
 });

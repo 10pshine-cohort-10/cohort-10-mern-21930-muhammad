@@ -8,6 +8,7 @@ import {
   useTransform,
 } from 'framer-motion';
 import { LEAF_OUTLINE_PATH, LEAF_STEM_PATH, LEAF_VEIN_PATH } from './leafPath';
+import { BRAND_COLOR_TOKENS } from '../../brand/leafGeometry';
 import { buildThreadGeometry, type ThreadAnchorRects, type ThreadGeometry } from './threadPath';
 import styles from '../../pages/LandingPage.module.css';
 
@@ -128,8 +129,8 @@ export default function LandingScrollThread({ containerRef }: LandingScrollThrea
           x2="0"
           y2={geometry?.endY ?? 800}
         >
-          <stop offset="0%" stopColor="#0ea5e9" />
-          <stop offset="100%" stopColor="#f97316" />
+          <stop offset="0%" stopColor={BRAND_COLOR_TOKENS.blue} />
+          <stop offset="100%" stopColor={BRAND_COLOR_TOKENS.orange} />
         </linearGradient>
       </defs>
 
@@ -162,7 +163,7 @@ export default function LandingScrollThread({ containerRef }: LandingScrollThrea
           <g transform={leafTransform}>
             {shouldReduceMotion ? (
               <>
-                <path d={LEAF_OUTLINE_PATH} fill="rgba(249, 115, 22, 0.14)" stroke="none" />
+                <path d={LEAF_OUTLINE_PATH} fill={BRAND_COLOR_TOKENS.orangeTint} stroke="none" />
                 <path d={LEAF_STEM_PATH} {...LEAF_STROKE_PROPS} strokeWidth={strokeWidth} />
                 <path d={LEAF_OUTLINE_PATH} {...LEAF_STROKE_PROPS} strokeWidth={strokeWidth} />
                 <path d={LEAF_VEIN_PATH} {...LEAF_STROKE_PROPS} strokeWidth={1.5} />
@@ -171,7 +172,7 @@ export default function LandingScrollThread({ containerRef }: LandingScrollThrea
               <>
                 <motion.path
                   d={LEAF_OUTLINE_PATH}
-                  fill="rgba(249, 115, 22, 0.14)"
+                  fill={BRAND_COLOR_TOKENS.orangeTint}
                   stroke="none"
                   initial={{ opacity: 0 }}
                   animate={hasLeafDrawn ? { opacity: 1 } : { opacity: 0 }}

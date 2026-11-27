@@ -1,11 +1,14 @@
 import { useRef } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { MotionConfig, motion, useReducedMotion } from 'framer-motion';
-import { BookOpen, ArrowRight, Pin } from 'lucide-react';
+import { ArrowRight, Pin } from 'lucide-react';
+import { EASE_TACTILE } from '../brand/motion';
 import { useAuth } from '../context/AuthContext';
 import LandingHero from '../components/landing/LandingHero';
 import LandingFeatureTabs from '../components/landing/LandingFeatureTabs';
 import LandingScrollThread from '../components/landing/LandingScrollThread';
+import PublicTopNav from '../components/PublicTopNav';
+import { TransitionLink } from '../context/PageTransitionContext';
 import styles from './LandingPage.module.css';
 
 function PinnedNoteCta() {
@@ -18,27 +21,27 @@ function PinnedNoteCta() {
         initial={shouldReduceMotion ? false : { opacity: 0, y: 18, rotate: -1.5 }}
         whileInView={{ opacity: 1, y: 0, rotate: -1.5 }}
         viewport={{ once: true, amount: 0.35 }}
-        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.45, ease: EASE_TACTILE }}
       >
         <span className={styles.pinnedCtaPin} data-thread-anchor="cta-pin" aria-hidden="true" />
         <div className={styles.pinnedCtaTape} aria-hidden="true" />
         <h2 className={styles.pinnedCtaHeading}>
-          Start writing in a workspace that stays out of your way.
+          Start writing in a place that stays out of your way.
         </h2>
         <p className={styles.pinnedCtaBody}>
-          Create an account to sync across devices, or open the Scratchpad right now.
+          Create an account to sync across devices, or open the local Scratchpad today.
         </p>
         <div className={styles.ctaGroup}>
-          <Link to="/signup" className={styles.primaryCta}>
+          <TransitionLink to="/signup" className={styles.primaryCta}>
             <span>Get started</span>
             <ArrowRight size={16} />
-          </Link>
+          </TransitionLink>
           <Link to="/scratchpad" className={styles.secondaryLink}>
             Try Scratchpad
           </Link>
-          <Link to="/login" className={styles.secondaryLink}>
+          <TransitionLink to="/login" className={styles.secondaryLink}>
             Log in
-          </Link>
+          </TransitionLink>
         </div>
         <div className={styles.pinnedCtaMeta}>
           <Pin size={12} />
@@ -60,25 +63,7 @@ export default function LandingPage() {
   return (
     <MotionConfig reducedMotion="user">
       <div className={styles.page}>
-        <header className={styles.topNav}>
-          <div className={styles.topNavInner}>
-            <Link to="/" className={styles.brand}>
-              <span className={styles.brandMark}>
-                <BookOpen size={17} />
-              </span>
-              <span>Notes Workspace</span>
-            </Link>
-
-            <nav className={styles.navActions} aria-label="Landing navigation">
-              <Link to="/login" className={styles.secondaryLink}>
-                Log in
-              </Link>
-              <Link to="/signup" className={styles.primaryCta}>
-                Get started
-              </Link>
-            </nav>
-          </div>
-        </header>
+        <PublicTopNav />
 
         <div ref={canvasRef} className={styles.mainCanvas}>
           <LandingScrollThread containerRef={canvasRef} />
@@ -90,9 +75,10 @@ export default function LandingPage() {
           </main>
 
           <footer className={styles.footer}>
-            <span>Notes Workspace</span>
+            <span>Pinnate</span>
+            <span className={styles.pronounceInline}>(PIN-ayt)</span>
             <span aria-hidden="true">·</span>
-            <span>Local-first Scratchpad · Real-time Sync</span>
+            <span>Pin it. Move it. Finish it.</span>
           </footer>
         </div>
       </div>

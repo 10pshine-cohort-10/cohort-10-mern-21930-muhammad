@@ -44,7 +44,13 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
     if (this.props.onNavigateHome) {
       this.props.onNavigateHome();
     } else {
-      window.location.assign('/dashboard');
+      let hasSession = false;
+      try {
+        hasSession = Boolean(localStorage.getItem('notes_auth_token'));
+      } catch {
+        hasSession = false;
+      }
+      window.location.assign(hasSession ? '/dashboard' : '/');
     }
   };
 
@@ -53,14 +59,11 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
       return (
         <div className={styles.container} role="alert">
           <div className={styles.card}>
-            <AlertTriangle size={36} color="#ef4444" />
-            <h2 className={styles.title}>Something went wrong on your desk</h2>
+            <AlertTriangle size={36} color="var(--danger-text)" />
+            <h2 className={styles.title}>Something went wrong in Pinnate</h2>
             <p className={styles.subtitle}>
               An unexpected render issue occurred. Your saved notes are completely safe.
             </p>
-            {this.state.errorMessage && (
-              <p className={styles.errorDetail}>{this.state.errorMessage}</p>
-            )}
             <div className={styles.actions}>
               <button
                 type="button"
@@ -68,7 +71,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
                 onClick={this.handleReload}
               >
                 <RotateCcw size={15} />
-                <span>Reload Workspace</span>
+                <span>Reload Pinnate</span>
               </button>
               <button
                 type="button"
@@ -76,7 +79,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
                 onClick={this.handleNavigateHome}
               >
                 <Home size={15} />
-                <span>Return to Desk</span>
+                <span>Return to Notes</span>
               </button>
             </div>
           </div>

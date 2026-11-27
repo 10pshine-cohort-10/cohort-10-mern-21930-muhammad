@@ -80,7 +80,7 @@
   height: 32px;
   border-radius: var(--radius-sm);
   background-color: var(--border-dark);
-  color: #ffffff;
+  color: var(--text-inverse);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -356,7 +356,7 @@
   height: 34px;
   border-radius: var(--radius-full);
   background-color: var(--border-dark);
-  color: #ffffff;
+  color: var(--text-inverse);
   font-weight: 700;
   font-size: 13px;
   display: flex;
@@ -388,6 +388,14 @@
   text-overflow: ellipsis;
 }
 
+.footerActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.helpButton,
 .logoutButton {
   padding: 8px;
   border-radius: var(--radius-sm);
@@ -398,11 +406,17 @@
   transition: transform 140ms var(--ease-tactile), background-color 140ms ease, color 140ms ease;
 }
 
+.helpButton:hover {
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+}
+
 .logoutButton:hover {
   background-color: var(--danger-bg);
   color: var(--danger-text);
 }
 
+.helpButton:active,
 .logoutButton:active {
   transform: scale(0.94);
 }
@@ -474,7 +488,7 @@
   gap: 8px;
   padding: 8px 16px;
   background-color: var(--border-dark);
-  color: #ffffff;
+  color: var(--text-inverse);
   border: 1.5px solid var(--border-dark);
   box-shadow: var(--shadow-sm);
   border-radius: var(--radius-full);
@@ -484,7 +498,7 @@
 }
 
 .newNoteButton:hover {
-  background-color: #27272a;
+  background-color: var(--accent-ink-hover);
   transform: translateY(-1px);
 }
 
@@ -502,7 +516,8 @@
   display: none;
 }
 
-.mobileAvatar {
+.mobileAvatar,
+.mobileHelpBtn {
   display: none;
 }
 
@@ -529,6 +544,12 @@
     display: none;
   }
 
+  .mobileHelpBtn {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
   .mobileAppName {
     font-size: 16px;
     font-weight: 700;
@@ -536,20 +557,30 @@
     letter-spacing: -0.01em;
   }
 
-  .mobileAvatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius-full);
-    background-color: var(--border-dark);
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 12px;
-    border: 1.5px solid var(--border-dark);
-    text-decoration: none;
-  }
+.mobileAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--radius-full);
+  color: var(--border-dark);
+  text-decoration: none;
+}
+
+.mobileAvatarCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background-color: var(--border-dark);
+  color: var(--text-inverse);
+  font-weight: 700;
+  font-size: 12px;
+  border: 1.5px solid var(--border-dark);
+}
 
   .newNoteButton {
     display: none;

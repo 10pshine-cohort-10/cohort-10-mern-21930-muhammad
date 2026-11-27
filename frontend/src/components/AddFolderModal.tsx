@@ -45,6 +45,10 @@ export default function AddFolderModal({
       setErrorText('Use only letters, numbers, hyphens, or underscores.');
       return;
     }
+    if (normalized === 'archive') {
+      setErrorText('Folder "#archive" is reserved for the Archive view.');
+      return;
+    }
     if (existingFolders.includes(normalized)) {
       setErrorText(`Folder "#${normalized}" already exists.`);
       return;

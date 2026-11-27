@@ -37,4 +37,18 @@ describe('authClipPaths', () => {
       expect(countNumbers(frame)).toBe(baseNumbers);
     }
   });
+
+  it('keeps resting desktop login (>= 0.50) and signup (<= 0.50) edges clear of active form inputs', () => {
+    const loginNums = DESKTOP_AUTH_CLIP_FRAMES[0].match(/-?\d+(?:\.\d+)?/g)!.map(Number);
+    // Leading edge occupies first 10 pairs (20 numbers)
+    for (let i = 0; i < 20; i += 2) {
+      expect(loginNums[i]).toBeGreaterThanOrEqual(0.5);
+    }
+
+    const signupNums = DESKTOP_AUTH_CLIP_FRAMES[3].match(/-?\d+(?:\.\d+)?/g)!.map(Number);
+    // Trailing edge occupies second 10 pairs (indices 20..38)
+    for (let i = 20; i < 40; i += 2) {
+      expect(signupNums[i]).toBeLessThanOrEqual(0.5);
+    }
+  });
 });

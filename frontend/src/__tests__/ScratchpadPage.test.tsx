@@ -96,7 +96,7 @@ describe('ScratchpadPage', () => {
     });
   });
 
-  it('renders Scratchpad and allows tacking note to notes when authenticated', async () => {
+  it('renders Scratchpad and promotes drafts to notes or straight to Board when authenticated', async () => {
     mockedUseAuth.mockReturnValue({
       user: { id: 'u1', name: 'Tester', email: 'tester@example.com' },
       token: 'fake-token',
@@ -133,10 +133,11 @@ describe('ScratchpadPage', () => {
     expect(screen.queryByText('Personal Draft Blotter — Fast, unfiled thoughts stored locally.')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Scratchpad' })).toBeInTheDocument();
 
-    const tackButton = screen.getByRole('button', { name: /tack to notes/i });
-    expect(tackButton).toBeInTheDocument();
+    const addButton = screen.getByRole('button', { name: /add to notes/i });
+    expect(addButton).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /move to board/i })).toBeInTheDocument();
 
-    fireEvent.click(tackButton);
+    fireEvent.click(addButton);
 
     await waitFor(() => {
       expect(mockCreateNote).toHaveBeenCalledWith({
@@ -147,7 +148,56 @@ describe('ScratchpadPage', () => {
         isPinned: false,
       });
       expect(mockedGuestStorage.deleteGuestNote).toHaveBeenCalledWith('guest-1');
-      expect(screen.getByRole('status')).toHaveTextContent('Tacked "Quick Brainstorm" to notes');
+      expect(screen.getByRole('status')).toHaveTextContent('Added "Quick Brainstorm" to notes');
+    });
+  });
+
+  it('moves draft straight to Board To Do stage when Move to Board is clicked', async () => {
+    mockedUseAuth.mockReturnValue({
+      user: { id: 'u1', name: 'Tester', email: 'tester@example.com' },
+      token: 'fake-token',
+      isAuthenticated: true,
+      isLoading: false,
+      login: jest.fn(),
+      register: jest.fn(),
+      logout: jest.fn(),
+      refreshUser: jest.fn(),
+    });
+
+    mockedGuestStorage.getGuestNotes.mockReturnValue([
+      {
+        id: 'guest-3',
+        userId: 'u1',
+        title: 'Plan Release',
+        content: '<p>Ship notes</p>',
+        color: 'teal',
+        isPinned: true,
+        tags: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ]);
+
+    mockCreateNote.mockResolvedValue({ id: 'cloud-3', title: 'Plan Release' });
+
+    render(
+      <MemoryRouter>
+        <ScratchpadPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /move to board/i }));
+
+    await waitFor(() => {
+      expect(mockCreateNote).toHaveBeenCalledWith({
+        title: 'Plan Release',
+        content: '<p>Ship notes</p>',
+        color: 'teal',
+        tags: ['scratch'],
+        isPinned: true,
+        status: 'todo',
+      });
+      expect(screen.getByRole('status')).toHaveTextContent('Added "Plan Release" to Board (To Do)');
     });
   });
 

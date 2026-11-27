@@ -25,6 +25,10 @@ describe('AddFolderModal', () => {
     fireEvent.click(submitBtn);
     expect(screen.getByRole('alert')).toHaveTextContent('Folder "#yea" already exists.');
 
+    fireEvent.change(input, { target: { value: 'archive' } });
+    fireEvent.click(submitBtn);
+    expect(screen.getByRole('alert')).toHaveTextContent('reserved for the Archive view');
+
     fireEvent.change(input, { target: { value: 'New Folder' } });
     fireEvent.click(submitBtn);
 

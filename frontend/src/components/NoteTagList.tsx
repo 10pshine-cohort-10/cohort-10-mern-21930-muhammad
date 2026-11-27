@@ -11,11 +11,17 @@ export interface NoteTagListProps {
 
 export default function NoteTagList({ tags, onAddTag, onRemoveTag }: NoteTagListProps) {
   const [tagInput, setTagInput] = useState<string>('');
+  const [tagError, setTagError] = useState<string>('');
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' || event.key === ',') {
       event.preventDefault();
-      const trimmed = tagInput.trim().replace(/^#/, '');
+      const trimmed = tagInput.trim().toLowerCase().replace(/^#/, '');
+      if (trimmed === 'archive') {
+        setTagError('Use Move to Archive instead of the #archive tag.');
+        return;
+      }
+      setTagError('');
       if (trimmed && !tags.includes(trimmed)) {
         onAddTag(trimmed);
       }
@@ -44,10 +50,19 @@ export default function NoteTagList({ tags, onAddTag, onRemoveTag }: NoteTagList
         type="text"
         className={styles.tagInput}
         value={tagInput}
-        onChange={(e) => setTagInput(e.target.value)}
+        onChange={(e) => {
+          setTagInput(e.target.value);
+          if (tagError) setTagError('');
+        }}
         onKeyDown={handleKeyDown}
         placeholder="Add tag and press Enter"
+        aria-label="Add tag"
       />
+      {tagError && (
+        <span className={styles.tagErrorText} role="alert">
+          {tagError}
+        </span>
+      )}
     </div>
   );
 }

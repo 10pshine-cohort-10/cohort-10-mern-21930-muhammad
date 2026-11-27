@@ -22,7 +22,6 @@ export default function UndoToast({
       setSecondsRemaining((previous) => {
         if (previous <= 1) {
           clearInterval(timer);
-          onDismiss();
           return 0;
         }
         return previous - 1;
@@ -30,7 +29,13 @@ export default function UndoToast({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [onDismiss]);
+  }, []);
+
+  useEffect(() => {
+    if (secondsRemaining === 0) {
+      onDismiss();
+    }
+  }, [secondsRemaining, onDismiss]);
 
   return (
     <div className={styles.toastContainer} role="alert">

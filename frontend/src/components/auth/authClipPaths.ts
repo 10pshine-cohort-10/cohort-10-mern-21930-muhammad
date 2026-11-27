@@ -48,20 +48,20 @@ const DESKTOP_FULL_LEFT: ClipBandEdge = {
 };
 
 export const DESKTOP_AUTH_CLIP_FRAMES: readonly [string, string, string, string] = [
-  // Frame 0 (Sketch 1 - Login): art on right, divider dips left around y=0.48 then curves down-right
+  // Frame 0 (Login): strictly >= 0.50 so the art band never overlaps the left form inputs
   buildClipBandPath(
     {
-      start: [0.55, 0],
+      start: [0.54, 0],
       segments: [
-        [[0.49, 0.18], [0.37, 0.38], [0.37, 0.48]],
-        [[0.37, 0.55], [0.52, 0.55], [0.52, 0.64]],
-        [[0.52, 0.76], [0.50, 0.88], [0.48, 1]],
+        [[0.51, 0.18], [0.50, 0.36], [0.50, 0.48]],
+        [[0.50, 0.56], [0.56, 0.58], [0.56, 0.68]],
+        [[0.56, 0.78], [0.53, 0.90], [0.51, 1]],
       ],
     },
     DESKTOP_FULL_RIGHT
   ),
 
-  // Frame 1 (Sketch 2 - Mid 1): 3-step staircase falling top-left to bottom-right
+  // Frame 1 (Mid 1): 3-step staircase falling top-left to bottom-right
   buildClipBandPath(
     {
       start: [0.18, 0],
@@ -81,7 +81,7 @@ export const DESKTOP_AUTH_CLIP_FRAMES: readonly [string, string, string, string]
     }
   ),
 
-  // Frame 2 (Sketch 3 - Mid 2): 3-step staircase rising bottom-left to top-right
+  // Frame 2 (Mid 2): 3-step staircase rising bottom-left to top-right
   buildClipBandPath(
     {
       start: [0.46, 0],
@@ -101,13 +101,13 @@ export const DESKTOP_AUTH_CLIP_FRAMES: readonly [string, string, string, string]
     }
   ),
 
-  // Frame 3 (Sketch 4 - Signup): art on left, divider bulges right around y=0.36 then notches left at y=0.62
+  // Frame 3 (Signup): strictly <= 0.50 so the art band never overlaps the right form inputs
   buildClipBandPath(DESKTOP_FULL_LEFT, {
-    start: [0.52, 1],
+    start: [0.49, 1],
     segments: [
-      [[0.55, 0.84], [0.54, 0.74], [0.48, 0.62]],
-      [[0.48, 0.56], [0.60, 0.46], [0.60, 0.36]],
-      [[0.60, 0.24], [0.53, 0.12], [0.48, 0]],
+      [[0.50, 0.86], [0.50, 0.74], [0.45, 0.62]],
+      [[0.44, 0.52], [0.50, 0.42], [0.50, 0.32]],
+      [[0.50, 0.20], [0.48, 0.10], [0.46, 0]],
     ],
   }),
 ];
@@ -122,13 +122,13 @@ const MOBILE_TOP_EDGE: ClipBandEdge = {
 };
 
 export const MOBILE_AUTH_CLIP_FRAMES: readonly [string, string, string, string] = [
-  // Frame 0 (Login): top band with subtle wave matching Sketch 1 curve
+  // Frame 0 (Login): top band kept <= 0.31 above row 2 inputs
   buildClipBandPath(MOBILE_TOP_EDGE, {
-    start: [1, 0.34],
+    start: [1, 0.28],
     segments: [
-      [[0.82, 0.37], [0.72, 0.31], [0.60, 0.32]],
-      [[0.48, 0.33], [0.40, 0.40], [0.28, 0.38]],
-      [[0.18, 0.36], [0.08, 0.34], [0, 0.35]],
+      [[0.82, 0.30], [0.72, 0.26], [0.60, 0.27]],
+      [[0.48, 0.28], [0.40, 0.31], [0.28, 0.30]],
+      [[0.18, 0.29], [0.08, 0.27], [0, 0.28]],
     ],
   }),
 
@@ -172,13 +172,13 @@ export const MOBILE_AUTH_CLIP_FRAMES: readonly [string, string, string, string] 
     }
   ),
 
-  // Frame 3 (Signup): top band mirrored wave matching Sketch 4 curve
+  // Frame 3 (Signup): top band mirrored wave kept <= 0.31
   buildClipBandPath(MOBILE_TOP_EDGE, {
-    start: [1, 0.35],
+    start: [1, 0.28],
     segments: [
-      [[0.88, 0.34], [0.76, 0.40], [0.64, 0.40]],
-      [[0.54, 0.40], [0.44, 0.31], [0.32, 0.32]],
-      [[0.20, 0.33], [0.10, 0.37], [0, 0.34]],
+      [[0.88, 0.27], [0.76, 0.31], [0.64, 0.30]],
+      [[0.54, 0.29], [0.44, 0.26], [0.32, 0.27]],
+      [[0.20, 0.28], [0.10, 0.30], [0, 0.28]],
     ],
   }),
 ];

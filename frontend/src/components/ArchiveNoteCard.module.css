@@ -61,15 +61,43 @@
   gap: 6px;
 }
 
+.emptyPreviewMuted {
+  font-style: italic;
+  color: var(--text-subtle);
+}
+
+.confirmPromptRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-subtle);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--danger-text);
+}
+
+.confirmDangerBtn {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background-color: var(--danger-text);
+  color: var(--text-inverse);
+  border: 1.5px solid var(--border-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .restoreBtn {
   display: flex;
   align-items: center;
   gap: 4px;
   padding: 4px 10px;
-  background-color: #ffffff;
+  background-color: var(--bg-surface);
   border: 1.5px solid var(--border-dark);
   border-radius: var(--radius-sm);
-  box-shadow: 1px 1px 0px var(--border-dark);
+  box-shadow: var(--shadow-pin-btn);
   font-size: 12px;
   font-weight: 600;
   color: var(--text-main);
@@ -96,4 +124,12 @@
 
 .deleteBtn:hover {
   background-color: var(--danger-bg);
+}
+
+@media (pointer: coarse), (max-width: 768px) {
+  .restoreBtn,
+  .deleteBtn {
+    min-width: 44px;
+    min-height: 44px;
+  }
 }

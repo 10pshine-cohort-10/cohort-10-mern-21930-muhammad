@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   animate,
@@ -19,6 +19,7 @@ import styles from './AuthSplitLayout.module.css';
 
 const MORPH_DURATION_SEC = 0.7;
 const MORPH_EASE = [0.65, 0, 0.35, 1] as const;
+const TYPING_IDLE_MS = 1200;
 
 function useIsMobileAuth(): boolean {
   const [isMobile, setIsMobile] = useState(() => {
@@ -42,6 +43,39 @@ function useIsMobileAuth(): boolean {
   return isMobile;
 }
 
+function useFormActivity() {
+  const [isFormActive, setIsFormActive] = useState(false);
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearIdleTimer = useCallback(() => {
+    if (idleTimerRef.current !== null) {
+      clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
+    }
+  }, []);
+
+  const handleFocusCapture = useCallback(() => {
+    clearIdleTimer();
+    setIsFormActive(true);
+  }, [clearIdleTimer]);
+
+  const handleBlurCapture = useCallback((e: React.FocusEvent) => {
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    clearIdleTimer();
+    setIsFormActive(false);
+  }, [clearIdleTimer]);
+
+  const handleInputCapture = useCallback(() => {
+    clearIdleTimer();
+    setIsFormActive(true);
+    idleTimerRef.current = setTimeout(() => setIsFormActive(false), TYPING_IDLE_MS);
+  }, [clearIdleTimer]);
+
+  useEffect(() => clearIdleTimer, [clearIdleTimer]);
+
+  return { isFormActive, handleFocusCapture, handleBlurCapture, handleInputCapture };
+}
+
 export default function AuthSplitLayout() {
   const { isAuthenticated, isLoading, login, register } = useAuth();
   const location = useLocation();
@@ -49,6 +83,7 @@ export default function AuthSplitLayout() {
   const shouldReduceMotion = useReducedMotion();
   const isMobile = useIsMobileAuth();
   const clipId = useId();
+  const { isFormActive, handleFocusCapture, handleBlurCapture, handleInputCapture } = useFormActivity();
 
   const isSignup = location.pathname === '/signup';
   const [sharedEmail, setSharedEmail] = useState('');
@@ -65,6 +100,7 @@ export default function AuthSplitLayout() {
   const prevIsSignupRef = useRef(isSignup);
   const loginHeadingRef = useRef<HTMLHeadingElement>(null);
   const signupHeadingRef = useRef<HTMLHeadingElement>(null);
+  const arrivedFromFog = Boolean((location.state as { fromFogTransition?: boolean } | null)?.fromFogTransition);
 
   useEffect(() => {
     if (!hasMountedRef.current) {
@@ -82,7 +118,7 @@ export default function AuthSplitLayout() {
     const target = isSignup ? 1 : 0;
     const distance = Math.abs(target - progress.get());
 
-    if (shouldReduceMotion) {
+    if (shouldReduceMotion || arrivedFromFog) {
       progress.jump(target);
       setIsTransitioning(false);
       const targetHeading = isSignup ? signupHeadingRef.current : loginHeadingRef.current;
@@ -104,7 +140,7 @@ export default function AuthSplitLayout() {
     return () => {
       controls.stop();
     };
-  }, [isSignup, progress, shouldReduceMotion]);
+  }, [arrivedFromFog, isSignup, progress, shouldReduceMotion]);
 
   if (!isLoading && isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
@@ -145,6 +181,9 @@ export default function AuthSplitLayout() {
           aria-hidden={isSignup}
           inert={isSignup}
           data-testid="login-panel"
+          onFocusCapture={!isSignup ? handleFocusCapture : undefined}
+          onBlurCapture={!isSignup ? handleBlurCapture : undefined}
+          onInputCapture={!isSignup ? handleInputCapture : undefined}
         >
           <LoginForm
             email={sharedEmail}
@@ -165,6 +204,9 @@ export default function AuthSplitLayout() {
           aria-hidden={!isSignup}
           inert={!isSignup}
           data-testid="signup-panel"
+          onFocusCapture={isSignup ? handleFocusCapture : undefined}
+          onBlurCapture={isSignup ? handleBlurCapture : undefined}
+          onInputCapture={isSignup ? handleInputCapture : undefined}
         >
           <SignupForm
             email={sharedEmail}
@@ -180,7 +222,6 @@ export default function AuthSplitLayout() {
             clipPath: `url(#${clipId})`,
             WebkitClipPath: `url(#${clipId})`,
           }}
-          aria-hidden="true"
         >
           <motion.div
             className={styles.artMover}
@@ -194,7 +235,7 @@ export default function AuthSplitLayout() {
                   : artShiftX,
             }}
           >
-            <AuthArtPanel isSignup={isSignup} />
+            <AuthArtPanel isSignup={isSignup} isPaused={isFormActive} />
           </motion.div>
         </section>
       </main>

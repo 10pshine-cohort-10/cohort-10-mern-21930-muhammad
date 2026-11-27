@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { X, Maximize2, Minimize2, Download } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { X, Maximize2, Minimize2, Download, Archive, ArchiveRestore } from 'lucide-react';
 import type { ExportFormat } from '../utils/noteExport';
 import styles from './NoteEditor.module.css';
 
@@ -9,7 +9,9 @@ export interface NoteEditorHeaderProps {
   isEditing: boolean;
   isFocusMode: boolean;
   saveStatus?: SaveStatus;
+  isArchived?: boolean;
   onToggleFocusMode: () => void;
+  onToggleArchive?: () => void;
   onExportCurrentNote?: (format: ExportFormat) => void;
   onClose: () => void;
 }
@@ -18,11 +20,26 @@ export default function NoteEditorHeader({
   isEditing,
   isFocusMode,
   saveStatus = 'idle',
+  isArchived = false,
   onToggleFocusMode,
+  onToggleArchive,
   onExportCurrentNote,
   onClose,
 }: NoteEditorHeaderProps) {
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const exportMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isExportOpen) return;
+    const handleOutside = (event: MouseEvent) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target as Node)) {
+        setIsExportOpen(false);
+      }
+    };
+    window.addEventListener('mousedown', handleOutside);
+    return () => window.removeEventListener('mousedown', handleOutside);
+  }, [isExportOpen]);
+
   let stampLabel = '';
   let stampClass = styles.saveStamp;
 
@@ -38,14 +55,25 @@ export default function NoteEditorHeader({
 
   return (
     <div className={styles.drawerHeader}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div className={styles.headerLeft}>
         <span className={styles.headerTitle}>{isEditing ? 'Edit Note' : 'Create Note'}</span>
         {stampLabel && <span className={stampClass}>{stampLabel}</span>}
       </div>
 
       <div className={styles.headerActions}>
+        {isEditing && onToggleArchive && (
+          <button
+            type="button"
+            className={styles.iconButton}
+            onClick={onToggleArchive}
+            title={isArchived ? 'Restore from Archive' : 'Move to Archive'}
+            aria-label={isArchived ? 'Restore from Archive' : 'Move to Archive'}
+          >
+            {isArchived ? <ArchiveRestore size={16} /> : <Archive size={16} />}
+          </button>
+        )}
         {isEditing && onExportCurrentNote && (
-          <>
+          <div ref={exportMenuRef} className={styles.exportWrap}>
             <button
               type="button"
               className={styles.iconButton}
@@ -95,7 +123,7 @@ export default function NoteEditorHeader({
                 </button>
               </div>
             )}
-          </>
+          </div>
         )}
         <button
           type="button"

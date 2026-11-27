@@ -46,7 +46,38 @@
 
 .durationBtnActive {
   background: var(--color-accent-dark);
-  color: #ffffff;
+  color: var(--text-inverse);
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-sm);
+  color: var(--danger-text);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.retryBtn {
+  padding: 5px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-sm);
+  color: var(--danger-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+@media (pointer: coarse), (max-width: 768px) {
+  .durationBtn {
+    min-height: 44px;
+    padding: 8px 14px;
+  }
 }
 
 .chartsGrid {
@@ -118,7 +149,7 @@
 }
 
 .axisLabel {
-  font-size: 9px;
+  font-size: 11px;
   fill: var(--text-subtle);
   font-weight: 600;
 }

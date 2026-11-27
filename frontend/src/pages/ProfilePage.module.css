@@ -3,7 +3,39 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
+}
+
+.pageTitle {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background-color: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-sm);
+  color: var(--danger-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.retryBtn {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-text);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .profileCard {
@@ -28,7 +60,7 @@
   height: 64px;
   border-radius: var(--radius-full);
   background-color: var(--border-dark);
-  color: #ffffff;
+  color: var(--text-inverse);
   font-size: 24px;
   font-weight: 700;
   display: flex;
@@ -149,7 +181,7 @@
 
 .logoutBtn:hover {
   background-color: var(--danger-text);
-  color: #ffffff;
+  color: var(--text-inverse);
 }
 
 @media (max-width: 480px) {
@@ -165,5 +197,12 @@
   .metaRow {
     flex-direction: column;
     gap: 4px;
+  }
+}
+
+@media (pointer: coarse), (max-width: 768px) {
+  .copyBtn {
+    min-width: 44px;
+    min-height: 44px;
   }
 }

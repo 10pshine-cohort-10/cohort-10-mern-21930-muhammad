@@ -37,8 +37,9 @@ describe('ErrorBoundary', () => {
     );
 
     expect(screen.getByRole('alert')).toBeInTheDocument();
-    expect(screen.getByText('Something went wrong on your desk')).toBeInTheDocument();
-    expect(screen.getByText('Reload Workspace')).toBeInTheDocument();
+    expect(screen.getByText('Something went wrong in Pinnate')).toBeInTheDocument();
+    expect(screen.queryByText('Test explosion')).not.toBeInTheDocument();
+    expect(screen.getByText('Reload Pinnate')).toBeInTheDocument();
   });
 
   it('triggers reload callback when reload button is clicked', () => {
@@ -50,7 +51,7 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     );
 
-    const reloadButton = screen.getByRole('button', { name: /reload workspace/i });
+    const reloadButton = screen.getByRole('button', { name: /reload pinnate/i });
     fireEvent.click(reloadButton);
 
     expect(handleReload).toHaveBeenCalledTimes(1);

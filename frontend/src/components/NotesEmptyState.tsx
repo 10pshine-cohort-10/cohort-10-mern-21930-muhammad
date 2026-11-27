@@ -4,6 +4,7 @@ import type { NoteInput } from '../types';
 
 export interface NotesEmptyStateProps {
   searchQuery: string;
+  activeFolder?: string;
   emptyTitle?: string;
   emptySubtitle?: string;
   onCreateNote: () => void;
@@ -45,6 +46,7 @@ const TEMPLATES: Array<{ label: string; note: NoteInput }> = [
 
 export default function NotesEmptyState({
   searchQuery,
+  activeFolder = '',
   emptyTitle,
   emptySubtitle,
   onCreateNote,
@@ -54,18 +56,20 @@ export default function NotesEmptyState({
     <div className={styles.emptyState}>
       <FileText size={40} color="var(--text-subtle)" />
       <h4 className={styles.emptyTitle}>
-        {searchQuery ? 'No notes matched your search' : emptyTitle || 'No notes on the desk yet'}
+        {searchQuery
+          ? 'No notes matched your search'
+          : emptyTitle || (activeFolder ? `No notes in #${activeFolder} yet` : 'No notes here yet')}
       </h4>
       <p className={styles.emptySubtitle}>
         {searchQuery
           ? 'Try searching with different keywords or clear the active folder filter.'
-          : emptySubtitle || 'Start by creating a note or pick a quick starter blueprint below.'}
+          : emptySubtitle || 'Start by creating a note or pick a quick starter template below.'}
       </p>
 
       {!searchQuery && (
         <>
           <button type="button" className={styles.primaryButton} onClick={onCreateNote}>
-            Create First Note
+            {activeFolder ? `Add Note to #${activeFolder}` : 'Create First Note'}
           </button>
 
           {onApplyTemplate && (

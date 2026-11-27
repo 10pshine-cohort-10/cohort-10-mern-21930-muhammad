@@ -49,9 +49,13 @@ describe('noteMetrics', () => {
     });
   });
 
-  it('returns empty summary when no active notes exist', () => {
-    const summary = getLastUpdatedSummary([makeNote({ tags: ['archive'] })]);
+  it('excludes archived notes from activity series, plan breakdown, and summary', () => {
+    const now = new Date('2026-11-26T12:00:00.000Z');
+    const archivedDone = makeNote({ id: 'arch', status: 'done', tags: ['archive'], updatedAt: '2026-11-26T10:00:00.000Z' });
+    const summary = getLastUpdatedSummary([archivedDone]);
     expect(summary.latestNote).toBeNull();
     expect(summary.relativeLabel).toBe('No notes yet');
+    expect(getActivitySeries([archivedDone], 7, now).totalActions).toBe(0);
+    expect(getPlanBreakdown([archivedDone]).totalTracked).toBe(0);
   });
 });

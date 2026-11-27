@@ -82,10 +82,12 @@ describe('DashboardPage folder and All Notes state sync', () => {
       </MemoryRouter>
     );
 
+    expect(screen.getByRole('heading', { level: 1, name: '#yea' })).toBeInTheDocument();
     expect(screen.getByText('Yea Note')).toBeInTheDocument();
     expect(screen.queryByText('General Note')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('link', { name: /all notes/i }));
+    expect(screen.getByRole('heading', { level: 1, name: 'All Notes' })).toBeInTheDocument();
     expect(screen.getByText('General Note')).toBeInTheDocument();
 
     const yeaFolderBtn = screen.getByRole('button', { name: '#yea' });
@@ -97,5 +99,120 @@ describe('DashboardPage folder and All Notes state sync', () => {
 
     fireEvent.click(yeaFolderBtn);
     expect(screen.queryByText('General Note')).not.toBeInTheDocument();
+  });
+
+  it('excludes archive tag from sidebar folders and active dashboard list', () => {
+    mockedUseNotes.mockReturnValue({
+      notes: [
+        {
+          id: 'active-1',
+          userId: 'u1',
+          title: 'Active Roadmap',
+          content: '',
+          color: 'slate',
+          isPinned: false,
+          tags: ['work'],
+          createdAt: '2026-01-01T00:00:00Z',
+          updatedAt: '2026-01-01T00:00:00Z',
+        },
+        {
+          id: 'archived-1',
+          userId: 'u1',
+          title: 'Old Archived Note',
+          content: '',
+          color: 'slate',
+          isPinned: false,
+          tags: ['archive'],
+          createdAt: '2026-01-01T00:00:00Z',
+          updatedAt: '2026-01-01T00:00:00Z',
+        },
+      ],
+      isLoading: false,
+      searchQuery: '',
+      setSearchQuery: jest.fn(),
+      selectedTag: '',
+      setSelectedTag: jest.fn(),
+      errorMessage: '',
+      allTags: ['archive', 'work'],
+      addCustomFolder: jest.fn(),
+      fetchNotes: jest.fn(),
+      createNote: jest.fn(),
+      updateNote: jest.fn(),
+      deleteNote: jest.fn(),
+      togglePin: jest.fn(),
+      exportNotes: jest.fn(),
+      importNotes: jest.fn(),
+      removeNoteLocally: jest.fn(),
+      restoreNoteLocally: jest.fn(),
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/dashboard']}>
+        <DashboardPage />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Active Roadmap')).toBeInTheDocument();
+    expect(screen.queryByText('Old Archived Note')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '#archive' })).not.toBeInTheDocument();
+  });
+
+  it('targets the visually focused pinned card first when using J and D keyboard navigation', () => {
+    const deleteNoteMock = jest.fn().mockResolvedValue(undefined);
+    const removeLocallyMock = jest.fn();
+    mockedUseNotes.mockReturnValue({
+      notes: [
+        {
+          id: 'unpinned-first',
+          userId: 'u1',
+          title: 'Unpinned First In Array',
+          content: '',
+          color: 'slate',
+          isPinned: false,
+          tags: [],
+          createdAt: '2026-01-01T00:00:00Z',
+          updatedAt: '2026-01-01T00:00:00Z',
+        },
+        {
+          id: 'pinned-second',
+          userId: 'u1',
+          title: 'Pinned Rendered First',
+          content: '',
+          color: 'sand',
+          isPinned: true,
+          tags: [],
+          createdAt: '2026-01-01T00:00:00Z',
+          updatedAt: '2026-01-01T00:00:00Z',
+        },
+      ],
+      isLoading: false,
+      searchQuery: '',
+      setSearchQuery: jest.fn(),
+      selectedTag: '',
+      setSelectedTag: jest.fn(),
+      errorMessage: '',
+      allTags: [],
+      addCustomFolder: jest.fn(),
+      fetchNotes: jest.fn(),
+      createNote: jest.fn(),
+      updateNote: jest.fn(),
+      deleteNote: deleteNoteMock,
+      togglePin: jest.fn(),
+      exportNotes: jest.fn(),
+      importNotes: jest.fn(),
+      removeNoteLocally: removeLocallyMock,
+      restoreNoteLocally: jest.fn(),
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/dashboard']}>
+        <DashboardPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.keyDown(window, { key: 'j' });
+    fireEvent.keyDown(window, { key: 'd' });
+
+    expect(removeLocallyMock).toHaveBeenCalledWith('pinned-second');
   });
 });

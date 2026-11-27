@@ -78,13 +78,13 @@
   color: var(--text-muted);
   background: var(--bg-subtle);
   padding: 2px 8px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
 }
 
 .columnAddBtn {
   width: 28px;
   height: 28px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -105,6 +105,10 @@
 
 .dragWrapper {
   position: relative;
+}
+
+.motionCard {
+  transform-origin: top center;
 }
 
 .kanbanCardSwinging {
@@ -132,8 +136,8 @@
   transform: translateX(-50%);
   width: 10px;
   height: 10px;
-  background-color: #ef4444;
-  border: 1.5px solid #18181b;
+  background-color: var(--pin-red);
+  border: 1.5px solid var(--border-dark);
   border-radius: var(--radius-full);
   box-shadow: 0 1px 2px rgba(24, 24, 27, 0.25);
   display: flex;
@@ -146,7 +150,7 @@
 .pinHole {
   width: 3px;
   height: 3px;
-  background-color: #7f1d1d;
+  background-color: var(--pin-red-hole);
   border-radius: var(--radius-full);
 }
 
@@ -231,21 +235,19 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-muted);
-  padding: 2px 6px;
-  border-radius: 5px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 140ms ease;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-subtle);
+  transition: background-color 140ms ease, color 140ms ease;
 }
 
-.kanbanCard:hover .moveToTrigger,
-.kanbanCard:focus-within .moveToTrigger,
-.moveToTrigger[aria-expanded='true'] {
-  opacity: 1;
-  visibility: visible;
+.moveToTrigger:hover {
+  background: var(--bg-muted);
+  color: var(--text-main);
 }
 
 .moveDropdown {
@@ -255,7 +257,7 @@
   min-width: 136px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-lg);
   padding: 4px;
   z-index: 20;
@@ -281,51 +283,34 @@
   background: var(--bg-subtle);
 }
 
-.quickMoveGroup {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 140ms ease;
-}
-
-.kanbanCard:hover .quickMoveGroup,
-.kanbanCard:focus-within .quickMoveGroup {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-@media (hover: none), (pointer: coarse) {
+@media (pointer: coarse), (max-width: 768px) {
   .moveToTrigger {
-    opacity: 1;
-    visibility: visible;
     min-height: 44px;
     padding: 0 10px;
   }
-
-  .quickMoveGroup {
-    display: none;
-  }
 }
 
-.moveBtn {
-  display: inline-flex;
+.unstagedHintBar {
+  display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.72rem;
-  font-weight: 600;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  font-size: 0.84rem;
   color: var(--text-muted);
-  background: var(--bg-subtle);
-  padding: 3px 8px;
-  border-radius: 6px;
 }
 
-.moveBtn:hover {
-  color: var(--text-main);
-  background: var(--bg-muted);
+.columnEmptyHint {
+  padding: 20px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-subtle);
+  font-size: 0.8rem;
+  color: var(--text-subtle);
+  text-align: center;
 }
 
 .emptyBoard {
@@ -388,11 +373,11 @@
   align-items: center;
   gap: 6px;
   background: var(--color-accent-dark);
-  color: #ffffff;
+  color: var(--text-inverse);
   font-weight: 600;
   font-size: 0.85rem;
   padding: 8px 14px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 
 .secondaryBtn {

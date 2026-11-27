@@ -62,7 +62,15 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 24px;
+  min-height: 44px;
+  margin-bottom: 20px;
+  text-decoration: none;
+}
+
+.brand:focus-visible {
+  outline: 2px solid var(--border-dark);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
 .brandIcon {
@@ -70,7 +78,7 @@
   height: 34px;
   border-radius: var(--radius-sm);
   background-color: var(--border-dark);
-  color: #ffffff;
+  color: var(--text-inverse);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -170,7 +178,7 @@
   padding: 10px 20px;
   border-radius: var(--radius-sm);
   background-color: var(--border-dark);
-  color: #ffffff;
+  color: var(--text-inverse);
   font-weight: 600;
   font-size: 15px;
   box-shadow: var(--shadow-sm);
@@ -178,7 +186,7 @@
 }
 
 .submitButton:hover:not(:disabled) {
-  background-color: #27272a;
+  background-color: var(--accent-ink-hover);
   transform: translateY(-1px);
 }
 
@@ -224,65 +232,26 @@
   gap: 20px;
 }
 
-.pinnedCard {
-  position: relative;
+.handDrawnArt {
   width: 100%;
-  background-color: var(--color-sage-bg);
-  border: 2px solid var(--card-border);
-  box-shadow: var(--card-shadow);
-  border-radius: var(--radius-md);
-  padding: 22px 20px;
-  transform: rotate(-1.5deg);
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.pinDot {
-  position: absolute;
-  top: -10px;
-  left: 22px;
-  width: 18px;
-  height: 18px;
-  border-radius: var(--radius-full);
-  background-color: #ef4444;
-  border: 2px solid var(--border-dark);
-}
-
-.cardHeader {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 24px;
 }
 
-.cardTitle {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.cardBody {
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-.cardFooter {
+.artShapeGroup {
+  width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--text-muted);
+  gap: 8px;
 }
 
-.tagChip {
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
-  background-color: rgba(255, 255, 255, 0.78);
-  border: 1px solid var(--border-dark);
-  font-weight: 600;
-  color: var(--text-main);
+.artShape {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
 }
 
 .artCaption {
@@ -296,19 +265,34 @@
 @media (max-width: 767px) {
   .splitStage {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(210px, 34svh) 1fr;
+    grid-template-rows: clamp(180px, 26svh, 224px) 1fr;
   }
 
   .artOverlay {
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    height: clamp(180px, 26svh, 224px);
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
+    border-bottom: 1.5px solid var(--border-subtle);
     align-items: flex-start;
-    padding: 20px;
+    padding: 14px 20px;
   }
 
   .artMover {
     padding: 8px 0 0;
     transform: none !important;
+  }
+
+  .handDrawnArt {
+    gap: 8px;
+  }
+
+  .artShape {
+    max-width: 136px;
   }
 
   .formColumn {

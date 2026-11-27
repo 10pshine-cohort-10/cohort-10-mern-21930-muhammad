@@ -28,12 +28,16 @@ function toLocalDateKey(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
+function isActiveNote(note: Note): boolean {
+  return !(Array.isArray(note.tags) && note.tags.includes('archive'));
+}
+
 export function getLastUpdatedSummary(notes: Note[]): {
   latestNote: Note | null;
   relativeLabel: string;
   encouragement: string;
 } {
-  const activeNotes = notes.filter((n) => !(Array.isArray(n.tags) && n.tags.includes('archive')));
+  const activeNotes = notes.filter(isActiveNote);
   if (activeNotes.length === 0) {
     return {
       latestNote: null,
@@ -71,7 +75,7 @@ export function getActivitySeries(notes: Note[], days: 7 | 30, now: Date = new D
     series.push({ dateKey: key, label, count: 0 });
   }
 
-  for (const note of notes) {
+  for (const note of notes.filter(isActiveNote)) {
     const updatedKey = toLocalDateKey(new Date(note.updatedAt));
     if (countsByDay.has(updatedKey)) {
       countsByDay.set(updatedKey, (countsByDay.get(updatedKey) || 0) + 1);
@@ -94,7 +98,7 @@ export function getPlanBreakdown(notes: Note[]): PlanBreakdown {
   let inProgress = 0;
   let done = 0;
 
-  for (const note of notes) {
+  for (const note of notes.filter(isActiveNote)) {
     if (note.status === 'todo') todo += 1;
     else if (note.status === 'in_progress') inProgress += 1;
     else if (note.status === 'done') done += 1;

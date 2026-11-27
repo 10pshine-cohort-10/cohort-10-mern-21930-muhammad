@@ -100,4 +100,20 @@ describe('CommandPalette Component', () => {
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it('switches view mode and opens keyboard help via commands', () => {
+    const onChangeViewMode = jest.fn();
+    const onOpenHelp = jest.fn();
+    const onClose = jest.fn();
+    renderComponent({ onChangeViewMode, onOpenHelp, onClose });
+
+    fireEvent.click(screen.getByText('Switch to Board view'));
+    expect(onChangeViewMode).toHaveBeenCalledWith('board');
+    expect(onClose).toHaveBeenCalledTimes(1);
+
+    const input = screen.getByPlaceholderText(/Type a command or search notes/i);
+    fireEvent.change(input, { target: { value: 'Keyboard' } });
+    fireEvent.click(screen.getByText('Keyboard shortcuts'));
+    expect(onOpenHelp).toHaveBeenCalledTimes(1);
+  });
 });

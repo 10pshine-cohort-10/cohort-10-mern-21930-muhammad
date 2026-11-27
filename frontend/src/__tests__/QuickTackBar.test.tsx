@@ -4,11 +4,11 @@ import QuickTackBar from '../components/QuickTackBar';
 describe('QuickTackBar Component', () => {
   it('starts collapsed as a pill and expands on click', () => {
     render(<QuickTackBar activeTag="" onQuickCreate={jest.fn()} />);
-    const pill = screen.getByRole('button', { name: /Quick tack a note/i });
+    const pill = screen.getByRole('button', { name: /Quick add a note/i });
     expect(pill).toBeInTheDocument();
 
     fireEvent.click(pill);
-    expect(screen.getByPlaceholderText(/Quick tack a note to board/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Quick add a note/i)).toBeInTheDocument();
   });
 
   it('ignores q shortcut when focus is inside an input', () => {
@@ -30,7 +30,7 @@ describe('QuickTackBar Component', () => {
     const handleCreateMock = jest.fn().mockResolvedValue(undefined);
     render(<QuickTackBar activeTag="work" onQuickCreate={handleCreateMock} />);
 
-    fireEvent.click(screen.getByRole('button', { name: /Quick tack a note/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Quick add a note/i }));
     const input = screen.getByLabelText('Quick note input') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'Buy more coffee' } });
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
@@ -41,12 +41,28 @@ describe('QuickTackBar Component', () => {
     });
   });
 
+  it('allows adding quick note directly to the Board To Do stage', async () => {
+    const handleCreateMock = jest.fn().mockResolvedValue(undefined);
+    render(<QuickTackBar activeTag="" onQuickCreate={handleCreateMock} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Quick add a note/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Add to Board/i }));
+
+    const input = screen.getByLabelText('Quick note input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'Ship release' } });
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+
+    await waitFor(() => {
+      expect(handleCreateMock).toHaveBeenCalledWith('Ship release', '', 'todo');
+    });
+  });
+
   it('preserves input and shows alert when quick create fails', async () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const handleCreateMock = jest.fn().mockRejectedValue(new Error('Network error'));
     render(<QuickTackBar activeTag="" onQuickCreate={handleCreateMock} />);
 
-    fireEvent.click(screen.getByRole('button', { name: /Quick tack a note/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Quick add a note/i }));
     const input = screen.getByLabelText('Quick note input') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'Unsaved idea' } });
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });

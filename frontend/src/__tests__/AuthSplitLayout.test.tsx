@@ -42,6 +42,12 @@ describe('AuthSplitLayout (Phase 2)', () => {
     expect(screen.getByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
     expect(screen.getByText('Your notes are where you left them.')).toBeInTheDocument();
     expect(screen.getByText('Pick up where you left off.')).toBeInTheDocument();
+    const artContainer = screen.getByTestId('auth-handdrawn-art');
+    expect(artContainer).toBeInTheDocument();
+    const svgs = artContainer.querySelectorAll('svg');
+    expect(svgs.length).toBeGreaterThan(0);
+    svgs.forEach((svg) => expect(svg).toHaveAttribute('aria-hidden', 'true'));
+    expect(screen.getByText('Pick up where you left off.').closest('[aria-hidden="true"]')).toBeNull();
     expect(screen.getByLabelText('Email', { selector: '#login-email' })).toHaveAttribute(
       'autocomplete',
       'username'
@@ -66,8 +72,11 @@ describe('AuthSplitLayout (Phase 2)', () => {
     expect(signupPanel).toHaveAttribute('inert');
     expect(signupPanel).toHaveAttribute('aria-hidden', 'true');
 
+    expect(screen.queryByRole('navigation', { name: 'Public navigation' })).not.toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: 'Pinnate home' })[0]).toHaveAttribute('href', '/');
+
     // Tab through all focusable controls on login; focus must never enter signupPanel
-    for (let step = 0; step < 6; step += 1) {
+    for (let step = 0; step < 8; step += 1) {
       await user.tab();
       expect(signupPanel.contains(document.activeElement)).toBe(false);
     }
@@ -127,7 +136,9 @@ describe('AuthSplitLayout (Phase 2)', () => {
 
     expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
     expect(screen.getByText('At least 8 characters.')).toBeInTheDocument();
-    expect(screen.getByText('Start small. Watch plans grow.')).toBeInTheDocument();
+    expect(screen.getByText('Capture a thought in seconds.')).toBeInTheDocument();
+    expect(screen.getByText('Move plans forward at your pace.')).toBeInTheDocument();
+    expect(screen.getByText('See how far you\'ve come.')).toBeInTheDocument();
     expect(screen.getByLabelText('Password', { selector: '#signup-password' })).toHaveAttribute(
       'autocomplete',
       'new-password'
@@ -214,7 +225,7 @@ describe('AuthSplitLayout (Phase 2)', () => {
 
     const { container } = renderAuthRoute('/login');
     const clipPathEl = container.querySelector('clipPath path');
-    expect(clipPathEl?.getAttribute('d')).toContain('1 0.34');
+    expect(clipPathEl?.getAttribute('d')).toContain('L 1 0.28');
 
     window.matchMedia = originalMatchMedia;
   });
@@ -243,6 +254,45 @@ describe('AuthSplitLayout (Phase 2)', () => {
       },
       { timeout: 1500 }
     );
+
+    window.matchMedia = originalMatchMedia;
+  });
+
+  it('pauses hand-drawn motion on focus and typing, and resumes cleanly after blur', () => {
+    renderAuthRoute('/signup');
+    const art = screen.getByTestId('auth-handdrawn-art');
+    expect(art).toHaveAttribute('data-paused', 'false');
+
+    const nameInput = screen.getByLabelText('Name', { selector: '#signup-name' });
+    const emailInput = screen.getByLabelText('Email', { selector: '#signup-email' });
+
+    fireEvent.focus(nameInput);
+    expect(art).toHaveAttribute('data-paused', 'true');
+
+    fireEvent.blur(nameInput, { relatedTarget: emailInput });
+    expect(art).toHaveAttribute('data-paused', 'true');
+
+    fireEvent.blur(emailInput, { relatedTarget: document.body });
+    expect(art).toHaveAttribute('data-paused', 'false');
+  });
+
+  it('shows only Shape 3 on mobile signup band', () => {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = jest.fn().mockImplementation((query: string) => ({
+      matches: query === '(max-width: 767px)',
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    }));
+
+    renderAuthRoute('/signup');
+    expect(screen.getByText("See how far you've come.")).toBeInTheDocument();
+    expect(screen.queryByText('Capture a thought in seconds.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Move plans forward at your pace.')).not.toBeInTheDocument();
 
     window.matchMedia = originalMatchMedia;
   });

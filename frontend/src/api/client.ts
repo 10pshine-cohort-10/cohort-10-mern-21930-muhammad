@@ -24,11 +24,14 @@ client.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      const isAuthRoute =
+      const isPublicOrAuthRoute =
         typeof window !== 'undefined' &&
-        (window.location.pathname.startsWith('/login') ||
-          window.location.pathname.startsWith('/register'));
-      if (!isAuthRoute && typeof window !== 'undefined') {
+        (window.location.pathname === '/' ||
+          window.location.pathname.startsWith('/login') ||
+          window.location.pathname.startsWith('/signup') ||
+          window.location.pathname.startsWith('/register') ||
+          window.location.pathname.startsWith('/scratchpad'));
+      if (!isPublicOrAuthRoute && typeof window !== 'undefined') {
         localStorage.removeItem('notes_auth_token');
         localStorage.removeItem('notes_user_data');
         window.location.href = '/login';

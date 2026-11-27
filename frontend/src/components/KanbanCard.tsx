@@ -73,7 +73,7 @@ export default function KanbanCard({
       className={`${styles.dragWrapper} ${isDragging ? styles.dragging : ''} ${shouldSwing || isMoveMenuOpen ? styles.kanbanCardSwinging : ''}`}
     >
       <motion.div
-        style={{ transformOrigin: 'top center' }}
+        className={styles.motionCard}
         initial={shouldSwing ? { rotate: restingTilt - 8 } : false}
         animate={{ rotate: targetTilt }}
         transition={
@@ -85,9 +85,11 @@ export default function KanbanCard({
         }
       >
         <div className={`${styles.kanbanCard} ${cardColorClass}`}>
-          <div className={styles.pinIndicator} aria-hidden="true">
-            <div className={styles.pinHole} />
-          </div>
+          {note.isPinned && (
+            <div className={styles.pinIndicator} aria-hidden="true">
+              <div className={styles.pinHole} />
+            </div>
+          )}
 
           <button type="button" className={styles.cardBodyBtn} onClick={() => onOpenNote(note)}>
             <div className={styles.cardTitle}>{note.title || 'Untitled'}</div>
@@ -143,21 +145,6 @@ export default function KanbanCard({
                   </div>
                 )}
               </div>
-            </div>
-
-            <div className={styles.quickMoveGroup}>
-              {targetColumns.map((target) => (
-                <button
-                  key={target.status}
-                  type="button"
-                  className={styles.moveBtn}
-                  onClick={() => onMoveStatus(note.id, target.status)}
-                  title={`Move to ${target.label}`}
-                >
-                  <ArrowRight size={11} />
-                  <span>{target.label}</span>
-                </button>
-              ))}
             </div>
           </div>
         </div>

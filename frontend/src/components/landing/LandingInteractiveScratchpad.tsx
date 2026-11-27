@@ -1,30 +1,30 @@
 import { useState, type KeyboardEvent } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Pin, Check } from 'lucide-react';
+import { Plus, ArrowUpRight, Check } from 'lucide-react';
 import styles from '../../pages/LandingPage.module.css';
 
-export default function LandingInteractiveScratchpad() {
+export default function LandingInteractiveScratchpad({ compact = false }: { compact?: boolean }) {
   const [draftText, setDraftText] = useState('');
   const [savedDraft, setSavedDraft] = useState('Ship v1 roadmap');
-  const [isTacked, setIsTacked] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && draftText.trim()) {
       e.preventDefault();
       setSavedDraft(draftText.trim());
       setDraftText('');
-      setIsTacked(false);
+      setIsAdded(false);
     }
   };
 
   return (
-    <div className={styles.visualStage}>
+    <div className={`${styles.visualStage} ${compact ? styles.visualStageCompact : ''}`}>
       <div className={styles.miniInputRow}>
         <Plus size={16} />
         <input
           type="text"
           className={styles.miniInput}
-          placeholder="Type a quick draft and press Enter..."
+          placeholder="Type a quick draft and press Enter…"
           value={draftText}
           onChange={(e) => setDraftText(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -33,7 +33,7 @@ export default function LandingInteractiveScratchpad() {
         <kbd className={styles.kbdBadge}>ENTER</kbd>
       </div>
 
-      {isTacked ? (
+      {isAdded ? (
         <motion.div
           className={styles.pinnedSnapCard}
           initial={{ scale: 0.96, rotate: 0 }}
@@ -46,18 +46,18 @@ export default function LandingInteractiveScratchpad() {
             animate={{ y: 0, scale: 1 }}
             transition={{ type: 'spring', stiffness: 460, damping: 20 }}
           />
-          <span style={{ fontWeight: 600 }}>{savedDraft}</span>
-          <button type="button" className={styles.miniTackBtn} onClick={() => setIsTacked(false)}>
+          <span className={styles.draftTitleText}>{savedDraft}</span>
+          <button type="button" className={styles.miniTackBtn} onClick={() => setIsAdded(false)}>
             <Check size={13} />
-            <span>Tacked to notes</span>
+            <span>Added to notes</span>
           </button>
         </motion.div>
       ) : (
         <div className={styles.miniDraftRow}>
           <span>{savedDraft}</span>
-          <button type="button" className={styles.miniTackBtn} onClick={() => setIsTacked(true)}>
-            <Pin size={13} />
-            <span>Tack to notes</span>
+          <button type="button" className={styles.miniTackBtn} onClick={() => setIsAdded(true)}>
+            <ArrowUpRight size={13} />
+            <span>Add to notes</span>
           </button>
         </div>
       )}

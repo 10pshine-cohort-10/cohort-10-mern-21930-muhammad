@@ -73,8 +73,12 @@ describe('ProfilePage', () => {
       </MemoryRouter>
     );
 
-    const ones = screen.getAllByText('1');
-    expect(ones).toHaveLength(3);
+    expect(screen.getByRole('heading', { level: 1, name: 'My Profile' })).toBeInTheDocument();
+    expect(screen.getAllByText('Folders').length).toBeGreaterThanOrEqual(2);
+    const statValues = screen
+      .getAllByText('1')
+      .filter((el) => el.classList.contains('statValue'));
+    expect(statValues).toHaveLength(3);
     expect(screen.getByText('user-abc-123')).toBeInTheDocument();
   });
 });

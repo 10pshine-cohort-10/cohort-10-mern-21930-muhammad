@@ -1,23 +1,12 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import styles from './ProtectedRoute.module.css';
 
 export default function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-          color: 'var(--text-muted)',
-        }}
-      >
-        Loading session...
-      </div>
-    );
+    return <div className={styles.loadingState}>Loading session...</div>;
   }
 
   if (!isAuthenticated) {

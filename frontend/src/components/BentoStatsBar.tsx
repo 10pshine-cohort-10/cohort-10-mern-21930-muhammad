@@ -16,13 +16,17 @@ export default function BentoStatsBar({
   totalNotes,
   pinnedCount,
   totalTags,
-  thirdStatLabel = 'folders',
+  thirdStatLabel = 'folder',
   thirdStatValue,
   activeFilter,
   onFilterAll,
   onFilterPinned,
 }: BentoStatsBarProps) {
   const folderDisplay = thirdStatValue ?? totalTags;
+  const resolvedThirdLabel =
+    thirdStatValue !== undefined
+      ? thirdStatLabel.toLowerCase()
+      : `${folderDisplay === 1 ? 'folder' : 'folders'}`;
 
   return (
     <div className={styles.quietStatsLine}>
@@ -59,7 +63,7 @@ export default function BentoStatsBar({
       <span aria-hidden="true">·</span>
 
       <span>
-        <span>{folderDisplay}</span> <span>{thirdStatLabel.toLowerCase()}</span>
+        <span>{folderDisplay}</span> <span>{resolvedThirdLabel}</span>
       </span>
     </div>
   );

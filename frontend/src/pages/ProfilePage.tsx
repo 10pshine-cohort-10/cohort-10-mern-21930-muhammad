@@ -8,7 +8,7 @@ import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
-  const { notes, allTags } = useNotes();
+  const { notes, allTags, errorMessage, fetchNotes } = useNotes();
   const [hasCopiedId, setHasCopiedId] = useState(false);
 
   const safeNotes = Array.isArray(notes) ? notes.filter(Boolean) : [];
@@ -30,8 +30,17 @@ export default function ProfilePage() {
   };
 
   return (
-    <Layout>
+    <Layout folders={safeTags}>
       <div className={styles.container}>
+        <h1 className={styles.pageTitle}>My Profile</h1>
+        {errorMessage && (
+          <div className={styles.errorBanner} role="alert">
+            <span>{errorMessage}</span>
+            <button type="button" className={styles.retryBtn} onClick={() => fetchNotes()}>
+              Retry
+            </button>
+          </div>
+        )}
         <div className={styles.profileCard}>
           <div className={styles.headerSection}>
             <div className={styles.avatarLarge}>{userInitial}</div>
@@ -52,7 +61,7 @@ export default function ProfilePage() {
             </div>
             <div className={styles.statBox}>
               <span className={styles.statValue}>{safeTags.length}</span>
-              <span className={styles.statLabel}>Unique Tags</span>
+              <span className={styles.statLabel}>Folders</span>
             </div>
           </div>
 

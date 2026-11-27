@@ -1,16 +1,24 @@
 import { useState, useEffect, useRef, type KeyboardEvent, type RefObject } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Columns3 } from 'lucide-react';
+import type { NoteStatus } from '../types';
 import styles from './QuickTackBar.module.css';
 
 export interface QuickTackBarProps {
   activeTag: string;
-  onQuickCreate: (title: string, tag: string) => Promise<void>;
+  onQuickCreate: (title: string, tag: string, status?: NoteStatus) => Promise<void>;
   inputRef?: RefObject<HTMLInputElement | null>;
+  expandSignal?: number;
 }
 
-export default function QuickTackBar({ activeTag, onQuickCreate, inputRef }: QuickTackBarProps) {
+export default function QuickTackBar({
+  activeTag,
+  onQuickCreate,
+  inputRef,
+  expandSignal = 0,
+}: QuickTackBarProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [content, setContent] = useState('');
+  const [addToBoard, setAddToBoard] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorText, setErrorText] = useState('');
   const localInputRef = useRef<HTMLInputElement>(null);
@@ -18,7 +26,10 @@ export default function QuickTackBar({ activeTag, onQuickCreate, inputRef }: Qui
 
   useEffect(() => {
     const handleGlobalKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.key.toLowerCase() !== 'q' || event.metaKey || event.ctrlKey || event.altKey) return;
+      const pressedKey = event.key.toLowerCase();
+      if ((pressedKey !== 'q' && pressedKey !== 't') || event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
       const activeEl = document.activeElement;
       const isEditingText =
         activeEl instanceof HTMLInputElement ||
@@ -33,6 +44,12 @@ export default function QuickTackBar({ activeTag, onQuickCreate, inputRef }: Qui
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, []);
+
+  useEffect(() => {
+    if (expandSignal > 0) {
+      setIsExpanded(true);
+    }
+  }, [expandSignal]);
 
   useEffect(() => {
     if (isExpanded) {
@@ -53,10 +70,14 @@ export default function QuickTackBar({ activeTag, onQuickCreate, inputRef }: Qui
       setIsSubmitting(true);
       setErrorText('');
       try {
-        await onQuickCreate(textToSave, activeTag);
+        if (addToBoard) {
+          await onQuickCreate(textToSave, activeTag, 'todo');
+        } else {
+          await onQuickCreate(textToSave, activeTag);
+        }
         setContent('');
       } catch (err) {
-        console.error('Quick tack failed:', err);
+        console.error('Quick add failed:', err);
         setErrorText('Failed to save note. Try again.');
       } finally {
         setIsSubmitting(false);
@@ -65,8 +86,8 @@ export default function QuickTackBar({ activeTag, onQuickCreate, inputRef }: Qui
   };
 
   const placeholderText = activeTag
-    ? `Quick tack a note to #${activeTag}... (press Enter)`
-    : 'Quick tack a note to board... (press Enter)';
+    ? `Quick add a note to #${activeTag}... (press Enter)`
+    : 'Quick add a note... (press Enter)';
 
   if (!isExpanded) {
     return (
@@ -75,11 +96,11 @@ export default function QuickTackBar({ activeTag, onQuickCreate, inputRef }: Qui
           type="button"
           className={styles.collapsedPill}
           onClick={() => setIsExpanded(true)}
-          aria-label="Quick tack a note"
-          title="Quick tack a note (Q)"
+          aria-label="Quick add a note"
+          title="Quick add a note (Q)"
         >
           <Plus size={16} />
-          <span>Quick tack</span>
+          <span>Quick add</span>
           <kbd className={styles.pillKbd}>Q</kbd>
         </button>
       </div>
@@ -111,12 +132,22 @@ export default function QuickTackBar({ activeTag, onQuickCreate, inputRef }: Qui
           onKeyDown={handleKeyDown}
           aria-label="Quick note input"
         />
+        <button
+          type="button"
+          className={`${styles.stageChipBtn} ${addToBoard ? styles.stageChipActive : ''}`}
+          onClick={() => setAddToBoard((prev) => !prev)}
+          aria-pressed={addToBoard}
+          title="Add straight to Board (To Do)"
+        >
+          <Columns3 size={12} />
+          <span>{addToBoard ? 'Board: To Do' : 'Add to Board'}</span>
+        </button>
         <kbd className={styles.hintKey}>{isSubmitting ? 'SAVING' : 'ENTER'}</kbd>
         <button
           type="button"
           className={styles.closeBtn}
           onClick={() => setIsExpanded(false)}
-          aria-label="Collapse quick tack"
+          aria-label="Collapse quick add"
           title="Collapse (Esc)"
         >
           <X size={14} />
