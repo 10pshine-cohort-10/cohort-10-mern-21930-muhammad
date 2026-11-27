@@ -1,5 +1,13 @@
 import { useEffect, useState, type RefObject } from 'react';
-import { motion, useScroll, useSpring, useTransform, useReducedMotion } from 'framer-motion';
+import {
+  motion,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'framer-motion';
+import { LEAF_OUTLINE_PATH, LEAF_STEM_PATH, LEAF_VEIN_PATH } from './leafPath';
 import { buildThreadGeometry, type ThreadAnchorRects, type ThreadGeometry } from './threadPath';
 import styles from '../../pages/LandingPage.module.css';
 
@@ -7,30 +15,39 @@ export interface LandingScrollThreadProps {
   containerRef: RefObject<HTMLElement | null>;
 }
 
+const LEAF_STROKE_PROPS = {
+  fill: 'none',
+  stroke: 'var(--accent-orange)',
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+  vectorEffect: 'non-scaling-stroke' as const,
+};
+
 function readAnchorRects(canvasEl: HTMLElement): ThreadAnchorRects | null {
-  const heroPinEl = canvasEl.querySelector<HTMLElement>('[data-thread-anchor="hero-pin"]');
+  const heroCopyEl = canvasEl.querySelector<HTMLElement>('[data-thread-anchor="hero-copy"]');
+  const heroStageEl = canvasEl.querySelector<HTMLElement>('[data-thread-anchor="hero-stage"]');
   const featuresEl = canvasEl.querySelector<HTMLElement>('[data-thread-anchor="features"]');
   const featuresInnerEl = canvasEl.querySelector<HTMLElement>('[data-thread-anchor="features-inner"]');
   const ctaCardEl = canvasEl.querySelector<HTMLElement>('[data-thread-anchor="cta-card"]');
-  const ctaPinEl = canvasEl.querySelector<HTMLElement>('[data-thread-anchor="cta-pin"]');
 
-  if (!heroPinEl || !featuresEl || !featuresInnerEl || !ctaCardEl || !ctaPinEl) {
+  if (!heroCopyEl || !heroStageEl || !featuresEl || !featuresInnerEl || !ctaCardEl) {
     return null;
   }
 
   return {
     canvas: canvasEl.getBoundingClientRect(),
-    heroPin: heroPinEl.getBoundingClientRect(),
+    heroCopy: heroCopyEl.getBoundingClientRect(),
+    heroStage: heroStageEl.getBoundingClientRect(),
     featuresSection: featuresEl.getBoundingClientRect(),
     featuresInner: featuresInnerEl.getBoundingClientRect(),
     ctaCard: ctaCardEl.getBoundingClientRect(),
-    ctaPin: ctaPinEl.getBoundingClientRect(),
   };
 }
 
 export default function LandingScrollThread({ containerRef }: LandingScrollThreadProps) {
   const shouldReduceMotion = useReducedMotion();
   const [geometry, setGeometry] = useState<ThreadGeometry | null>(null);
+  const [hasLeafDrawn, setHasLeafDrawn] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -43,13 +60,13 @@ export default function LandingScrollThread({ containerRef }: LandingScrollThrea
     mass: 0.45,
   });
 
-  const headProgress = useTransform(smoothProgress, [0.1, 0.2, 0.78, 1], [0, 0.18, 1, 1]);
-  const tailProgress = useTransform(smoothProgress, [0.1, 0.22, 0.78, 0.9, 1], [0, 0, 0.66, 1, 1]);
-  const visibleLength = useTransform([headProgress, tailProgress], ([h, t]: number[]) => {
-    const span = h - t;
-    return span < 0.002 ? 0 : Math.min(1, span);
+  const lineProgress = useTransform(smoothProgress, [0.04, 0.92], [0, 1]);
+
+  useMotionValueEvent(lineProgress, 'change', (latest) => {
+    if (!shouldReduceMotion && !hasLeafDrawn && latest >= 0.985) {
+      setHasLeafDrawn(true);
+    }
   });
-  const activeOpacity = useTransform(visibleLength, (len) => (len <= 0 ? 0 : 1));
 
   useEffect(() => {
     const canvasEl = containerRef.current;
@@ -62,6 +79,9 @@ export default function LandingScrollThread({ containerRef }: LandingScrollThrea
         const rects = readAnchorRects(canvasEl);
         if (!rects || rects.canvas.width === 0 || rects.canvas.height === 0) return;
         setGeometry(buildThreadGeometry(rects));
+        if (!shouldReduceMotion && lineProgress.get() >= 0.985) {
+          setHasLeafDrawn(true);
+        }
       });
     };
 
@@ -85,19 +105,12 @@ export default function LandingScrollThread({ containerRef }: LandingScrollThrea
       resizeObserver?.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [containerRef]);
+  }, [containerRef, lineProgress, shouldReduceMotion]);
 
-  const sharedPathProps = geometry
-    ? {
-        d: geometry.d,
-        fill: 'none',
-        stroke: 'url(#landingThreadGradient)',
-        strokeWidth: geometry.isCompact ? 1.5 : 2,
-        strokeLinecap: 'round' as const,
-        strokeLinejoin: 'round' as const,
-        vectorEffect: 'non-scaling-stroke' as const,
-      }
-    : null;
+  const strokeWidth = geometry?.isCompact ? 1.5 : 2;
+  const leafTransform = geometry
+    ? `translate(${geometry.leaf.x}, ${geometry.leaf.y}) rotate(${geometry.leaf.tiltDeg}) scale(${geometry.leaf.scale})`
+    : undefined;
 
   return (
     <svg
@@ -120,15 +133,79 @@ export default function LandingScrollThread({ containerRef }: LandingScrollThrea
         </linearGradient>
       </defs>
 
-      {sharedPathProps &&
-        (shouldReduceMotion ? (
-          <path {...sharedPathProps} opacity={0.22} />
-        ) : (
-          <motion.path
-            {...sharedPathProps}
-            style={{ pathLength: visibleLength, pathOffset: tailProgress, opacity: activeOpacity }}
-          />
-        ))}
+      {geometry && (
+        <>
+          {shouldReduceMotion ? (
+            <path
+              d={geometry.d}
+              fill="none"
+              stroke="url(#landingThreadGradient)"
+              strokeWidth={strokeWidth}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+              opacity={0.25}
+            />
+          ) : (
+            <motion.path
+              d={geometry.d}
+              fill="none"
+              stroke="url(#landingThreadGradient)"
+              strokeWidth={strokeWidth}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+              style={{ pathLength: lineProgress }}
+            />
+          )}
+
+          <g transform={leafTransform}>
+            {shouldReduceMotion ? (
+              <>
+                <path d={LEAF_OUTLINE_PATH} fill="rgba(249, 115, 22, 0.14)" stroke="none" />
+                <path d={LEAF_STEM_PATH} {...LEAF_STROKE_PROPS} strokeWidth={strokeWidth} />
+                <path d={LEAF_OUTLINE_PATH} {...LEAF_STROKE_PROPS} strokeWidth={strokeWidth} />
+                <path d={LEAF_VEIN_PATH} {...LEAF_STROKE_PROPS} strokeWidth={1.5} />
+              </>
+            ) : (
+              <>
+                <motion.path
+                  d={LEAF_OUTLINE_PATH}
+                  fill="rgba(249, 115, 22, 0.14)"
+                  stroke="none"
+                  initial={{ opacity: 0 }}
+                  animate={hasLeafDrawn ? { opacity: 1 } : { opacity: 0 }}
+                  transition={{ delay: 0.88, duration: 0.32, ease: 'easeOut' }}
+                />
+                <motion.path
+                  d={LEAF_STEM_PATH}
+                  {...LEAF_STROKE_PROPS}
+                  strokeWidth={strokeWidth}
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={hasLeafDrawn ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                />
+                <motion.path
+                  d={LEAF_OUTLINE_PATH}
+                  {...LEAF_STROKE_PROPS}
+                  strokeWidth={strokeWidth}
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={hasLeafDrawn ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+                  transition={{ delay: 0.1, duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
+                />
+                <motion.path
+                  d={LEAF_VEIN_PATH}
+                  {...LEAF_STROKE_PROPS}
+                  strokeWidth={1.5}
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={hasLeafDrawn ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+                  transition={{ delay: 0.58, duration: 0.37, ease: 'easeOut' }}
+                />
+              </>
+            )}
+          </g>
+        </>
+      )}
     </svg>
   );
 }

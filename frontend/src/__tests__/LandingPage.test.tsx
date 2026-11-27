@@ -40,7 +40,7 @@ describe('LandingPage', () => {
       refreshUser: jest.fn(),
     });
 
-    render(
+    const { container } = render(
       <MemoryRouter initialEntries={['/']}>
         <LandingPage />
       </MemoryRouter>
@@ -49,7 +49,7 @@ describe('LandingPage', () => {
     // Nav + hero CTA
     const getStartedLinks = screen.getAllByRole('link', { name: /get started/i });
     expect(getStartedLinks.length).toBeGreaterThanOrEqual(2);
-    expect(getStartedLinks[0]).toHaveAttribute('href', '/register');
+    expect(getStartedLinks[0]).toHaveAttribute('href', '/signup');
 
     const loginLinks = screen.getAllByRole('link', { name: /log in/i });
     expect(loginLinks.length).toBeGreaterThanOrEqual(1);
@@ -78,9 +78,8 @@ describe('LandingPage', () => {
     // Pinned-note CTA is present
     expect(screen.getByText('Start writing in a workspace that stays out of your way.')).toBeInTheDocument();
 
-    // Decorative scroll thread SVG mounts cleanly inside main without blocking content
-    const main = screen.getByRole('main');
-    const threadSvg = main.querySelector('svg[aria-hidden="true"]');
+    // Decorative scroll thread SVG mounts cleanly inside the canvas wrapper
+    const threadSvg = container.querySelector('svg[aria-hidden="true"]');
     expect(threadSvg).toBeInTheDocument();
 
     // No Cloud Desk, no Desk branding

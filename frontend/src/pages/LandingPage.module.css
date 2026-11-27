@@ -252,7 +252,7 @@
   height: 100%;
   z-index: 1;
   pointer-events: none;
-  overflow: visible;
+  overflow: hidden;
   display: block;
 }
 
@@ -674,16 +674,18 @@
 
 /* ── Footer ── */
 .footer {
+  position: relative;
+  z-index: 2;
   max-width: 1160px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 24px 112px 36px 24px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   font-size: 13px;
   color: var(--text-muted);
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px 12px;
 }
 
 @media (max-width: 1023px) {

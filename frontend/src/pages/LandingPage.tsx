@@ -29,7 +29,7 @@ function PinnedNoteCta() {
           Create an account to sync across devices, or open the Scratchpad right now.
         </p>
         <div className={styles.ctaGroup}>
-          <Link to="/register" className={styles.primaryCta}>
+          <Link to="/signup" className={styles.primaryCta}>
             <span>Get started</span>
             <ArrowRight size={16} />
           </Link>
@@ -51,7 +51,7 @@ function PinnedNoteCta() {
 
 export default function LandingPage() {
   const { isAuthenticated, isLoading } = useAuth();
-  const mainRef = useRef<HTMLElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
 
   if (!isLoading && isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
@@ -73,24 +73,28 @@ export default function LandingPage() {
               <Link to="/login" className={styles.secondaryLink}>
                 Log in
               </Link>
-              <Link to="/register" className={styles.primaryCta}>
+              <Link to="/signup" className={styles.primaryCta}>
                 Get started
               </Link>
             </nav>
           </div>
         </header>
 
-        <main ref={mainRef} className={styles.mainCanvas}>
-          <LandingScrollThread containerRef={mainRef} />
-          <LandingHero />
-          <LandingFeatureTabs />
-          <PinnedNoteCta />
-        </main>
+        <div ref={canvasRef} className={styles.mainCanvas}>
+          <LandingScrollThread containerRef={canvasRef} />
 
-        <footer className={styles.footer}>
-          <span>Notes Workspace</span>
-          <span>Local-first Scratchpad · Real-time Sync</span>
-        </footer>
+          <main>
+            <LandingHero />
+            <LandingFeatureTabs />
+            <PinnedNoteCta />
+          </main>
+
+          <footer className={styles.footer}>
+            <span>Notes Workspace</span>
+            <span aria-hidden="true">·</span>
+            <span>Local-first Scratchpad · Real-time Sync</span>
+          </footer>
+        </div>
       </div>
     </MotionConfig>
   );

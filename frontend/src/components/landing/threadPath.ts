@@ -14,11 +14,18 @@ export interface Point {
 
 export interface ThreadAnchorRects {
   canvas: RectBox;
-  heroPin: RectBox;
+  heroCopy: RectBox;
+  heroStage: RectBox;
   featuresSection: RectBox;
   featuresInner: RectBox;
   ctaCard: RectBox;
-  ctaPin: RectBox;
+}
+
+export interface LeafTransform {
+  x: number;
+  y: number;
+  scale: number;
+  tiltDeg: number;
 }
 
 export interface ThreadGeometry {
@@ -27,120 +34,132 @@ export interface ThreadGeometry {
   startY: number;
   endY: number;
   d: string;
-  hasLoop: boolean;
   isCompact: boolean;
+  leaf: LeafTransform;
 }
 
 const COMPACT_BREAKPOINT = 1024;
-const MIN_LOOP_GAP_HEIGHT = 64;
-
-function getRelativeCenter(box: RectBox, canvas: RectBox): Point {
-  return {
-    x: box.left + box.width / 2 - canvas.left,
-    y: box.top + box.height / 2 - canvas.top,
-  };
-}
+const MOBILE_BREAKPOINT = 768;
+const SAFE_EDGE_PADDING = 10;
 
 function roundCoord(value: number): number {
   return Math.round(value * 10) / 10;
 }
 
-function buildLoopSegment(
-  gutterX: number,
-  gapTop: number,
-  ctaPin: Point,
-  gapHeight: number,
-  canvasWidth: number,
-  isCompact: boolean
-): { segment: string; hasLoop: boolean } {
-  if (gapHeight < MIN_LOOP_GAP_HEIGHT) {
-    const midY = (gapTop + ctaPin.y) / 2;
-    return {
-      hasLoop: false,
-      segment: `C ${roundCoord(gutterX)} ${roundCoord(midY)}, ${roundCoord(ctaPin.x)} ${roundCoord(midY)}, ${roundCoord(ctaPin.x)} ${roundCoord(ctaPin.y)}`,
-    };
-  }
-
-  const loopCy = gapTop + gapHeight * 0.52;
-  const targetCenterX = isCompact
-    ? Math.min(canvasWidth * 0.44, Math.max(gutterX + 54, ctaPin.x * 0.65))
-    : Math.max(gutterX + 120, Math.min(ctaPin.x - 40, canvasWidth * 0.46));
-
-  const ry = isCompact ? Math.min(20, gapHeight * 0.22) : Math.min(36, gapHeight * 0.25);
-  const rx = isCompact
-    ? Math.min(24, canvasWidth * 0.08)
-    : Math.min(44, Math.abs(targetCenterX - gutterX) * 0.32);
-
-  const inX = targetCenterX - rx * 0.9;
-  const inY = loopCy + ry * 0.45;
-  const outX = targetCenterX + rx * 0.95;
-  const outY = loopCy + ry * 0.35;
-
-  const enterCurve = `C ${roundCoord(gutterX)} ${roundCoord(gapTop + gapHeight * 0.36)}, ${roundCoord(inX - rx * 0.7)} ${roundCoord(inY + ry * 0.35)}, ${roundCoord(inX)} ${roundCoord(inY)}`;
-
-  const loopArc1 = `C ${roundCoord(targetCenterX - rx * 0.15)} ${roundCoord(loopCy + ry * 0.95)}, ${roundCoord(targetCenterX + rx)} ${roundCoord(loopCy + ry * 0.55)}, ${roundCoord(targetCenterX + rx * 0.85)} ${roundCoord(loopCy - ry * 0.25)}`;
-  const loopArc2 = `C ${roundCoord(targetCenterX + rx * 0.7)} ${roundCoord(loopCy - ry)}, ${roundCoord(targetCenterX - rx * 0.55)} ${roundCoord(loopCy - ry * 0.95)}, ${roundCoord(targetCenterX - rx * 0.35)} ${roundCoord(loopCy + ry * 0.18)}`;
-  const loopArc3 = `C ${roundCoord(targetCenterX - rx * 0.18)} ${roundCoord(loopCy + ry * 0.85)}, ${roundCoord(targetCenterX + rx * 0.5)} ${roundCoord(loopCy + ry * 0.85)}, ${roundCoord(outX)} ${roundCoord(outY)}`;
-
-  const exitCtrlY = (outY + ctaPin.y) / 2;
-  const exitCurve = `C ${roundCoord(outX + rx * 0.6)} ${roundCoord(exitCtrlY)}, ${roundCoord(ctaPin.x)} ${roundCoord(exitCtrlY - 12)}, ${roundCoord(ctaPin.x)} ${roundCoord(ctaPin.y)}`;
-
-  return {
-    hasLoop: true,
-    segment: `${enterCurve} ${loopArc1} ${loopArc2} ${loopArc3} ${exitCurve}`,
-  };
+function clampX(x: number, canvasWidth: number): number {
+  return roundCoord(Math.max(SAFE_EDGE_PADDING, Math.min(canvasWidth - SAFE_EDGE_PADDING, x)));
 }
 
 /**
- * Generates a single document-space SVG path that leaves the hero pushpin,
- * routes through the desktop left gutter without crossing content, draws one
- * loop in the gap before the closing card, and terminates on the CTA pushpin.
+ * Generates a single document-space SVG path that enters from the right gap
+ * beside the hero card, passes strictly below all hero copy and cards,
+ * weaves through the center above #features before drifting left, bypasses
+ * the closing CTA card on the right, and joins the bottom-right leaf stem.
  */
 export function buildThreadGeometry(rects: ThreadAnchorRects): ThreadGeometry {
-  const { canvas, heroPin, featuresSection, featuresInner, ctaCard, ctaPin } = rects;
+  const { canvas, heroCopy, heroStage, featuresSection, featuresInner, ctaCard } = rects;
   const width = Math.max(1, Math.round(canvas.width));
   const height = Math.max(1, Math.round(canvas.height));
   const isCompact = width < COMPACT_BREAKPOINT;
+  const isMobile = width < MOBILE_BREAKPOINT;
 
-  const start = getRelativeCenter(heroPin, canvas);
-  const end = getRelativeCenter(ctaPin, canvas);
-
-  const featuresInnerLeft = featuresInner.left - canvas.left;
-  const gutterX = isCompact
-    ? 10
-    : featuresInnerLeft > 56
-      ? Math.max(24, Math.min(48, featuresInnerLeft - 28))
-      : Math.max(16, featuresInnerLeft * 0.5);
+  const stageTop = heroStage.top - canvas.top;
+  const stageRight = heroStage.right - canvas.left;
+  const stageBottom = heroStage.bottom - canvas.top;
+  const copyBottom = heroCopy.bottom - canvas.top;
+  const heroClearY = Math.max(stageBottom, copyBottom) + (isMobile ? 22 : 30);
 
   const featuresTop = featuresSection.top - canvas.top;
-  const featuresBottom = featuresSection.bottom - canvas.top;
-  const ctaCardTop = ctaCard.top - canvas.top;
+  const featuresInnerLeft = featuresInner.left - canvas.left;
+  const featuresInnerBottom = featuresInner.bottom - canvas.top;
 
-  const featuresEnterY = Math.max(start.y + 48, featuresTop + 20);
-  const heroSwingY = Math.max(start.y + 28, featuresTop - 44);
-  const featuresExitY = Math.max(featuresEnterY + 24, featuresBottom - 16);
-  const gapBottom = Math.max(featuresExitY + 16, ctaCardTop - 12);
-  const gapHeight = gapBottom - featuresExitY;
+  const ctaTop = ctaCard.top - canvas.top;
+  const ctaRight = ctaCard.right - canvas.left;
+  const ctaBottom = ctaCard.bottom - canvas.top;
 
-  const startSegment = `M ${roundCoord(start.x)} ${roundCoord(start.y)} C ${roundCoord(start.x)} ${roundCoord(heroSwingY)}, ${roundCoord(gutterX)} ${roundCoord(heroSwingY)}, ${roundCoord(gutterX)} ${roundCoord(featuresEnterY)}`;
-  const gutterSegment = `L ${roundCoord(gutterX)} ${roundCoord(featuresExitY)}`;
-
-  const { segment: loopToEndSegment, hasLoop } = buildLoopSegment(
-    gutterX,
-    featuresExitY,
-    end,
-    gapHeight,
-    width,
-    isCompact
+  const rightEntryX = clampX(
+    isCompact ? width - 10 : Math.min(width - 24, stageRight + 36),
+    width
   );
+  const startY = roundCoord(Math.max(24, stageTop + (isMobile ? 24 : 36)));
+
+  const leftGutterX = clampX(
+    isCompact
+      ? 10
+      : featuresInnerLeft > 64
+        ? Math.max(28, Math.min(56, featuresInnerLeft - 36))
+        : Math.max(16, featuresInnerLeft * 0.45),
+    width
+  );
+
+  const centerX = clampX(width * 0.5, width);
+  const featuresClearTopY = roundCoord(Math.max(heroClearY + 20, featuresTop - 16));
+  const heroToCenterMidY = roundCoord((heroClearY + featuresClearTopY) * 0.5);
+
+  const featuresExitY = roundCoord(Math.max(featuresClearTopY + 48, featuresInnerBottom + 24));
+  const gutterMidY = roundCoord((featuresClearTopY + featuresExitY) * 0.5);
+  const gutterBreathX = clampX(isCompact ? leftGutterX : leftGutterX + 10, width);
+
+  const ctaClearTopY = roundCoord(Math.max(featuresExitY + 24, ctaTop - 28));
+  const ctaRightX = clampX(
+    isCompact ? width - 10 : Math.min(width - 28, ctaRight + 42),
+    width
+  );
+  const ctaClearBottomY = roundCoord(Math.max(ctaClearTopY + 48, ctaBottom + 20));
+
+  const leafScale = isMobile ? 0.85 : 1;
+  const stemX = clampX(
+    isMobile ? width - 40 : Math.min(width - 56, ctaRight + 28),
+    width
+  );
+  const stemY = roundCoord(Math.max(ctaClearBottomY + 28, height - (isMobile ? 34 : 42)));
+
+  const segments = [
+    // 1. Drop down the hero right gap until clear of both hero columns
+    `M ${rightEntryX} ${startY}`,
+    `C ${rightEntryX} ${roundCoord(heroClearY - 24)}, ${rightEntryX} ${heroClearY}, ${clampX(
+      (rightEntryX + centerX) * 0.5,
+      width
+    )} ${heroClearY}`,
+    // 2. Sweep through center in open space above #features, then drift left
+    `C ${centerX} ${heroClearY}, ${centerX} ${heroToCenterMidY}, ${clampX(
+      (centerX + leftGutterX) * 0.5,
+      width
+    )} ${roundCoord((heroToCenterMidY + featuresClearTopY) * 0.5)}`,
+    `C ${leftGutterX} ${roundCoord(featuresClearTopY - 12)}, ${leftGutterX} ${featuresClearTopY}, ${leftGutterX} ${roundCoord(
+      featuresClearTopY + 12
+    )}`,
+    // 3. Soft organic breath down the left side clear of #features cards
+    `C ${gutterBreathX} ${roundCoord(
+      (featuresClearTopY + gutterMidY) * 0.5
+    )}, ${leftGutterX} ${gutterMidY}, ${leftGutterX} ${featuresExitY}`,
+    // 4. Sweep right across the gap above the closing CTA card (skipping its pin)
+    `C ${leftGutterX} ${roundCoord(ctaClearTopY - 12)}, ${centerX} ${ctaClearTopY}, ${ctaRightX} ${roundCoord(
+      ctaClearTopY + 24
+    )}`,
+    // 5. Curve down past the closing card's lower-right corner into the leaf stem
+    `C ${ctaRightX} ${roundCoord((ctaClearTopY + ctaClearBottomY) * 0.5)}, ${ctaRightX} ${ctaClearBottomY}, ${clampX(
+      stemX - 18,
+      width
+    )} ${roundCoord(stemY + 10)}`,
+    `C ${clampX(stemX - 6, width)} ${roundCoord(stemY + 14)}, ${clampX(
+      stemX - 2,
+      width
+    )} ${roundCoord(stemY + 6)}, ${stemX} ${stemY}`,
+  ];
 
   return {
     width,
     height,
-    startY: roundCoord(start.y),
-    endY: roundCoord(end.y),
-    d: `${startSegment} ${gutterSegment} ${loopToEndSegment}`,
-    hasLoop,
+    startY,
+    endY: stemY,
+    d: segments.join(' '),
     isCompact,
+    leaf: {
+      x: stemX,
+      y: stemY,
+      scale: leafScale,
+      tiltDeg: 22,
+    },
   };
 }
